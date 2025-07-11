@@ -5,13 +5,21 @@ import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import NotFound from "@/pages/not-found";
 import DebugPlayer from "@/pages/debug-player";
+import PluginManager from "@/pages/plugin-manager";
+import Navigation from "@/components/navigation";
 
 function Router() {
   return (
-    <Switch>
-      <Route path="/" component={DebugPlayer} />
-      <Route component={NotFound} />
-    </Switch>
+    <div className="min-h-screen bg-background">
+      <Navigation />
+      <main className="flex-1">
+        <Switch>
+          <Route path="/" component={DebugPlayer} />
+          <Route path="/plugins" component={PluginManager} />
+          <Route component={NotFound} />
+        </Switch>
+      </main>
+    </div>
   );
 }
 

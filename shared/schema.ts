@@ -10,6 +10,7 @@ export const users = pgTable("users", {
 
 export const dataSessions = pgTable("data_sessions", {
   id: serial("id").primaryKey(),
+  userId: integer("user_id").references(() => users.id),
   name: text("name").notNull(),
   filename: text("filename").notNull(),
   fileSize: integer("file_size").notNull(),
@@ -47,6 +48,9 @@ export const plugins = pgTable("plugins", {
   description: text("description"),
   isActive: boolean("is_active").default(true),
   version: text("version").notNull(),
+  pluginType: text("plugin_type").notNull(),
+  configuration: text("configuration"), // JSON string
+  createdAt: timestamp("created_at").defaultNow(),
 });
 
 export const insertUserSchema = createInsertSchema(users).pick({
@@ -69,6 +73,10 @@ export const insertBookmarkSchema = createInsertSchema(bookmarks).omit({
 
 export const insertPluginSchema = createInsertSchema(plugins).omit({
   id: true,
+  createdAt: true,
+}).extend({
+  pluginType: z.string(),
+  configuration: z.string().optional(),
 });
 
 export type User = typeof users.$inferSelect;
