@@ -16,9 +16,11 @@ import { insertPluginSchema, type Plugin } from "@shared/schema";
 import { apiRequest } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
 import PluginWizard from "@/components/plugin-wizard";
+import PluginWizardDemo from "@/components/plugin-wizard-demo";
 
 export default function PluginManager() {
   const [isWizardOpen, setIsWizardOpen] = useState(false);
+  const [isDemoMode, setIsDemoMode] = useState(false);
   const { toast } = useToast();
   const queryClient = useQueryClient();
 
@@ -36,6 +38,7 @@ export default function PluginManager() {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["/api/plugins"] });
       setIsWizardOpen(false);
+      setIsDemoMode(false);
       toast({
         title: "Plugin created successfully",
         description: "Your plugin has been added to the system",
@@ -109,23 +112,43 @@ export default function PluginManager() {
             Manage data processing plugins for the Debug Player Framework
           </p>
         </div>
-        <Dialog open={isWizardOpen} onOpenChange={setIsWizardOpen}>
-          <DialogTrigger asChild>
-            <Button className="flex items-center gap-2">
-              <Plus className="h-4 w-4" />
-              Add Plugin
-            </Button>
-          </DialogTrigger>
-          <DialogContent className="max-w-2xl">
-            <DialogHeader>
-              <DialogTitle>Plugin Creation Wizard</DialogTitle>
-            </DialogHeader>
-            <PluginWizard
-              onSubmit={(data) => createPluginMutation.mutate(data)}
-              isLoading={createPluginMutation.isPending}
-            />
-          </DialogContent>
-        </Dialog>
+        <div className="flex items-center gap-2">
+          <Dialog open={isDemoMode} onOpenChange={setIsDemoMode}>
+            <DialogTrigger asChild>
+              <Button variant="outline" className="flex items-center gap-2">
+                <Play className="h-4 w-4" />
+                Demo Wizard
+              </Button>
+            </DialogTrigger>
+            <DialogContent className="max-w-4xl max-h-[80vh] overflow-y-auto">
+              <DialogHeader>
+                <DialogTitle>Plugin Creation Wizard Demo</DialogTitle>
+              </DialogHeader>
+              <PluginWizardDemo
+                onCreatePlugin={(data) => createPluginMutation.mutate(data)}
+                isLoading={createPluginMutation.isPending}
+              />
+            </DialogContent>
+          </Dialog>
+          
+          <Dialog open={isWizardOpen} onOpenChange={setIsWizardOpen}>
+            <DialogTrigger asChild>
+              <Button className="flex items-center gap-2">
+                <Plus className="h-4 w-4" />
+                Add Plugin
+              </Button>
+            </DialogTrigger>
+            <DialogContent className="max-w-2xl">
+              <DialogHeader>
+                <DialogTitle>Plugin Creation Wizard</DialogTitle>
+              </DialogHeader>
+              <PluginWizard
+                onSubmit={(data) => createPluginMutation.mutate(data)}
+                isLoading={createPluginMutation.isPending}
+              />
+            </DialogContent>
+          </Dialog>
+        </div>
       </div>
 
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">

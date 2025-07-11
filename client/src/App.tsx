@@ -6,6 +6,7 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import NotFound from "@/pages/not-found";
 import DebugPlayer from "@/pages/debug-player";
 import PluginManager from "@/pages/plugin-manager";
+import TripLoader from "@/pages/trip-loader";
 import Navigation from "@/components/navigation";
 
 function Router() {
@@ -16,6 +17,7 @@ function Router() {
         <Switch>
           <Route path="/" component={DebugPlayer} />
           <Route path="/plugins" component={PluginManager} />
+          <Route path="/trip-loader" component={TripLoader} />
           <Route component={NotFound} />
         </Switch>
       </main>

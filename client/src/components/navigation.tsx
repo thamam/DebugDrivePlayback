@@ -1,6 +1,6 @@
 import { Link, useLocation } from "wouter";
 import { Button } from "@/components/ui/button";
-import { Home, Settings, Database } from "lucide-react";
+import { Home, Settings, Database, Upload } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 export default function Navigation() {
@@ -12,6 +12,12 @@ export default function Navigation() {
       label: "Debug Player",
       icon: Home,
       description: "Vehicle data visualization and analysis",
+    },
+    {
+      path: "/trip-loader",
+      label: "Trip Loader",
+      icon: Upload,
+      description: "Load and analyze trip data",
     },
     {
       path: "/plugins",
