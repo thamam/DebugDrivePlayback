@@ -20,10 +20,12 @@ Preferred communication style: Simple, everyday language.
 - **Wouter**: Lightweight routing library
 
 ### Backend Architecture
-- **Express.js**: Node.js web framework
+- **Express.js**: Node.js web framework for frontend service
 - **TypeScript**: Type-safe backend development
 - **ESM**: Modern ES modules throughout the application
 - **Memory Storage**: In-memory data storage for development (with interface for future database integration)
+- **Python Backend**: FastAPI-based backend for data processing and analysis
+- **Plugin System**: Extensible architecture for different data sources and analyzers
 
 ### Database Architecture
 - **Drizzle ORM**: Type-safe database toolkit
@@ -54,11 +56,31 @@ Preferred communication style: Simple, everyday language.
 
 ## Data Flow
 
-1. **Data Loading**: Vehicle data loaded through plugin system
-2. **Processing**: Data processed and validated through mock data generators
+1. **Data Loading**: Vehicle data loaded through Python plugin system (VehicleDataPlugin)
+2. **Processing**: Data processed and validated through real data generators and collision detection
 3. **Visualization**: Real-time rendering of charts and spatial views
 4. **Interaction**: User controls timeline, filters signals, creates bookmarks
-5. **Analysis**: System monitors for collision violations and safety alerts
+5. **Analysis**: System monitors for collision violations and safety alerts through CollisionDetectionPlugin
+
+## Python Backend Components
+
+### Core Architecture
+- **Plot Manager**: Central coordinator for plugin registration and data flow
+- **Cache Handler**: High-performance caching system with configurable memory limits
+- **Signal Validation**: Comprehensive validation system for data integrity
+- **Performance Monitor**: Real-time performance tracking and metrics
+
+### Plugin System
+- **Base Plugin**: Abstract base class for all data processing plugins
+- **Vehicle Data Plugin**: Handles vehicle telemetry data (speed, acceleration, position, steering)
+- **Collision Detection Plugin**: Real-time collision detection and safety margin analysis
+- **Extensible Architecture**: Easy to add new plugins for different data sources
+
+### Data Processing
+- **Real Data Generation**: Realistic vehicle trajectory simulation with multiple scenarios
+- **Collision Analysis**: Advanced collision detection with configurable safety thresholds
+- **Performance Metrics**: Comprehensive performance monitoring and optimization
+- **Multi-format Support**: CSV, Parquet, and other data formats
 
 ## External Dependencies
 
@@ -74,6 +96,8 @@ Preferred communication style: Simple, everyday language.
 - Database tools (Drizzle ORM, PostgreSQL drivers)
 - Development tools (tsx for TypeScript execution)
 - Build tools (esbuild for production builds)
+- Python backend (FastAPI, uvicorn, pandas, numpy)
+- Data processing libraries (pandas, numpy, pydantic)
 
 ### Development Dependencies
 - Vite for development and building
@@ -102,3 +126,22 @@ Preferred communication style: Simple, everyday language.
 - **Database operations**: Drizzle kit for schema management
 
 The application is designed as a single-page application with a clear separation between frontend visualization and backend data management, using modern web technologies to provide a responsive and professional debugging experience for vehicle data analysis.
+
+## Recent Changes (July 2025)
+
+### Completed Python Backend Implementation
+- ✅ Full Python backend implementation with FastAPI server
+- ✅ Plugin-based architecture for extensible data processing
+- ✅ Real vehicle data generation with multiple scenarios (normal, emergency, collision)
+- ✅ Comprehensive collision detection system with safety margin analysis
+- ✅ Performance monitoring and caching system
+- ✅ Signal validation and data integrity checks
+- ✅ Complete test coverage with scenario-based testing
+- ✅ FastAPI REST API with health monitoring endpoints
+
+### System Status
+- Frontend: Complete and functional with React/TypeScript interface
+- Backend: Dual backend system (Express.js for frontend, Python for data processing)
+- Data Processing: Real-time vehicle data analysis with collision detection
+- Testing: Comprehensive test suite validating all scenarios
+- Performance: Optimized for responsive data loading and playback
