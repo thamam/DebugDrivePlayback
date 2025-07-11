@@ -1,0 +1,221 @@
+1. Overall Layout
+Main Application Window Structure:
+
+Top Menu Bar (40px height): Standard file menu with File, Edit, View, Tools, Plugins, Help options
+Toolbar (50px height): Quick access buttons for Load Data, Save Session, Export, Settings, and plugin management
+Tab Panel (35px height): Three primary tabs - "Temporal Analysis", "Spatial Analysis", and "Integrated View"
+Main Content Area (flexible height): Split into multiple resizable panels
+Left Sidebar (300px width, collapsible): Plugin controls, signal selection, and filters
+Right Sidebar (250px width, collapsible): Properties panel, bookmarks, and analysis tools
+Bottom Status Bar (25px height): Current timestamp, loaded files, active plugins, and system status
+Navigation Panel (80px height, dockable): Timestamp slider and playback controls
+
+Layout Responsiveness:
+
+All panels are dockable and can be rearranged
+Minimum window size: 1024x768
+Optimal size: 1920x1080 or larger
+Panels can be tabbed together or floated as separate windows
+
+2. Data Visualization
+Central Visualization Area:
+
+Plot Grid Layout: 2x2 default grid that can be customized to 1x1, 2x1, 3x2, or custom arrangements
+Plot Types Available:
+
+Temporal Line Charts: Multi-signal time-series with synchronized cursors
+Spatial 2D Plots: Vehicle trajectory, obstacle positions, path planning
+Spatial 3D Views: Full 3D environment visualization with camera controls
+Scatter Plots: Signal correlation analysis
+Heat Maps: Density analysis and performance metrics
+
+
+
+Temporal Visualization Panel:
+
+Multiple synchronized line plots stacked vertically
+Each plot shows different signals (speed, acceleration, steering angle, etc.)
+Shared time axis with zoom and pan capabilities
+Signal legend with color coding and toggle visibility
+Cursor tracking with value display across all plots
+
+Spatial Visualization Panel:
+
+Main 2D overhead view showing vehicle path and environment
+Coordinate system selector (Global, Local, UTM)
+Layer toggles for: Vehicle position, Planned path, Actual path, Obstacles, Lane markings
+Zoom controls with fit-to-data and reset view options
+Grid overlay and measurement tools
+
+3D Spatial View (Optional Tab):
+
+Full 3D scene with vehicle model and environment
+Camera controls (orbit, pan, zoom, predefined views)
+Lighting and rendering quality controls
+Point cloud visualization for sensor data
+
+3. User Interaction
+Left Sidebar - Control Panel:
+Plugin Management Section:
+
+Dropdown list of available plugins with status indicators (loaded/error/disabled)
+"Scan for Plugins" button to discover new plugins
+Plugin settings button that opens configuration dialogs
+
+Data Source Section:
+
+"Load Data" button with file browser
+Recently loaded files dropdown
+Data source status (file path, size, timestamp range)
+Reload and unload buttons
+
+Signal Selection Section:
+
+Hierarchical tree view of available signals organized by plugin
+Search/filter box for finding specific signals
+Checkboxes for signal visibility
+Color picker for each signal
+Signal information panel (units, range, description)
+
+Time Range Controls:
+
+Start/end time input fields with datetime pickers
+Quick selection buttons (Last hour, Full dataset, Custom range)
+Playback speed slider (0.1x to 10x)
+Loop playback toggle
+
+Right Sidebar - Analysis Panel:
+Properties Section:
+
+Selected signal properties and statistics
+Current cursor position values
+Signal quality indicators
+
+Bookmarks Section:
+
+List of saved timestamps with user annotations
+Add bookmark button (bookmarks current timestamp)
+Jump to bookmark functionality
+Export bookmarks option
+
+Measurement Tools:
+
+Distance measurement between points
+Time interval measurement
+Custom calculation builder with formula input
+Results display area
+
+Navigation Controls (Bottom Panel):
+
+Large timestamp slider spanning full window width
+Current timestamp display (both absolute and relative)
+Play/pause, step forward/backward buttons
+Speed indicator and speed adjustment
+Progress indicator showing analysis progress
+
+4. Specific Features
+Collision Detection Interface:
+
+Red "X" markers overlaid on spatial plots at violation locations
+Collision margin distance plot in temporal view (orange line)
+Safety threshold line (red dashed) on margin plot
+Alert panel showing active violations with severity levels
+Collision statistics summary (min margin, violation count, risk score)
+
+KPI Dashboard (Accessible via toolbar):
+
+Configurable grid of KPI widgets
+Pre-defined metrics: Average speed, Max acceleration, Path deviation, Collision margins
+Custom KPI builder with formula editor
+Historical comparison charts
+Export functionality for KPI reports
+
+Data Export Interface:
+
+Export dialog with format selection (PNG, SVG, PDF for plots; CSV, JSON for data)
+Time range selection for export
+Signal selection for data export
+Quality and resolution settings for image exports
+Batch export for multiple plots/datasets
+
+Session Management:
+
+Save/Load session functionality preserving all settings
+Session information panel (creation date, data sources, bookmarks)
+Auto-save capability with configurable intervals
+Session comparison tool for analyzing different configurations
+
+Plugin Development Interface:
+
+Plugin template generator
+Plugin validation and testing tools
+Code editor with syntax highlighting (accessible via Tools menu)
+Plugin documentation browser
+
+Comparison Mode:
+
+Split-screen view for comparing two datasets
+Synchronized navigation between datasets
+Difference highlighting and calculation
+Overlay mode for direct comparison on same plots
+
+5. Design Choices
+Color Scheme:
+
+Primary background: Dark gray (#2b2b2b) for reduced eye strain during long sessions
+Panel backgrounds: Slightly lighter gray (#3c3c3c)
+Text: Light gray (#e0e0e0) for high contrast
+Accent colors: Blue (#4a9eff) for primary actions, Orange (#ff8c42) for warnings, Red (#ff4757) for errors
+Plot colors: Carefully selected palette with high contrast and colorblind-friendly options
+
+Typography:
+
+Primary font: Segoe UI (Windows) / SF Pro (macOS) / Ubuntu (Linux) at 9pt for UI
+Monospace font: Consolas / SF Mono / Ubuntu Mono at 8pt for data display
+Clear hierarchy with bold weights for headers and regular for content
+
+Iconography:
+
+Consistent icon set using 16x16px and 24x24px variants
+Material Design icons for universal recognition
+Custom icons for domain-specific tools (collision detection, path analysis)
+Tool tips on hover for all icons and controls
+
+Interaction Design:
+
+Hover states for all interactive elements
+Loading indicators for data operations
+Contextual menus (right-click) for advanced options
+Keyboard shortcuts for power users (Ctrl+O for open, Space for play/pause, etc.)
+Drag-and-drop support for loading files and rearranging plots
+
+Performance Optimizations:
+
+Lazy loading for large datasets
+Level-of-detail rendering for 3D views
+Intelligent data decimation for smooth navigation
+Background processing indicators to show system status
+
+Accessibility Features:
+
+High contrast mode toggle
+Keyboard navigation support
+Screen reader compatibility for critical information
+Configurable UI scaling for different screen sizes and vision needs
+
+</mockup_description>
+Additional Notes and Assumptions:
+
+Data Format Assumptions: Based on the documents, I assumed the system primarily handles autonomous vehicle data including pose, velocity, sensor readings, and path planning information.
+User Expertise Level: The design assumes users are technical experts who value efficiency over hand-holding, hence the information-dense interface with advanced controls readily accessible.
+Screen Real Estate: The design assumes users typically work on large monitors (1920x1080 or larger) given the data-intensive nature of the work.
+Plugin Architecture: I assumed the plugin system is mature enough to provide standardized signal types and metadata, enabling consistent UI representation.
+Performance Requirements: The design incorporates the performance requirements from the SRD (500ms update times, large dataset handling) through virtualization and intelligent rendering strategies.
+
+Areas where further clarification would be helpful:
+
+Specific sensor data types and their visualization requirements
+Integration requirements with existing engineering tools
+Multi-user collaboration features and access control
+Specific export formats required by the engineering workflow
+Custom analysis algorithms that need to be supported in the UI
