@@ -12,11 +12,13 @@ export const dataSessions = pgTable("data_sessions", {
   id: serial("id").primaryKey(),
   userId: integer("user_id").references(() => users.id),
   name: text("name").notNull(),
-  filename: text("filename").notNull(),
-  fileSize: integer("file_size").notNull(),
-  duration: real("duration").notNull(),
-  frequency: real("frequency").notNull(),
-  signalCount: integer("signal_count").notNull(),
+  description: text("description"),
+  filePath: text("file_path").notNull(),
+  filename: text("filename"),
+  fileSize: integer("file_size"),
+  duration: real("duration"),
+  frequency: real("frequency"),
+  signalCount: integer("signal_count"),
   createdAt: timestamp("created_at").defaultNow(),
 });
 

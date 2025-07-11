@@ -52,6 +52,16 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Data session routes
+  app.get("/api/sessions", async (req, res) => {
+    try {
+      // For now, return sessions for user ID 1 (demo user)
+      const sessions = await storage.getUserDataSessions(1);
+      res.json(sessions);
+    } catch (error: any) {
+      res.status(500).json({ message: error.message });
+    }
+  });
+
   app.post("/api/sessions", async (req, res) => {
     try {
       const session = insertDataSessionSchema.parse(req.body);
