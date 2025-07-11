@@ -91,15 +91,15 @@ export default function DataLoader({ onLoadComplete }: DataLoaderProps) {
 
       setLoadingStatus("Processing data...");
       
-      // Load from path using Python backend
-      const response = await fetch('http://localhost:8000/load-data', {
+      // Load from path using integrated Python backend
+      const response = await fetch('/api/python/load-data', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'
         },
         body: JSON.stringify({
-          file_path: tripPath,
-          plugin_type: pluginType
+          filePath: tripPath,
+          pluginType: pluginType
         })
       });
 
@@ -189,8 +189,8 @@ export default function DataLoader({ onLoadComplete }: DataLoaderProps) {
 
       setLoadingStatus("Processing data...");
       
-      // Upload to Python backend
-      const response = await fetch('http://localhost:8000/upload-data', {
+      // Upload to integrated Python backend
+      const response = await fetch('/api/python/upload-data', {
         method: 'POST',
         body: formData
       });
