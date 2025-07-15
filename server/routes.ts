@@ -256,10 +256,15 @@ export async function registerRoutes(app: Express): Promise<Server> {
       // Load trip data using the Python backend integration
       const result = await pythonBackend.loadTripData(filePath, pluginType);
       
-      if (!result.success) {
-        return res.status(400).json({ message: result.error });
+      // Handle demo mode responses (they're considered successful)
+      if (!result.success && !result.isDemoMode) {
+        return res.status(400).json({ 
+          message: result.error,
+          availableTrips: result.availableTrips 
+        });
       }
       
+      // For demo mode, return success with demo data
       res.json(result);
     } catch (error: any) {
       res.status(500).json({ message: `Backend integration error: ${error.message}` });

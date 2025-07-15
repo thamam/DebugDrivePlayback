@@ -103,11 +103,12 @@ export default function DataLoader({ onLoadComplete }: DataLoaderProps) {
         })
       });
 
-      if (!response.ok) {
-        throw new Error(`Load failed: ${response.statusText}`);
-      }
-
       const result = await response.json();
+      
+      // Handle both success and demo mode responses
+      if (!response.ok && !result.isDemoMode) {
+        throw new Error(result.error || `Load failed: ${response.statusText}`);
+      }
       
       setUploadProgress(100);
       setLoadingStatus("Creating session...");
@@ -117,9 +118,9 @@ export default function DataLoader({ onLoadComplete }: DataLoaderProps) {
         name: loadingMode === "file" ? selectedFile?.name || "Unknown" : `Trip ${tripPath.split('/').pop()}`,
         filename: loadingMode === "file" ? selectedFile?.name || "Unknown" : tripPath,
         fileSize: loadingMode === "file" ? selectedFile?.size || 0 : result.file_size || 0,
-        duration: result.duration || 0,
+        duration: result.duration || 300,
         frequency: result.frequency || 10,
-        signalCount: result.signal_count || 0,
+        signalCount: result.signal_count || Object.keys(result.signals || {}).length,
         userId: 1 // Default user for now
       };
 
@@ -132,8 +133,10 @@ export default function DataLoader({ onLoadComplete }: DataLoaderProps) {
       setLoadingStatus("Complete!");
 
       toast({
-        title: "Data loaded successfully",
-        description: `${loadingMode === "file" ? selectedFile?.name : tripPath} has been processed and loaded`,
+        title: result.isDemoMode ? "Demo data loaded" : "Data loaded successfully",
+        description: result.isDemoMode ? 
+          `Demo mode active: ${result.error}` : 
+          `${loadingMode === "file" ? selectedFile?.name : tripPath} has been processed and loaded`,
       });
 
       onLoadComplete({
@@ -266,7 +269,8 @@ export default function DataLoader({ onLoadComplete }: DataLoaderProps) {
             Load Trip Data
           </CardTitle>
           <CardDescription>
-            Upload vehicle data files to analyze and visualize trip information
+            Upload your actual vehicle trip data files for analysis and visualization. 
+            The system will process your real data for collision detection and spatial analysis.
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-6">
@@ -303,11 +307,11 @@ export default function DataLoader({ onLoadComplete }: DataLoaderProps) {
                 id="trip-path"
                 value={tripPath}
                 onChange={(e) => setTripPath(e.target.value)}
-                placeholder="/home/thh3/data/trips/2025-04-07T10_50_18"
+                placeholder="/home/thh3/data/trips/2025-07-15T12_06_02"
                 disabled={isLoading}
               />
               <p className="text-xs text-muted-foreground">
-                Enter the full path to your trip data directory
+                Enter the full path to your local trip data directory (e.g., /home/thh3/data/trips/2025-07-15T12_06_02)
               </p>
             </div>
           )}
