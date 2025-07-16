@@ -1,0 +1,13 @@
+{
+    "tags": "main",
+    "run_mode": "Control",
+    "camera_degree": 51.682999,
+    "car": "NiroEV",
+    "day_part": "Afternoon",
+    "driver": "Driver Name",
+    "weather": "",
+    "location": "HA",
+    "time_zone_offset_sec": 10800.000000,
+    "car_config": "8 cams, Lidar, CAN",
+    "aidriver_commit": "31d9236826"
+}

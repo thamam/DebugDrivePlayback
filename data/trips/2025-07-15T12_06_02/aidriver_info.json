@@ -1,0 +1,20 @@
+{
+   "aidriver_commit" : "31d9236826",
+   "models_paths" : {
+      "AVMPsd" : "avm_psd/1",
+      "Detector" : "efficientvit/3",
+      "PROJ2MMNET" : "proj2mm/23",
+      "RAFT_LARGE" : "",
+      "RAFT_SMALL" : "",
+      "SEGNET" : "segnet/44",
+      "STITCHNET" : "stitchnet/25",
+      "SignsClassifier" : "ts_israel/1",
+      "SpaceNet" : "hpcc-25m/5",
+      "TrafficLight" : "tl_israel/1",
+      "TrafficMarks" : "",
+      "UrbanPsd" : "urban_psd/1"
+   },
+   "spacenet_commit" : "e172275",
+   "vehicle_id" : "NIROEV_HA_02"
+}
+

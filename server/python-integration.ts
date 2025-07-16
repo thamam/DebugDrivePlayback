@@ -118,6 +118,15 @@ export class PythonBackendIntegration {
         const parentExists = await fs.access(parentDir).then(() => true).catch(() => false);
         
         if (!parentExists) {
+          // Check if we have the development dataset available
+          const devDataPath = path.join(process.cwd(), 'data/trips/2025-07-15T12_06_02');
+          const devDataExists = await fs.access(devDataPath).then(() => true).catch(() => false);
+          
+          if (devDataExists) {
+            // Use the real development dataset
+            return this.generateSyntheticTripData(devDataPath, pluginType);
+          }
+          
           // In development mode, provide a demo response showing what would happen
           return {
             success: true,
@@ -205,35 +214,65 @@ export class PythonBackendIntegration {
   private generateSignalDefinitions(pluginType: string): Record<string, any> {
     const baseSignals = {
       vehicle_data: {
-        'vehicle_speed': {
-          name: 'vehicle_speed',
+        'front_left_wheel_speed': {
+          name: 'front_left_wheel_speed',
           type: 'temporal',
-          units: 'm/s',
-          description: 'Vehicle speed over time'
+          units: 'km/h',
+          description: 'Front left wheel speed'
         },
-        'steering_angle': {
-          name: 'steering_angle',
+        'front_right_wheel_speed': {
+          name: 'front_right_wheel_speed',
           type: 'temporal',
+          units: 'km/h',
+          description: 'Front right wheel speed'
+        },
+        'rear_left_wheel_speed': {
+          name: 'rear_left_wheel_speed',
+          type: 'temporal',
+          units: 'km/h',
+          description: 'Rear left wheel speed'
+        },
+        'rear_right_wheel_speed': {
+          name: 'rear_right_wheel_speed',
+          type: 'temporal',
+          units: 'km/h',
+          description: 'Rear right wheel speed'
+        },
+        'throttle': {
+          name: 'throttle',
+          type: 'temporal',
+          units: 'percent',
+          description: 'Throttle position'
+        },
+        'brake': {
+          name: 'brake',
+          type: 'temporal',
+          units: 'percent',
+          description: 'Brake pressure'
+        },
+        'path_trajectory': {
+          name: 'path_trajectory',
+          type: 'spatial',
+          units: 'm',
+          description: 'Vehicle trajectory path'
+        },
+        'driving_mode': {
+          name: 'driving_mode',
+          type: 'temporal',
+          units: 'enum',
+          description: 'Current driving mode'
+        },
+        'turn_indicator': {
+          name: 'turn_indicator',
+          type: 'temporal',
+          units: 'enum',
+          description: 'Turn indicator state'
+        },
+        'gps': {
+          name: 'gps',
+          type: 'spatial',
           units: 'degrees',
-          description: 'Steering wheel angle'
-        },
-        'position_x': {
-          name: 'position_x',
-          type: 'spatial',
-          units: 'm',
-          description: 'Vehicle X position'
-        },
-        'position_y': {
-          name: 'position_y',
-          type: 'spatial',
-          units: 'm',
-          description: 'Vehicle Y position'
-        },
-        'acceleration': {
-          name: 'acceleration',
-          type: 'temporal',
-          units: 'm/s²',
-          description: 'Vehicle acceleration'
+          description: 'GPS coordinates'
         }
       },
       collision_detection: {

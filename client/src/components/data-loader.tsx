@@ -15,7 +15,7 @@ interface DataLoaderProps {
 
 export default function DataLoader({ onLoadComplete }: DataLoaderProps) {
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
-  const [tripPath, setTripPath] = useState<string>("/home/thh3/data/trips/2025-04-07T10_50_18");
+  const [tripPath, setTripPath] = useState<string>("data/trips/2025-07-15T12_06_02");
   const [pluginType, setPluginType] = useState<string>("vehicle_data");
   const [isLoading, setIsLoading] = useState(false);
   const [uploadProgress, setUploadProgress] = useState(0);
@@ -307,7 +307,7 @@ export default function DataLoader({ onLoadComplete }: DataLoaderProps) {
                 id="trip-path"
                 value={tripPath}
                 onChange={(e) => setTripPath(e.target.value)}
-                placeholder="/home/thh3/data/trips/2025-07-15T12_06_02"
+                placeholder="data/trips/2025-07-15T12_06_02"
                 disabled={isLoading}
               />
               <p className="text-xs text-muted-foreground">

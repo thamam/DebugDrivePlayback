@@ -1,0 +1,13 @@
+diff --git a/config/vehicle_config/NIROEV_HA_02.conf b/config/vehicle_config/NIROEV_HA_02.conf
+index d9355bbd4c..9cf341ff3a 100644
+--- a/config/vehicle_config/NIROEV_HA_02.conf
++++ b/config/vehicle_config/NIROEV_HA_02.conf
+@@ -287,6 +287,8 @@ MPC_V2_ADAPTIVE_STEERING_HIGH_SPEED_WEIGHT = 50.0
+ MPC_V2_ENABLE_STEERING_MULTIPLIER = 0
+ MPC_V2_STEERING_FILTER_FACTOR=1.0
+ 
++
++SPEED_HANDLER_PRINTS_ENABLED=0
+ ################################ End of MPC V2 #############################
+ ################################ End of MPC ################################
+ ################################ ControlAPI configs ########################
