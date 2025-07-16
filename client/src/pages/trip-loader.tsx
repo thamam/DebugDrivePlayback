@@ -3,9 +3,10 @@ import { useLocation } from "wouter";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { ArrowLeft, Database, Play, Settings, CheckCircle } from "lucide-react";
+import { ArrowLeft, Database, Play, Settings, CheckCircle, Navigation } from "lucide-react";
 import DataLoader from "@/components/data-loader";
 import DemoTripLoader from "@/components/demo-trip-loader";
+import TrajectoryVisualizer from "@/components/trajectory-visualizer";
 import { useToast } from "@/hooks/use-toast";
 
 export default function TripLoaderPage() {
@@ -152,6 +153,20 @@ export default function TripLoaderPage() {
           </Card>
         </div>
       </div>
+
+      {/* Trajectory Visualization */}
+      {loadedSession && (
+        <div className="mt-8">
+          <h2 className="text-xl font-semibold mb-4 flex items-center gap-2">
+            <Navigation className="h-5 w-5" />
+            Real Trajectory Visualization
+          </h2>
+          <TrajectoryVisualizer 
+            tripData={loadedSession.dataInfo} 
+            isRealData={!loadedSession.dataInfo?.isDemoMode}
+          />
+        </div>
+      )}
     </div>
   );
 }

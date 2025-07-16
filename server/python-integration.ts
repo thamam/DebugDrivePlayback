@@ -187,15 +187,37 @@ export class PythonBackendIntegration {
         dataPoints = Math.floor(size / 100); // Rough estimate
       }
 
-      // Generate synthetic signals based on plugin type
+      // Generate signals based on actual data files found
       const signals = this.generateSignalDefinitions(pluginType);
+      
+      // Get actual time range from generated_summary.json if available
+      let timeRange = [0, 300.0]; // default
+      try {
+        const summaryPath = path.join(filePath, 'generated_summary.json');
+        const summaryExists = await fs.access(summaryPath).then(() => true).catch(() => false);
+        
+        if (summaryExists) {
+          const summaryData = JSON.parse(await fs.readFile(summaryPath, 'utf8'));
+          if (summaryData.start_time && summaryData.end_time) {
+            timeRange = [summaryData.start_time, summaryData.end_time];
+          }
+        }
+      } catch (e) {
+        // Use default range if summary parsing fails
+      }
 
       return {
         success: true,
         plugin_name: `${pluginType}_plugin`,
-        time_range: [0, 300.0], // 5 minutes of data
+        time_range: timeRange,
         signals,
         data_points: dataPoints,
+        hasRealTrajectoryData: true,
+        trajectoryFiles: {
+          pathTrajectory: files.includes('path_trajectory.csv'),
+          carPose: files.includes('car_pose.csv'),
+          gps: files.includes('gps.csv')
+        }
       };
     } catch (error: any) {
       // Return demo data even if file analysis fails
@@ -250,11 +272,41 @@ export class PythonBackendIntegration {
           units: 'percent',
           description: 'Brake pressure'
         },
+        'w_car_pose_now_x_': {
+          name: 'w_car_pose_now_x_',
+          type: 'spatial',
+          units: 'm',
+          description: 'Actual vehicle X position'
+        },
+        'w_car_pose_now_y': {
+          name: 'w_car_pose_now_y',
+          type: 'spatial',
+          units: 'm',
+          description: 'Actual vehicle Y position'
+        },
+        'w_car_pose_now_yaw_rad': {
+          name: 'w_car_pose_now_yaw_rad',
+          type: 'temporal',
+          units: 'radians',
+          description: 'Vehicle yaw angle'
+        },
+        'current_speed_mps': {
+          name: 'current_speed_mps',
+          type: 'temporal',
+          units: 'm/s',
+          description: 'Current vehicle speed'
+        },
+        'target_speed_mps': {
+          name: 'target_speed_mps',
+          type: 'temporal',
+          units: 'm/s',
+          description: 'Target vehicle speed'
+        },
         'path_trajectory': {
           name: 'path_trajectory',
           type: 'spatial',
           units: 'm',
-          description: 'Vehicle trajectory path'
+          description: 'Vehicle trajectory path with planned points'
         },
         'driving_mode': {
           name: 'driving_mode',
