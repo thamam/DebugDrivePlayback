@@ -1,6 +1,6 @@
 import { Link, useLocation } from "wouter";
 import { Button } from "@/components/ui/button";
-import { Home, Settings, Database, Upload } from "lucide-react";
+import { Home, Settings, Database, Upload, Grid } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 export default function Navigation() {
@@ -24,6 +24,12 @@ export default function Navigation() {
       label: "Plugin Manager",
       icon: Settings,
       description: "Manage data processing plugins",
+    },
+    {
+      path: "/widget-manager",
+      label: "Widget Manager",
+      icon: Grid,
+      description: "Create and manage data visualization widgets",
     },
   ];
 

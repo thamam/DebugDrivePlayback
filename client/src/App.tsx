@@ -8,6 +8,7 @@ import DebugPlayer from "@/pages/debug-player";
 import PluginManager from "@/pages/plugin-manager";
 import TripLoader from "@/pages/trip-loader";
 import IntegrationDemo from "@/pages/integration-demo";
+import WidgetManager from "@/pages/widget-manager";
 import Navigation from "@/components/navigation";
 
 function Router() {
@@ -20,6 +21,7 @@ function Router() {
           <Route path="/plugins" component={PluginManager} />
           <Route path="/trip-loader" component={TripLoader} />
           <Route path="/integration-demo" component={IntegrationDemo} />
+          <Route path="/widget-manager" component={WidgetManager} />
           <Route component={NotFound} />
         </Switch>
       </main>
