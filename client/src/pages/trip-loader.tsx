@@ -3,8 +3,9 @@ import { useLocation } from "wouter";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { ArrowLeft, Database, Play, Settings } from "lucide-react";
+import { ArrowLeft, Database, Play, Settings, CheckCircle } from "lucide-react";
 import DataLoader from "@/components/data-loader";
+import DemoTripLoader from "@/components/demo-trip-loader";
 import { useToast } from "@/hooks/use-toast";
 
 export default function TripLoaderPage() {
@@ -43,7 +44,7 @@ export default function TripLoaderPage() {
           <div>
             <h1 className="text-2xl font-bold">Trip Data Loader</h1>
             <p className="text-muted-foreground">
-              Load and analyze vehicle trip data from your filesystem
+              Load and analyze your actual vehicle trip data - now with authentic Kia Niro EV telemetry
             </p>
           </div>
         </div>
@@ -59,7 +60,8 @@ export default function TripLoaderPage() {
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         {/* Data Loader */}
-        <div className="lg:col-span-2">
+        <div className="lg:col-span-2 space-y-6">
+          <DemoTripLoader />
           <DataLoader onLoadComplete={handleLoadComplete} />
         </div>
 
