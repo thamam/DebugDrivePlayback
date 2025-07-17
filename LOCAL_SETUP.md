@@ -27,11 +27,14 @@ brew install node@20
 # https://nodejs.org/en/download/
 ```
 
-#### 2. Python 3.8+
+#### 2. Python 3.8+ (Python 3.11 recommended)
 ```bash
 # Ubuntu/Debian
 sudo apt update
 sudo apt install python3 python3-pip python3-venv
+
+# For Python 3.11 specifically (recommended for NumPy compatibility):
+sudo apt install python3.11 python3.11-venv python3.11-dev
 
 # macOS (with Homebrew)
 brew install python@3.11
@@ -39,6 +42,8 @@ brew install python@3.11
 # Windows
 # Download from python.org or use Microsoft Store
 ```
+
+**Note**: Python 3.11 is recommended as it has better NumPy wheel support and avoids common build issues.
 
 #### 3. PostgreSQL 13+
 ```bash
@@ -95,6 +100,48 @@ source venv/bin/activate
 venv\Scripts\activate
 
 # Install Python dependencies
+pip install -r python_backend/requirements.txt
+```
+
+#### Troubleshooting Python Dependencies
+
+If you encounter the error `BackendUnavailable: Cannot import 'setuptools.build_meta'`, this is typically due to NumPy 1.24.3 not having a prebuilt wheel for Python 3.12 on Linux. Here's how to fix it:
+
+**Step 1: Verify the issue**
+```bash
+# In your activated venv, test if setuptools.build_meta is available
+source venv/bin/activate
+python3 -c "import setuptools.build_meta"
+```
+
+**Step 2: Upgrade build tools**
+```bash
+# Upgrade pip, setuptools, and wheel (these provide PEP 517 build hooks)
+pip install --upgrade pip setuptools wheel
+
+# Try installing Python dependencies again
+pip install -r python_backend/requirements.txt
+```
+
+**Step 3: Install build prerequisites (if Step 2 fails)**
+```bash
+# Install OS-level build prerequisites for NumPy compilation
+sudo apt-get update
+sudo apt-get install -y build-essential python3-dev gfortran libopenblas-dev liblapack-dev
+
+# Retry the pip install
+pip install -r python_backend/requirements.txt
+```
+
+**Alternative: Use Python 3.11**
+If the above steps fail, you can switch to Python 3.11 (which has official NumPy wheels):
+```bash
+# Ubuntu/Debian
+sudo apt install python3.11 python3.11-venv python3.11-dev
+
+# Create venv with Python 3.11
+python3.11 -m venv venv
+source venv/bin/activate
 pip install -r python_backend/requirements.txt
 ```
 
