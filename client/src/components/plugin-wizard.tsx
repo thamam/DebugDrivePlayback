@@ -39,7 +39,7 @@ export default function PluginWizard({ onSubmit, isLoading }: PluginWizardProps)
         description: template.description,
         configuration: JSON.stringify(template.template, null, 2)
       }));
-      setPluginConfig(template.template);
+      setPluginConfig(template.template as PluginConfiguration);
     }
   };
 

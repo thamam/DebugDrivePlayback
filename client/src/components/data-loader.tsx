@@ -124,10 +124,8 @@ export default function DataLoader({ onLoadComplete }: DataLoaderProps) {
         userId: 1 // Default user for now
       };
 
-      const session = await apiRequest('/api/sessions', {
-        method: 'POST',
-        body: JSON.stringify(sessionData)
-      });
+      const sessionResponse = await apiRequest('POST', '/api/sessions', sessionData);
+      const session = await sessionResponse.json();
 
       clearInterval(progressInterval);
       setLoadingStatus("Complete!");
@@ -218,10 +216,8 @@ export default function DataLoader({ onLoadComplete }: DataLoaderProps) {
         userId: 1 // Default user for now
       };
 
-      const session = await apiRequest('/api/sessions', {
-        method: 'POST',
-        body: JSON.stringify(sessionData)
-      });
+      const sessionResponse = await apiRequest('POST', '/api/sessions', sessionData);
+      const session = await sessionResponse.json();
 
       clearInterval(progressInterval);
       setLoadingStatus("Complete!");

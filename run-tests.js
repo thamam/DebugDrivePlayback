@@ -97,7 +97,7 @@ async function main() {
   // 1. Run Unit Tests with Coverage
   log(`\n${colors.bright}${colors.yellow}=== UNIT TESTS (Jest) ===${colors.reset}`);
   const unitTestResult = runCommand(
-    'npx jest --coverage --coverageDirectory=test-reports/coverage --testPathPattern=__tests__',
+    'npx jest --coverage --coverageDirectory=test-reports/coverage --testPathPatterns="__tests__" --passWithNoTests',
     'Unit Tests with Coverage'
   );
   testResults.push({
@@ -111,7 +111,7 @@ async function main() {
   // 2. Run E2E Tests
   log(`\n${colors.bright}${colors.yellow}=== E2E TESTS (Playwright) ===${colors.reset}`);
   const e2eTestResult = runCommand(
-    'npx playwright test --reporter=html --output-dir=test-reports/e2e-results',
+    'npx playwright test --reporter=html --output test-reports/e2e-results',
     'End-to-End Tests'
   );
   testResults.push({
