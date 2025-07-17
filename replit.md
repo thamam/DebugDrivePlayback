@@ -152,6 +152,9 @@ The application is designed as a single-page application with a clear separation
 - ✅ **Port Conflict Resolution**: Added instructions for handling port conflicts and process management
 - ✅ **Database Connection Testing**: Added proper connection testing procedures and expected outputs
 - ✅ **Package Lock File Guidance**: Added explanation for package-lock.json changes between environments
+- ✅ **Dependency Resolution Fix**: Created fix-dependencies.sh script for Node.js version conflicts
+- ✅ **Legacy Peer Deps Solution**: Resolved Vite/Tailwind version conflicts with --legacy-peer-deps
+- ✅ **Complete Local Setup Validation**: Confirmed working local development environment
 
 ### Real Trip Data Integration (July 16, 2025)
 - ✅ **Authentic Data Dataset**: Integrated actual Kia Niro EV trip data from 2025-07-15T12_06_02 (50MB)
