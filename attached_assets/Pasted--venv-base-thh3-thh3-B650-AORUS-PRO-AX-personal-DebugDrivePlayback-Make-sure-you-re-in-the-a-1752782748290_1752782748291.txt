@@ -1,0 +1,158 @@
+(venv) (base) thh3@thh3-B650-AORUS-PRO-AX:~/personal/DebugDrivePlayback$ # Make sure you're in the activated venv
+source venv/bin/activate
+
+# Upgrade the build tools
+pip install --upgrade pip setuptools wheel
+
+# Then retry the requirements install
+pip install -r python_backend/requirements.txt
+Requirement already satisfied: pip in ./venv/lib/python3.12/site-packages (25.1.1)
+Requirement already satisfied: setuptools in ./venv/lib/python3.12/site-packages (80.9.0)
+Requirement already satisfied: wheel in ./venv/lib/python3.12/site-packages (0.45.1)
+Collecting fastapi==0.104.1 (from -r python_backend/requirements.txt (line 1))
+  Using cached fastapi-0.104.1-py3-none-any.whl.metadata (24 kB)
+Collecting uvicorn==0.24.0 (from uvicorn[standard]==0.24.0->-r python_backend/requirements.txt (line 2))
+  Using cached uvicorn-0.24.0-py3-none-any.whl.metadata (6.4 kB)
+Collecting pydantic==2.5.0 (from -r python_backend/requirements.txt (line 3))
+  Using cached pydantic-2.5.0-py3-none-any.whl.metadata (174 kB)
+Collecting numpy==1.24.3 (from -r python_backend/requirements.txt (line 4))
+  Using cached numpy-1.24.3.tar.gz (10.9 MB)
+  Installing build dependencies ... done
+  Getting requirements to build wheel ... error
+  error: subprocess-exited-with-error
+  
+  × Getting requirements to build wheel did not run successfully.
+  │ exit code: 1
+  ╰─> [33 lines of output]
+      Traceback (most recent call last):
+        File "/home/thh3/personal/DebugDrivePlayback/venv/lib/python3.12/site-packages/pip/_vendor/pyproject_hooks/_in_process/_in_process.py", line 389, in <module>
+          main()
+        File "/home/thh3/personal/DebugDrivePlayback/venv/lib/python3.12/site-packages/pip/_vendor/pyproject_hooks/_in_process/_in_process.py", line 373, in main
+          json_out["return_val"] = hook(**hook_input["kwargs"])
+                                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+        File "/home/thh3/personal/DebugDrivePlayback/venv/lib/python3.12/site-packages/pip/_vendor/pyproject_hooks/_in_process/_in_process.py", line 137, in get_requires_for_build_wheel
+          backend = _build_backend()
+                    ^^^^^^^^^^^^^^^^
+        File "/home/thh3/personal/DebugDrivePlayback/venv/lib/python3.12/site-packages/pip/_vendor/pyproject_hooks/_in_process/_in_process.py", line 70, in _build_backend
+          obj = import_module(mod_path)
+                ^^^^^^^^^^^^^^^^^^^^^^^
+        File "/home/thh3/anaconda3/lib/python3.12/importlib/__init__.py", line 90, in import_module
+          return _bootstrap._gcd_import(name[level:], package, level)
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+        File "<frozen importlib._bootstrap>", line 1387, in _gcd_import
+        File "<frozen importlib._bootstrap>", line 1360, in _find_and_load
+        File "<frozen importlib._bootstrap>", line 1310, in _find_and_load_unlocked
+        File "<frozen importlib._bootstrap>", line 488, in _call_with_frames_removed
+        File "<frozen importlib._bootstrap>", line 1387, in _gcd_import
+        File "<frozen importlib._bootstrap>", line 1360, in _find_and_load
+        File "<frozen importlib._bootstrap>", line 1331, in _find_and_load_unlocked
+        File "<frozen importlib._bootstrap>", line 935, in _load_unlocked
+        File "<frozen importlib._bootstrap_external>", line 995, in exec_module
+        File "<frozen importlib._bootstrap>", line 488, in _call_with_frames_removed
+        File "/tmp/pip-build-env-dr09cte8/overlay/lib/python3.12/site-packages/setuptools/__init__.py", line 16, in <module>
+          import setuptools.version
+        File "/tmp/pip-build-env-dr09cte8/overlay/lib/python3.12/site-packages/setuptools/version.py", line 1, in <module>
+          import pkg_resources
+        File "/tmp/pip-build-env-dr09cte8/overlay/lib/python3.12/site-packages/pkg_resources/__init__.py", line 2172, in <module>
+          register_finder(pkgutil.ImpImporter, find_on_path)
+                          ^^^^^^^^^^^^^^^^^^^
+      AttributeError: module 'pkgutil' has no attribute 'ImpImporter'. Did you mean: 'zipimporter'?
+      [end of output]
+  
+  note: This error originates from a subprocess, and is likely not a problem with pip.
+error: subprocess-exited-with-error
+
+× Getting requirements to build wheel did not run successfully.
+│ exit code: 1
+╰─> See above for output.
+
+note: This error originates from a subprocess, and is likely not a problem with pip.
+(venv) (base) thh3@thh3-B650-AORUS-PRO-AX:~/personal/DebugDrivePlayback$ sudo apt-get update
+sudo apt-get install -y build-essential python3-dev gfortran libopenblas-dev liblapack-dev
+
+# Then retry
+pip install -r python_backend/requirements.txt
+Hit:1 https://download.docker.com/linux/ubuntu jammy InRelease
+Hit:2 https://brave-browser-apt-release.s3.brave.com stable InRelease                                                                  
+Get:3 https://nvidia.github.io/libnvidia-container/stable/deb/amd64  InRelease [1,477 B]                                               
+Hit:4 https://dl.google.com/linux/chrome/deb stable InRelease                                                                          
+Hit:5 http://security.ubuntu.com/ubuntu jammy-security InRelease                                                                       
+Hit:6 https://packages.microsoft.com/repos/code stable InRelease                                                                       
+Hit:7 http://il.archive.ubuntu.com/ubuntu jammy InRelease                                                                             
+Hit:8 https://deb.nodesource.com/node_18.x nodistro InRelease                                                   
+Hit:9 http://il.archive.ubuntu.com/ubuntu jammy-updates InRelease                                               
+Hit:11 https://ppa.launchpadcontent.net/deadsnakes/ppa/ubuntu jammy InRelease             
+Hit:12 https://windsurf-stable.codeiumdata.com/wVxQEIWkwPUEAGf3/apt stable InRelease
+Hit:13 http://il.archive.ubuntu.com/ubuntu jammy-backports InRelease              
+Hit:10 https://downloads.typora.io/linux ./ InRelease       
+Fetched 1,477 B in 1s (1,034 B/s)
+Reading package lists... Done
+N: Skipping acquire of configured file 'main/binary-i386/Packages' as repository 'https://brave-browser-apt-release.s3.brave.com stable InRelease' doesn't support architecture 'i386'
+W: https://typora.io/linux/./InRelease: Key is stored in legacy trusted.gpg keyring (/etc/apt/trusted.gpg), see the DEPRECATION section in apt-key(8) for details.
+Reading package lists... Done
+Building dependency tree... Done
+Reading state information... Done
+build-essential is already the newest version (12.9ubuntu3).
+gfortran is already the newest version (4:11.2.0-1ubuntu1).
+liblapack-dev is already the newest version (3.10.0-2ubuntu1).
+libopenblas-dev is already the newest version (0.3.20+ds-1).
+python3-dev is already the newest version (3.10.6-1~22.04.1).
+0 upgraded, 0 newly installed, 0 to remove and 35 not upgraded.
+Collecting fastapi==0.104.1 (from -r python_backend/requirements.txt (line 1))
+  Using cached fastapi-0.104.1-py3-none-any.whl.metadata (24 kB)
+Collecting uvicorn==0.24.0 (from uvicorn[standard]==0.24.0->-r python_backend/requirements.txt (line 2))
+  Using cached uvicorn-0.24.0-py3-none-any.whl.metadata (6.4 kB)
+Collecting pydantic==2.5.0 (from -r python_backend/requirements.txt (line 3))
+  Using cached pydantic-2.5.0-py3-none-any.whl.metadata (174 kB)
+Collecting numpy==1.24.3 (from -r python_backend/requirements.txt (line 4))
+  Using cached numpy-1.24.3.tar.gz (10.9 MB)
+  Installing build dependencies ... done
+  Getting requirements to build wheel ... error
+  error: subprocess-exited-with-error
+  
+  × Getting requirements to build wheel did not run successfully.
+  │ exit code: 1
+  ╰─> [33 lines of output]
+      Traceback (most recent call last):
+        File "/home/thh3/personal/DebugDrivePlayback/venv/lib/python3.12/site-packages/pip/_vendor/pyproject_hooks/_in_process/_in_process.py", line 389, in <module>
+          main()
+        File "/home/thh3/personal/DebugDrivePlayback/venv/lib/python3.12/site-packages/pip/_vendor/pyproject_hooks/_in_process/_in_process.py", line 373, in main
+          json_out["return_val"] = hook(**hook_input["kwargs"])
+                                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+        File "/home/thh3/personal/DebugDrivePlayback/venv/lib/python3.12/site-packages/pip/_vendor/pyproject_hooks/_in_process/_in_process.py", line 137, in get_requires_for_build_wheel
+          backend = _build_backend()
+                    ^^^^^^^^^^^^^^^^
+        File "/home/thh3/personal/DebugDrivePlayback/venv/lib/python3.12/site-packages/pip/_vendor/pyproject_hooks/_in_process/_in_process.py", line 70, in _build_backend
+          obj = import_module(mod_path)
+                ^^^^^^^^^^^^^^^^^^^^^^^
+        File "/home/thh3/anaconda3/lib/python3.12/importlib/__init__.py", line 90, in import_module
+          return _bootstrap._gcd_import(name[level:], package, level)
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+        File "<frozen importlib._bootstrap>", line 1387, in _gcd_import
+        File "<frozen importlib._bootstrap>", line 1360, in _find_and_load
+        File "<frozen importlib._bootstrap>", line 1310, in _find_and_load_unlocked
+        File "<frozen importlib._bootstrap>", line 488, in _call_with_frames_removed
+        File "<frozen importlib._bootstrap>", line 1387, in _gcd_import
+        File "<frozen importlib._bootstrap>", line 1360, in _find_and_load
+        File "<frozen importlib._bootstrap>", line 1331, in _find_and_load_unlocked
+        File "<frozen importlib._bootstrap>", line 935, in _load_unlocked
+        File "<frozen importlib._bootstrap_external>", line 995, in exec_module
+        File "<frozen importlib._bootstrap>", line 488, in _call_with_frames_removed
+        File "/tmp/pip-build-env-c33mhdhs/overlay/lib/python3.12/site-packages/setuptools/__init__.py", line 16, in <module>
+          import setuptools.version
+        File "/tmp/pip-build-env-c33mhdhs/overlay/lib/python3.12/site-packages/setuptools/version.py", line 1, in <module>
+          import pkg_resources
+        File "/tmp/pip-build-env-c33mhdhs/overlay/lib/python3.12/site-packages/pkg_resources/__init__.py", line 2172, in <module>
+          register_finder(pkgutil.ImpImporter, find_on_path)
+                          ^^^^^^^^^^^^^^^^^^^
+      AttributeError: module 'pkgutil' has no attribute 'ImpImporter'. Did you mean: 'zipimporter'?
+      [end of output]
+  
+  note: This error originates from a subprocess, and is likely not a problem with pip.
+error: subprocess-exited-with-error
+
+× Getting requirements to build wheel did not run successfully.
+│ exit code: 1
+╰─> See above for output.
+
+note: This error originates from a subprocess, and is likely not a problem with pip.
