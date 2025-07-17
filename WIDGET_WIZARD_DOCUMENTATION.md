@@ -360,6 +360,21 @@ try {
 - End-to-end widget lifecycle
 - Data flow validation
 
+### GUI/Visual Tests (Playwright)
+- Widget wizard user interface interactions
+- Widget manager interface testing
+- Widget dashboard real-time updates
+- Visual regression testing with screenshots
+- Responsive design across different screen sizes
+
+### Accessibility Tests
+- Screen reader compatibility
+- Keyboard navigation support
+- Color contrast validation
+- Focus management and indicators
+- Modal dialog accessibility
+- ARIA labeling and roles
+
 ### Performance Tests
 - Widget processing speed
 - Memory usage monitoring
@@ -379,6 +394,13 @@ try {
 2. Start development server: `npm run dev`
 3. Access Widget Manager at `/widget-manager`
 4. Create and test widgets in development environment
+
+### Testing Setup
+1. Run unit tests: `npm test`
+2. Run GUI tests: `npx playwright test`
+3. Run visual tests: `npx playwright test tests/e2e/widget-visual.spec.ts`
+4. Run accessibility tests: `npx playwright test tests/e2e/widget-accessibility.spec.ts`
+5. Generate test report: `npx playwright show-report`
 
 ## Troubleshooting
 

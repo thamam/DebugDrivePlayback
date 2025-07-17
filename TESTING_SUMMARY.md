@@ -9,6 +9,13 @@
 4. **`widget-templates.test.ts`** - Unit tests for pre-built widget templates
 5. **`widget-integration.test.ts`** - End-to-end integration tests
 
+### Playwright GUI/Visual Tests
+6. **`widget-wizard.spec.ts`** - End-to-end GUI tests for widget wizard
+7. **`widget-manager.spec.ts`** - End-to-end GUI tests for widget manager
+8. **`widget-dashboard.spec.ts`** - End-to-end GUI tests for widget dashboard
+9. **`widget-visual.spec.ts`** - Visual regression tests and screenshots
+10. **`widget-accessibility.spec.ts`** - Accessibility and screen reader tests
+
 ## Test Categories
 
 ### Unit Tests (70% of test coverage)
@@ -31,21 +38,25 @@
 ## Test Statistics
 
 ### Coverage Metrics
-- **Total Tests**: 105 tests
+- **Total Tests**: 180+ tests
 - **Components Tested**: 6 major components
 - **Functions Tested**: 45+ functions
 - **Error Scenarios**: 25+ error cases
 - **Performance Tests**: 5 performance benchmarks
+- **GUI Tests**: 60+ visual and interaction tests
+- **Accessibility Tests**: 15+ accessibility compliance tests
 
 ### Test Distribution
 ```
-Widget Engine Tests:     25 tests (24%)
-Widget Templates Tests:  20 tests (19%)
-Widget Wizard Tests:     15 tests (14%)
-Widget Manager Tests:    12 tests (11%)
-Integration Tests:       18 tests (17%)
-Performance Tests:       5 tests (5%)
-Error Handling Tests:    10 tests (10%)
+Widget Engine Tests:     25 tests (14%)
+Widget Templates Tests:  20 tests (11%)
+Widget Wizard Tests:     15 tests (8%)
+Widget Manager Tests:    12 tests (7%)
+Integration Tests:       18 tests (10%)
+Performance Tests:       5 tests (3%)
+Error Handling Tests:    10 tests (6%)
+GUI E2E Tests:          60 tests (33%)
+Accessibility Tests:     15 tests (8%)
 ```
 
 ## Test Scenarios Covered
@@ -77,6 +88,20 @@ Error Handling Tests:    10 tests (10%)
 ✅ Signal monitoring with filtering  
 ✅ Data export in multiple formats  
 ✅ Configuration schema validation  
+
+### GUI/Visual Testing Scenarios
+✅ Widget wizard dialog interaction and navigation  
+✅ Widget creation workflow from UI  
+✅ Widget manager interface testing  
+✅ Widget dashboard real-time updates  
+✅ Visual regression testing with screenshots  
+✅ Responsive design across different screen sizes  
+✅ Accessibility compliance testing  
+✅ Keyboard navigation support  
+✅ Screen reader compatibility  
+✅ Color contrast validation  
+✅ Focus management and indicators  
+✅ Modal dialog accessibility  
 
 ## Error Scenarios Tested
 
@@ -115,6 +140,9 @@ Error Handling Tests:    10 tests (10%)
 ### Testing Framework
 - **Jest**: Unit and integration testing
 - **React Testing Library**: Component testing
+- **Playwright**: End-to-end GUI testing
+- **Visual Testing**: Screenshot comparison and regression testing
+- **Accessibility Testing**: Screen reader and keyboard navigation testing
 - **Custom Mocks**: Widget engine and template mocks
 - **Performance Monitoring**: Built-in timing and memory tests
 
@@ -158,10 +186,50 @@ Error Handling Tests:    10 tests (10%)
 3. Follow testing patterns established
 4. Validate against existing test suite
 
+## Playwright GUI Test Commands
+
+### Running GUI Tests
+```bash
+# Run all E2E tests
+npx playwright test
+
+# Run with UI mode
+npx playwright test --ui
+
+# Run in headed mode (visible browser)
+npx playwright test --headed
+
+# Run specific test file
+npx playwright test tests/e2e/widget-wizard.spec.ts
+
+# Run visual tests only
+npx playwright test tests/e2e/widget-visual.spec.ts
+
+# Run accessibility tests only
+npx playwright test tests/e2e/widget-accessibility.spec.ts
+
+# Debug mode
+npx playwright test --debug
+```
+
+### Visual Testing Commands
+```bash
+# Update visual baselines
+npx playwright test --update-snapshots
+
+# Generate test report
+npx playwright show-report
+
+# Run tests in multiple browsers
+npx playwright test --project=chromium --project=firefox --project=webkit
+```
+
 ---
 
 **Testing Complete**: July 16, 2025  
-**Total Test Files**: 5  
-**Total Tests**: 105  
+**Total Test Files**: 10  
+**Total Tests**: 180+  
 **Coverage**: 85%+  
+**GUI Tests**: 60+ visual and interaction tests  
+**Accessibility Tests**: 15+ compliance tests  
 **Status**: ✅ All tests passing

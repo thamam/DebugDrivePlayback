@@ -1,0 +1,260 @@
+import { test, expect } from '@playwright/test';
+
+test.describe('Widget Dashboard GUI Tests', () => {
+  test.beforeEach(async ({ page }) => {
+    await page.goto('/widget-manager');
+  });
+
+  test('should display dashboard header and controls', async ({ page }) => {
+    // Check dashboard header
+    await expect(page.locator('text=Widget Dashboard')).toBeVisible();
+    await expect(page.locator('text=Live view and management of active widgets')).toBeVisible();
+    
+    // Check control buttons
+    await expect(page.locator('button:has-text("Add Widget")')).toBeVisible();
+    await expect(page.locator('button:has-text("Refresh")')).toBeVisible();
+  });
+
+  test('should show empty state when no widgets exist', async ({ page }) => {
+    // Check empty state
+    await expect(page.locator('text=No Active Widgets')).toBeVisible();
+    await expect(page.locator('text=Create your first widget to start visualizing')).toBeVisible();
+    
+    // Check that create widget button is available
+    await expect(page.locator('button:has-text("Create Widget")')).toBeVisible();
+  });
+
+  test('should display widgets in grid layout', async ({ page }) => {
+    // Create multiple widgets
+    const widgets = [
+      { template: 'Trajectory Visualizer', name: 'Trajectory Widget' },
+      { template: 'Speed Analyzer', name: 'Speed Widget' },
+      { template: 'Signal Monitor', name: 'Signal Widget' }
+    ];
+
+    for (const widget of widgets) {
+      await page.click('button:has-text("Add Widget")');
+      await page.click(`text=${widget.template}`);
+      await page.locator('input[placeholder*="name"]').first().fill(widget.name);
+      await page.click('button:has-text("Preview")');
+      await page.click('button:has-text("Create Widget")');
+    }
+
+    // Check that all widgets are displayed
+    for (const widget of widgets) {
+      await expect(page.locator(`text=${widget.name}`)).toBeVisible();
+    }
+
+    // Check grid layout
+    const widgetCards = page.locator('[data-testid="widget-card"]');
+    await expect(widgetCards).toHaveCount(3);
+  });
+
+  test('should render widget content', async ({ page }) => {
+    // Create a trajectory widget
+    await page.click('button:has-text("Add Widget")');
+    await page.click('text=Trajectory Visualizer');
+    await page.locator('input[placeholder*="name"]').first().fill('Test Trajectory');
+    await page.click('button:has-text("Preview")');
+    await page.click('button:has-text("Create Widget")');
+
+    // Check that widget content is rendered
+    await expect(page.locator('text=Test Trajectory')).toBeVisible();
+    await expect(page.locator('[data-testid="widget-renderer"]')).toBeVisible();
+    
+    // Check widget status indicator
+    await expect(page.locator('text=active')).toBeVisible();
+  });
+
+  test('should handle widget actions from dashboard', async ({ page }) => {
+    // Create a widget
+    await page.click('button:has-text("Add Widget")');
+    await page.click('text=Speed Analyzer');
+    await page.locator('input[placeholder*="name"]').first().fill('Dashboard Widget');
+    await page.click('button:has-text("Preview")');
+    await page.click('button:has-text("Create Widget")');
+
+    // Check widget appears in dashboard
+    await expect(page.locator('text=Dashboard Widget')).toBeVisible();
+
+    // Test widget actions menu
+    await page.locator('[data-testid="widget-menu-button"]').first().click();
+    await expect(page.locator('text=Pause')).toBeVisible();
+    await expect(page.locator('text=Configure')).toBeVisible();
+    await expect(page.locator('text=Delete')).toBeVisible();
+
+    // Test pause action
+    await page.click('text=Pause');
+    await expect(page.locator('text=paused')).toBeVisible();
+
+    // Test resume action
+    await page.locator('[data-testid="widget-menu-button"]').first().click();
+    await page.click('text=Start');
+    await expect(page.locator('text=active')).toBeVisible();
+  });
+
+  test('should show widget performance metrics', async ({ page }) => {
+    // Create a widget
+    await page.click('button:has-text("Add Widget")');
+    await page.click('text=Signal Monitor');
+    await page.locator('input[placeholder*="name"]').first().fill('Performance Widget');
+    await page.click('button:has-text("Preview")');
+    await page.click('button:has-text("Create Widget")');
+
+    // Check performance indicators
+    await expect(page.locator('text=Last updated:')).toBeVisible();
+    
+    // Check widget status
+    await expect(page.locator('text=active')).toBeVisible();
+  });
+
+  test('should handle refresh functionality', async ({ page }) => {
+    // Create a widget
+    await page.click('button:has-text("Add Widget")');
+    await page.click('text=Data Exporter');
+    await page.locator('input[placeholder*="name"]').first().fill('Refresh Widget');
+    await page.click('button:has-text("Preview")');
+    await page.click('button:has-text("Create Widget")');
+
+    // Click refresh button
+    await page.click('button:has-text("Refresh")');
+    
+    // Widget should still be visible after refresh
+    await expect(page.locator('text=Refresh Widget')).toBeVisible();
+  });
+
+  test('should handle widget errors gracefully', async ({ page }) => {
+    // Create a widget that might encounter errors
+    await page.click('button:has-text("Add Widget")');
+    await page.click('text=Speed Analyzer');
+    await page.locator('input[placeholder*="name"]').first().fill('Error Widget');
+    await page.click('button:has-text("Preview")');
+    await page.click('button:has-text("Create Widget")');
+
+    // Widget should render even if there are processing errors
+    await expect(page.locator('text=Error Widget')).toBeVisible();
+  });
+
+  test('should show widget configuration details', async ({ page }) => {
+    // Create a widget with specific configuration
+    await page.click('button:has-text("Add Widget")');
+    await page.click('text=Trajectory Visualizer');
+    
+    // Configure widget
+    await page.locator('input[placeholder*="name"]').first().fill('Config Widget');
+    await page.click('text=Show Planned Path'); // Toggle checkbox
+    await page.selectOption('select:near(:text("Chart Size"))', 'large');
+    
+    await page.click('button:has-text("Preview")');
+    await page.click('button:has-text("Create Widget")');
+
+    // Check widget displays configuration
+    await expect(page.locator('text=Config Widget')).toBeVisible();
+    await expect(page.locator('text=trajectory_visualizer')).toBeVisible();
+  });
+
+  test('should handle responsive dashboard layout', async ({ page }) => {
+    // Create multiple widgets
+    for (let i = 1; i <= 4; i++) {
+      await page.click('button:has-text("Add Widget")');
+      await page.click('text=Signal Monitor');
+      await page.locator('input[placeholder*="name"]').first().fill(`Widget ${i}`);
+      await page.click('button:has-text("Preview")');
+      await page.click('button:has-text("Create Widget")');
+    }
+
+    // Test mobile layout
+    await page.setViewportSize({ width: 390, height: 844 });
+    await page.waitForTimeout(500);
+    
+    // Widgets should still be visible and usable
+    await expect(page.locator('text=Widget 1')).toBeVisible();
+    await expect(page.locator('text=Widget 2')).toBeVisible();
+
+    // Test tablet layout
+    await page.setViewportSize({ width: 768, height: 1024 });
+    await page.waitForTimeout(500);
+    
+    // Should show more widgets per row
+    await expect(page.locator('text=Widget 3')).toBeVisible();
+    await expect(page.locator('text=Widget 4')).toBeVisible();
+
+    // Test desktop layout
+    await page.setViewportSize({ width: 1920, height: 1080 });
+    await page.waitForTimeout(500);
+    
+    // All widgets should be visible
+    for (let i = 1; i <= 4; i++) {
+      await expect(page.locator(`text=Widget ${i}`)).toBeVisible();
+    }
+  });
+
+  test('should handle widget real-time updates', async ({ page }) => {
+    // Create a widget
+    await page.click('button:has-text("Add Widget")');
+    await page.click('text=Speed Analyzer');
+    await page.locator('input[placeholder*="name"]').first().fill('Live Widget');
+    await page.click('button:has-text("Preview")');
+    await page.click('button:has-text("Create Widget")');
+
+    // Widget should be visible and active
+    await expect(page.locator('text=Live Widget')).toBeVisible();
+    await expect(page.locator('text=active')).toBeVisible();
+
+    // Check that widget updates over time
+    await page.waitForTimeout(1000);
+    await expect(page.locator('text=Live Widget')).toBeVisible();
+  });
+
+  test('should handle keyboard navigation', async ({ page }) => {
+    // Create a widget
+    await page.click('button:has-text("Add Widget")');
+    await page.click('text=Trajectory Visualizer');
+    await page.locator('input[placeholder*="name"]').first().fill('Keyboard Widget');
+    await page.click('button:has-text("Preview")');
+    await page.click('button:has-text("Create Widget")');
+
+    // Test keyboard navigation
+    await page.keyboard.press('Tab');
+    await page.keyboard.press('Tab');
+    
+    // Should be able to navigate to widget actions
+    await page.keyboard.press('Enter');
+    
+    // Menu should open
+    await expect(page.locator('text=Pause')).toBeVisible();
+    
+    // Close menu with Escape
+    await page.keyboard.press('Escape');
+    await expect(page.locator('text=Pause')).not.toBeVisible();
+  });
+
+  test('should show loading states', async ({ page }) => {
+    // Check initial loading state
+    await expect(page.locator('text=Widget Dashboard')).toBeVisible();
+    
+    // Loading should complete quickly
+    await page.waitForTimeout(1000);
+    await expect(page.locator('text=No Active Widgets')).toBeVisible();
+  });
+
+  test('should handle widget deletion from dashboard', async ({ page }) => {
+    // Create a widget
+    await page.click('button:has-text("Add Widget")');
+    await page.click('text=Data Exporter');
+    await page.locator('input[placeholder*="name"]').first().fill('Delete Widget');
+    await page.click('button:has-text("Preview")');
+    await page.click('button:has-text("Create Widget")');
+
+    // Verify widget is created
+    await expect(page.locator('text=Delete Widget')).toBeVisible();
+
+    // Delete widget from dashboard
+    await page.locator('[data-testid="widget-menu-button"]').first().click();
+    await page.click('text=Delete');
+
+    // Verify widget is removed
+    await expect(page.locator('text=Delete Widget')).not.toBeVisible();
+    await expect(page.locator('text=No Active Widgets')).toBeVisible();
+  });
+});

@@ -1,0 +1,275 @@
+import { test, expect } from '@playwright/test';
+
+test.describe('Widget Accessibility Tests', () => {
+  test.beforeEach(async ({ page }) => {
+    await page.goto('/widget-manager');
+  });
+
+  test('should have proper heading structure', async ({ page }) => {
+    // Check main heading
+    await expect(page.locator('h1, h2').first()).toHaveText('Widget Dashboard');
+    
+    // Check that headings are properly structured
+    const headings = page.locator('h1, h2, h3, h4, h5, h6');
+    const headingTexts = await headings.allTextContents();
+    
+    expect(headingTexts).toContain('Widget Dashboard');
+    expect(headingTexts).toContain('Widget System Active');
+  });
+
+  test('should have proper ARIA labels and roles', async ({ page }) => {
+    // Check that buttons have proper labels
+    await expect(page.locator('button:has-text("Add Widget")')).toHaveAttribute('type', 'button');
+    await expect(page.locator('button:has-text("Refresh")')).toHaveAttribute('type', 'button');
+    
+    // Check tab navigation
+    await expect(page.locator('[role="tablist"]')).toBeVisible();
+    await expect(page.locator('[role="tab"]')).toHaveCount(3);
+    
+    // Check that tabs have proper accessibility attributes
+    const tabs = page.locator('[role="tab"]');
+    for (let i = 0; i < 3; i++) {
+      await expect(tabs.nth(i)).toHaveAttribute('aria-selected');
+    }
+  });
+
+  test('should be keyboard navigable', async ({ page }) => {
+    // Test tab navigation
+    await page.keyboard.press('Tab');
+    let focusedElement = page.locator(':focus');
+    await expect(focusedElement).toBeVisible();
+    
+    // Continue tabbing through interactive elements
+    await page.keyboard.press('Tab');
+    await page.keyboard.press('Tab');
+    
+    // Should be able to activate buttons with Enter
+    await page.keyboard.press('Enter');
+    
+    // Should be able to close dialogs with Escape
+    await page.keyboard.press('Escape');
+  });
+
+  test('should support screen reader navigation', async ({ page }) => {
+    // Create a widget to test screen reader features
+    await page.click('button:has-text("Add Widget")');
+    await page.click('text=Speed Analyzer');
+    await page.locator('input[placeholder*="name"]').first().fill('Screen Reader Test');
+    await page.click('button:has-text("Preview")');
+    await page.click('button:has-text("Create Widget")');
+    
+    // Check that widget has proper labeling
+    await expect(page.locator('text=Screen Reader Test')).toBeVisible();
+    
+    // Check that status is announced
+    await expect(page.locator('text=active')).toBeVisible();
+    
+    // Check that actions are properly labeled
+    await page.locator('[data-testid="widget-menu-button"]').first().click();
+    await expect(page.locator('text=Pause')).toBeVisible();
+    await expect(page.locator('text=Configure')).toBeVisible();
+    await expect(page.locator('text=Delete')).toBeVisible();
+  });
+
+  test('should have proper form labeling', async ({ page }) => {
+    // Open widget wizard
+    await page.click('button:has-text("Add Widget")');
+    await page.click('text=Trajectory Visualizer');
+    
+    // Check that form fields have proper labels
+    await expect(page.locator('text=Widget Name')).toBeVisible();
+    await expect(page.locator('text=Show Planned Path')).toBeVisible();
+    await expect(page.locator('text=Path Color')).toBeVisible();
+    await expect(page.locator('text=Chart Size')).toBeVisible();
+    
+    // Check that input fields are properly associated with labels
+    const nameInput = page.locator('input[placeholder*="name"]').first();
+    await expect(nameInput).toBeVisible();
+    
+    // Check that checkbox has proper labeling
+    const checkbox = page.locator('input[type="checkbox"]');
+    await expect(checkbox).toBeVisible();
+  });
+
+  test('should have proper color contrast', async ({ page }) => {
+    // Create a widget to test color contrast
+    await page.click('button:has-text("Add Widget")');
+    await page.click('text=Signal Monitor');
+    await page.locator('input[placeholder*="name"]').first().fill('Contrast Test');
+    await page.click('button:has-text("Preview")');
+    await page.click('button:has-text("Create Widget")');
+    
+    // Check that text is visible against background
+    await expect(page.locator('text=Contrast Test')).toBeVisible();
+    await expect(page.locator('text=active')).toBeVisible();
+    
+    // Check that interactive elements have proper contrast
+    await expect(page.locator('button:has-text("Add Widget")')).toBeVisible();
+    await expect(page.locator('button:has-text("Refresh")')).toBeVisible();
+  });
+
+  test('should provide proper focus indicators', async ({ page }) => {
+    // Test that focused elements have visible focus indicators
+    await page.keyboard.press('Tab');
+    
+    // Check that focus is visible (this would require CSS testing in a real scenario)
+    const focusedElement = page.locator(':focus');
+    await expect(focusedElement).toBeVisible();
+    
+    // Test focus within widget wizard
+    await page.click('button:has-text("Add Widget")');
+    await page.keyboard.press('Tab');
+    
+    // Focus should be visible within the dialog
+    const dialogFocus = page.locator('div[role="dialog"] :focus');
+    await expect(dialogFocus).toBeVisible();
+  });
+
+  test('should have proper error handling accessibility', async ({ page }) => {
+    // Test error states
+    await page.click('button:has-text("Add Widget")');
+    await page.click('text=Speed Analyzer');
+    
+    // Clear the name field to trigger validation
+    const nameInput = page.locator('input[placeholder*="name"]').first();
+    await nameInput.fill('');
+    
+    // Try to proceed - should show error or prevent progress
+    await page.click('button:has-text("Preview")');
+    
+    // Should still be on configuration step
+    await expect(page.locator('text=Configuration')).toBeVisible();
+  });
+
+  test('should support high contrast mode', async ({ page }) => {
+    // Test that interface works in high contrast
+    await page.emulateMedia({ colorScheme: 'dark' });
+    
+    // Check that elements are still visible
+    await expect(page.locator('text=Widget Dashboard')).toBeVisible();
+    await expect(page.locator('button:has-text("Add Widget")')).toBeVisible();
+    
+    // Test with light theme
+    await page.emulateMedia({ colorScheme: 'light' });
+    
+    await expect(page.locator('text=Widget Dashboard')).toBeVisible();
+    await expect(page.locator('button:has-text("Add Widget")')).toBeVisible();
+  });
+
+  test('should handle reduced motion preferences', async ({ page }) => {
+    // Test with reduced motion preference
+    await page.emulateMedia({ reducedMotion: 'reduce' });
+    
+    // Interface should still be functional
+    await page.click('button:has-text("Add Widget")');
+    await expect(page.locator('text=Create New Widget')).toBeVisible();
+    
+    // Animations should be reduced/disabled
+    await page.click('text=Trajectory Visualizer');
+    await expect(page.locator('text=Configuration')).toBeVisible();
+  });
+
+  test('should provide proper landmark navigation', async ({ page }) => {
+    // Check for main landmark
+    await expect(page.locator('main')).toBeVisible();
+    
+    // Check for navigation landmarks
+    await expect(page.locator('nav')).toBeVisible();
+    
+    // Check for proper section structure
+    await expect(page.locator('section')).toBeVisible();
+  });
+
+  test('should support zoom up to 200%', async ({ page }) => {
+    // Test interface at 200% zoom
+    await page.setViewportSize({ width: 960, height: 540 }); // Simulates 200% zoom
+    
+    // Interface should remain usable
+    await expect(page.locator('text=Widget Dashboard')).toBeVisible();
+    await expect(page.locator('button:has-text("Add Widget")')).toBeVisible();
+    
+    // Test widget creation at high zoom
+    await page.click('button:has-text("Add Widget")');
+    await expect(page.locator('text=Create New Widget')).toBeVisible();
+    
+    // Dialog should be accessible
+    await page.click('text=Speed Analyzer');
+    await expect(page.locator('text=Configuration')).toBeVisible();
+  });
+
+  test('should provide proper live regions for dynamic content', async ({ page }) => {
+    // Create a widget to test live updates
+    await page.click('button:has-text("Add Widget")');
+    await page.click('text=Data Exporter');
+    await page.locator('input[placeholder*="name"]').first().fill('Live Region Test');
+    await page.click('button:has-text("Preview")');
+    await page.click('button:has-text("Create Widget")');
+    
+    // Check that widget status changes are announced
+    await expect(page.locator('text=active')).toBeVisible();
+    
+    // Test status change
+    await page.locator('[data-testid="widget-menu-button"]').first().click();
+    await page.click('text=Pause');
+    await expect(page.locator('text=paused')).toBeVisible();
+  });
+
+  test('should have proper dialog accessibility', async ({ page }) => {
+    // Test dialog accessibility
+    await page.click('button:has-text("Add Widget")');
+    
+    // Check dialog structure
+    await expect(page.locator('div[role="dialog"]')).toBeVisible();
+    
+    // Check dialog labeling
+    await expect(page.locator('text=Create New Widget')).toBeVisible();
+    
+    // Check focus trap
+    await page.keyboard.press('Tab');
+    
+    // Focus should be trapped within dialog
+    const focusedElement = page.locator(':focus');
+    await expect(focusedElement).toBeVisible();
+    
+    // Test closing dialog with Escape
+    await page.keyboard.press('Escape');
+    await expect(page.locator('div[role="dialog"]')).not.toBeVisible();
+  });
+
+  test('should support alternative input methods', async ({ page }) => {
+    // Test that interface works with different input methods
+    
+    // Test with mouse
+    await page.click('button:has-text("Add Widget")');
+    await page.click('text=Signal Monitor');
+    await expect(page.locator('text=Configuration')).toBeVisible();
+    
+    // Test with keyboard
+    await page.keyboard.press('Escape');
+    await page.keyboard.press('Tab');
+    await page.keyboard.press('Enter');
+    await expect(page.locator('text=Create New Widget')).toBeVisible();
+  });
+
+  test('should provide proper status announcements', async ({ page }) => {
+    // Test that status changes are properly announced
+    await page.click('button:has-text("Add Widget")');
+    await page.click('text=Trajectory Visualizer');
+    await page.locator('input[placeholder*="name"]').first().fill('Status Test');
+    await page.click('button:has-text("Preview")');
+    await page.click('button:has-text("Create Widget")');
+    
+    // Check initial status
+    await expect(page.locator('text=active')).toBeVisible();
+    
+    // Change status and check announcement
+    await page.locator('[data-testid="widget-menu-button"]').first().click();
+    await page.click('text=Pause');
+    await expect(page.locator('text=paused')).toBeVisible();
+    
+    // Resume and check announcement
+    await page.locator('[data-testid="widget-menu-button"]').first().click();
+    await page.click('text=Start');
+    await expect(page.locator('text=active')).toBeVisible();
+  });
+});

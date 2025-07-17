@@ -1,0 +1,220 @@
+import { test, expect } from '@playwright/test';
+
+test.describe('Widget Visual Tests', () => {
+  test.beforeEach(async ({ page }) => {
+    await page.goto('/widget-manager');
+  });
+
+  test('should take visual snapshots of widget wizard', async ({ page }) => {
+    // Snapshot of widget manager page
+    await expect(page).toHaveScreenshot('widget-manager-initial.png');
+
+    // Open widget wizard
+    await page.click('button:has-text("Add Widget")');
+    await expect(page).toHaveScreenshot('widget-wizard-template-selection.png');
+
+    // Select trajectory visualizer
+    await page.click('text=Trajectory Visualizer');
+    await expect(page).toHaveScreenshot('widget-wizard-configuration.png');
+
+    // Go to preview
+    await page.click('button:has-text("Preview")');
+    await expect(page).toHaveScreenshot('widget-wizard-preview.png');
+  });
+
+  test('should test widget card visual appearance', async ({ page }) => {
+    // Create a widget
+    await page.click('button:has-text("Add Widget")');
+    await page.click('text=Speed Analyzer');
+    await page.locator('input[placeholder*="name"]').first().fill('Visual Test Widget');
+    await page.click('button:has-text("Preview")');
+    await page.click('button:has-text("Create Widget")');
+
+    // Take snapshot of widget card
+    const widgetCard = page.locator('[data-testid="widget-card"]').first();
+    await expect(widgetCard).toHaveScreenshot('widget-card-active.png');
+
+    // Pause widget and take snapshot
+    await page.locator('[data-testid="widget-menu-button"]').first().click();
+    await page.click('text=Pause');
+    await expect(widgetCard).toHaveScreenshot('widget-card-paused.png');
+  });
+
+  test('should test dashboard grid layout visuals', async ({ page }) => {
+    // Create multiple widgets for grid testing
+    const widgets = [
+      { template: 'Trajectory Visualizer', name: 'Trajectory' },
+      { template: 'Speed Analyzer', name: 'Speed' },
+      { template: 'Signal Monitor', name: 'Signal' },
+      { template: 'Data Exporter', name: 'Export' }
+    ];
+
+    for (const widget of widgets) {
+      await page.click('button:has-text("Add Widget")');
+      await page.click(`text=${widget.template}`);
+      await page.locator('input[placeholder*="name"]').first().fill(widget.name);
+      await page.click('button:has-text("Preview")');
+      await page.click('button:has-text("Create Widget")');
+    }
+
+    // Take snapshot of dashboard with multiple widgets
+    await expect(page).toHaveScreenshot('dashboard-grid-layout.png');
+  });
+
+  test('should test responsive design visuals', async ({ page }) => {
+    // Create a widget for testing
+    await page.click('button:has-text("Add Widget")');
+    await page.click('text=Trajectory Visualizer');
+    await page.locator('input[placeholder*="name"]').first().fill('Responsive Widget');
+    await page.click('button:has-text("Preview")');
+    await page.click('button:has-text("Create Widget")');
+
+    // Test different viewport sizes
+    await page.setViewportSize({ width: 1920, height: 1080 });
+    await expect(page).toHaveScreenshot('desktop-layout.png');
+
+    await page.setViewportSize({ width: 768, height: 1024 });
+    await expect(page).toHaveScreenshot('tablet-layout.png');
+
+    await page.setViewportSize({ width: 390, height: 844 });
+    await expect(page).toHaveScreenshot('mobile-layout.png');
+  });
+
+  test('should test empty state visuals', async ({ page }) => {
+    // Test empty dashboard
+    await expect(page).toHaveScreenshot('empty-dashboard.png');
+
+    // Test empty paused widgets
+    await page.click('text=Paused (0)');
+    await expect(page).toHaveScreenshot('empty-paused-widgets.png');
+  });
+
+  test('should test widget menu visuals', async ({ page }) => {
+    // Create a widget
+    await page.click('button:has-text("Add Widget")');
+    await page.click('text=Signal Monitor');
+    await page.locator('input[placeholder*="name"]').first().fill('Menu Test Widget');
+    await page.click('button:has-text("Preview")');
+    await page.click('button:has-text("Create Widget")');
+
+    // Open widget menu
+    await page.locator('[data-testid="widget-menu-button"]').first().click();
+    await expect(page).toHaveScreenshot('widget-menu-open.png');
+  });
+
+  test('should test configuration fields visuals', async ({ page }) => {
+    await page.click('button:has-text("Add Widget")');
+    await page.click('text=Trajectory Visualizer');
+
+    // Test different configuration field types
+    await expect(page).toHaveScreenshot('config-fields-default.png');
+
+    // Modify configuration
+    await page.click('text=Show Planned Path'); // Toggle checkbox
+    await page.selectOption('select:near(:text("Chart Size"))', 'large');
+    await page.fill('input[type="text"]', '#ff0000');
+
+    await expect(page).toHaveScreenshot('config-fields-modified.png');
+  });
+
+  test('should test widget status indicators', async ({ page }) => {
+    // Create widgets in different states
+    await page.click('button:has-text("Add Widget")');
+    await page.click('text=Speed Analyzer');
+    await page.locator('input[placeholder*="name"]').first().fill('Status Test Widget');
+    await page.click('button:has-text("Preview")');
+    await page.click('button:has-text("Create Widget")');
+
+    // Active state
+    const activeWidget = page.locator('[data-testid="widget-card"]').first();
+    await expect(activeWidget).toHaveScreenshot('widget-status-active.png');
+
+    // Paused state
+    await page.locator('[data-testid="widget-menu-button"]').first().click();
+    await page.click('text=Pause');
+    await expect(activeWidget).toHaveScreenshot('widget-status-paused.png');
+  });
+
+  test('should test wizard navigation visuals', async ({ page }) => {
+    await page.click('button:has-text("Add Widget")');
+    
+    // Template selection step
+    await expect(page).toHaveScreenshot('wizard-step-1-templates.png');
+
+    // Configuration step
+    await page.click('text=Speed Analyzer');
+    await expect(page).toHaveScreenshot('wizard-step-2-config.png');
+
+    // Preview step
+    await page.click('button:has-text("Preview")');
+    await expect(page).toHaveScreenshot('wizard-step-3-preview.png');
+  });
+
+  test('should test theme consistency', async ({ page }) => {
+    // Test dark theme (default)
+    await expect(page).toHaveScreenshot('theme-dark.png');
+
+    // Create a widget to test theme on various elements
+    await page.click('button:has-text("Add Widget")');
+    await page.click('text=Trajectory Visualizer');
+    await page.locator('input[placeholder*="name"]').first().fill('Theme Test Widget');
+    await page.click('button:has-text("Preview")');
+    await page.click('button:has-text("Create Widget")');
+
+    // Test widget theming
+    await expect(page).toHaveScreenshot('theme-dark-with-widgets.png');
+  });
+
+  test('should test tab navigation visuals', async ({ page }) => {
+    // Create widgets
+    await page.click('button:has-text("Add Widget")');
+    await page.click('text=Speed Analyzer');
+    await page.locator('input[placeholder*="name"]').first().fill('Tab Test Widget');
+    await page.click('button:has-text("Preview")');
+    await page.click('button:has-text("Create Widget")');
+
+    // Test different tabs
+    await page.click('text=All Widgets (1)');
+    await expect(page).toHaveScreenshot('tab-all-widgets.png');
+
+    await page.click('text=Active (1)');
+    await expect(page).toHaveScreenshot('tab-active-widgets.png');
+
+    // Pause widget and test paused tab
+    await page.locator('[data-testid="widget-menu-button"]').first().click();
+    await page.click('text=Pause');
+    await page.click('text=Paused (1)');
+    await expect(page).toHaveScreenshot('tab-paused-widgets.png');
+  });
+
+  test('should test widget template previews', async ({ page }) => {
+    await page.click('button:has-text("Add Widget")');
+
+    // Test each template preview
+    const templates = [
+      'Trajectory Visualizer',
+      'Speed Analyzer', 
+      'Signal Monitor',
+      'Data Exporter'
+    ];
+
+    for (const template of templates) {
+      await page.click(`text=${template}`);
+      await expect(page).toHaveScreenshot(`template-${template.toLowerCase().replace(' ', '-')}.png`);
+      
+      // Go back to template selection
+      await page.click('button:has-text("Back")');
+    }
+  });
+
+  test('should test loading and error states', async ({ page }) => {
+    // Test loading state (initial page load)
+    await page.goto('/widget-manager');
+    await page.waitForTimeout(100); // Capture during potential loading
+    await expect(page).toHaveScreenshot('loading-state.png');
+
+    // Test with widgets loaded
+    await page.waitForTimeout(1000);
+    await expect(page).toHaveScreenshot('loaded-state.png');
+  });
+});

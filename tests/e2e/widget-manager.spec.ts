@@ -1,0 +1,215 @@
+import { test, expect } from '@playwright/test';
+
+test.describe('Widget Manager GUI Tests', () => {
+  test.beforeEach(async ({ page }) => {
+    await page.goto('/widget-manager');
+  });
+
+  test('should display widget manager interface', async ({ page }) => {
+    // Check main components are visible
+    await expect(page.locator('text=Widget Dashboard')).toBeVisible();
+    await expect(page.locator('text=Widget System Active')).toBeVisible();
+    await expect(page.locator('text=Active (0)')).toBeVisible();
+    await expect(page.locator('text=All Widgets (0)')).toBeVisible();
+    await expect(page.locator('text=Paused (0)')).toBeVisible();
+  });
+
+  test('should create and manage widgets', async ({ page }) => {
+    // Create a widget first
+    await page.click('button:has-text("Add Widget")');
+    await page.click('text=Speed Analyzer');
+    
+    // Fill in widget name
+    const nameInput = page.locator('input[placeholder*="name"]').first();
+    await nameInput.fill('Test Speed Widget');
+    
+    // Create the widget
+    await page.click('button:has-text("Preview")');
+    await page.click('button:has-text("Create Widget")');
+    
+    // Verify widget appears in dashboard
+    await expect(page.locator('text=Test Speed Widget')).toBeVisible();
+    
+    // Check widget status
+    await expect(page.locator('text=active')).toBeVisible();
+    
+    // Check tabs updated
+    await expect(page.locator('text=Active (1)')).toBeVisible();
+    await expect(page.locator('text=All Widgets (1)')).toBeVisible();
+  });
+
+  test('should filter widgets by status', async ({ page }) => {
+    // Create multiple widgets with different statuses
+    // First widget
+    await page.click('button:has-text("Add Widget")');
+    await page.click('text=Speed Analyzer');
+    await page.locator('input[placeholder*="name"]').first().fill('Speed Widget');
+    await page.click('button:has-text("Preview")');
+    await page.click('button:has-text("Create Widget")');
+    
+    // Second widget
+    await page.click('button:has-text("Add Widget")');
+    await page.click('text=Signal Monitor');
+    await page.locator('input[placeholder*="name"]').first().fill('Signal Widget');
+    await page.click('button:has-text("Preview")');
+    await page.click('button:has-text("Create Widget")');
+    
+    // Test filtering
+    await expect(page.locator('text=All Widgets (2)')).toBeVisible();
+    await expect(page.locator('text=Active (2)')).toBeVisible();
+    
+    // Click on Active tab
+    await page.click('text=Active (2)');
+    await expect(page.locator('text=Speed Widget')).toBeVisible();
+    await expect(page.locator('text=Signal Widget')).toBeVisible();
+    
+    // Click on All Widgets tab
+    await page.click('text=All Widgets (2)');
+    await expect(page.locator('text=Speed Widget')).toBeVisible();
+    await expect(page.locator('text=Signal Widget')).toBeVisible();
+  });
+
+  test('should handle widget actions menu', async ({ page }) => {
+    // Create a widget first
+    await page.click('button:has-text("Add Widget")');
+    await page.click('text=Trajectory Visualizer');
+    await page.locator('input[placeholder*="name"]').first().fill('Test Widget');
+    await page.click('button:has-text("Preview")');
+    await page.click('button:has-text("Create Widget")');
+    
+    // Find and click the widget menu button
+    await page.locator('[data-testid="widget-menu-button"]').first().click();
+    
+    // Check menu options are visible
+    await expect(page.locator('text=Pause')).toBeVisible();
+    await expect(page.locator('text=Configure')).toBeVisible();
+    await expect(page.locator('text=Delete')).toBeVisible();
+    
+    // Test pause action
+    await page.click('text=Pause');
+    await expect(page.locator('text=paused')).toBeVisible();
+    
+    // Test resume action
+    await page.locator('[data-testid="widget-menu-button"]').first().click();
+    await page.click('text=Start');
+    await expect(page.locator('text=active')).toBeVisible();
+  });
+
+  test('should delete widgets', async ({ page }) => {
+    // Create a widget first
+    await page.click('button:has-text("Add Widget")');
+    await page.click('text=Data Exporter');
+    await page.locator('input[placeholder*="name"]').first().fill('Export Widget');
+    await page.click('button:has-text("Preview")');
+    await page.click('button:has-text("Create Widget")');
+    
+    // Verify widget is created
+    await expect(page.locator('text=Export Widget')).toBeVisible();
+    await expect(page.locator('text=All Widgets (1)')).toBeVisible();
+    
+    // Delete the widget
+    await page.locator('[data-testid="widget-menu-button"]').first().click();
+    await page.click('text=Delete');
+    
+    // Verify widget is deleted
+    await expect(page.locator('text=Export Widget')).not.toBeVisible();
+    await expect(page.locator('text=All Widgets (0)')).toBeVisible();
+  });
+
+  test('should display widget information', async ({ page }) => {
+    // Create a widget
+    await page.click('button:has-text("Add Widget")');
+    await page.click('text=Signal Monitor');
+    await page.locator('input[placeholder*="name"]').first().fill('Info Widget');
+    await page.click('button:has-text("Preview")');
+    await page.click('button:has-text("Create Widget")');
+    
+    // Check widget information is displayed
+    await expect(page.locator('text=Info Widget')).toBeVisible();
+    await expect(page.locator('text=signal_monitor')).toBeVisible();
+    await expect(page.locator('text=Last updated:')).toBeVisible();
+    
+    // Check inputs/outputs sections
+    await expect(page.locator('text=Inputs:')).toBeVisible();
+    await expect(page.locator('text=Outputs:')).toBeVisible();
+  });
+
+  test('should handle empty states', async ({ page }) => {
+    // Check empty state for no widgets
+    await expect(page.locator('text=No Active Widgets')).toBeVisible();
+    await expect(page.locator('text=Create your first widget')).toBeVisible();
+    
+    // Check paused tab empty state
+    await page.click('text=Paused (0)');
+    await expect(page.locator('text=No paused widgets')).toBeVisible();
+  });
+
+  test('should auto-refresh widget status', async ({ page }) => {
+    // Create a widget
+    await page.click('button:has-text("Add Widget")');
+    await page.click('text=Speed Analyzer');
+    await page.locator('input[placeholder*="name"]').first().fill('Auto Refresh Widget');
+    await page.click('button:has-text("Preview")');
+    await page.click('button:has-text("Create Widget")');
+    
+    // Verify initial state
+    await expect(page.locator('text=Auto Refresh Widget')).toBeVisible();
+    await expect(page.locator('text=active')).toBeVisible();
+    
+    // Wait a bit and check that the widget is still there
+    await page.waitForTimeout(2000);
+    await expect(page.locator('text=Auto Refresh Widget')).toBeVisible();
+  });
+
+  test('should handle navigation back to home', async ({ page }) => {
+    // Check back button is visible
+    await expect(page.locator('button:has-text("Back to Home")')).toBeVisible();
+    
+    // Click back button
+    await page.click('button:has-text("Back to Home")');
+    
+    // Should navigate to home page
+    await expect(page).toHaveURL('/');
+    await expect(page.locator('text=Debug Player Framework')).toBeVisible();
+  });
+
+  test('should display system status', async ({ page }) => {
+    // Check system status information
+    await expect(page.locator('text=Widget System Active')).toBeVisible();
+    await expect(page.locator('text=0 widgets running')).toBeVisible();
+    
+    // Create a widget and check status update
+    await page.click('button:has-text("Add Widget")');
+    await page.click('text=Trajectory Visualizer');
+    await page.locator('input[placeholder*="name"]').first().fill('Status Widget');
+    await page.click('button:has-text("Preview")');
+    await page.click('button:has-text("Create Widget")');
+    
+    // Check updated status
+    await expect(page.locator('text=1 widgets running')).toBeVisible();
+  });
+
+  test('should handle visual states correctly', async ({ page }) => {
+    // Create widgets with different states
+    await page.click('button:has-text("Add Widget")');
+    await page.click('text=Speed Analyzer');
+    await page.locator('input[placeholder*="name"]').first().fill('Active Widget');
+    await page.click('button:has-text("Preview")');
+    await page.click('button:has-text("Create Widget")');
+    
+    // Check active state styling
+    const activeWidget = page.locator('text=Active Widget').locator('..');
+    await expect(activeWidget).toBeVisible();
+    
+    // Pause the widget
+    await page.locator('[data-testid="widget-menu-button"]').first().click();
+    await page.click('text=Pause');
+    
+    // Check paused state styling
+    await expect(page.locator('text=paused')).toBeVisible();
+    
+    // Check that paused widgets appear in paused tab
+    await page.click('text=Paused (1)');
+    await expect(page.locator('text=Active Widget')).toBeVisible();
+  });
+});

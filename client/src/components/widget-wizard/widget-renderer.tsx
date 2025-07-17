@@ -91,7 +91,7 @@ export default function WidgetRenderer({ widgetId, className = '' }: WidgetRende
   };
 
   return (
-    <Card className={className}>
+    <Card className={className} data-testid="widget-renderer">
       <CardHeader className="pb-3">
         <div className="flex items-center justify-between">
           <CardTitle className="text-lg">{widget.name}</CardTitle>
