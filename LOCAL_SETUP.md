@@ -133,7 +133,7 @@ sudo apt-get install -y build-essential python3-dev gfortran libopenblas-dev lib
 pip install -r python_backend/requirements.txt
 ```
 
-**Alternative: Use Python 3.11**
+**Alternative: Use Python 3.11 (Recommended)**
 If the above steps fail, you can switch to Python 3.11 (which has official NumPy wheels):
 ```bash
 # Ubuntu/Debian - Install Python 3.11 and required packages
@@ -151,6 +151,12 @@ pip install --upgrade pip setuptools wheel
 pip install -r python_backend/requirements.txt
 ```
 
+**Common Python 3.12 Issues**
+If you encounter `AttributeError: module 'pkgutil' has no attribute 'ImpImporter'` with Python 3.12:
+- This is due to compatibility issues between Python 3.12 and older NumPy versions
+- The cleanest solution is to use Python 3.11 as shown above
+- Python 3.12 support for NumPy 1.24.3 requires building from source, which is complex
+
 ### 4. Database Setup
 
 #### Create PostgreSQL Database
@@ -158,11 +164,34 @@ pip install -r python_backend/requirements.txt
 # Connect to PostgreSQL
 sudo -u postgres psql
 
-# Create database and user
+# Create database and user (run these commands inside the psql prompt)
 CREATE DATABASE debug_player_framework;
 CREATE USER debug_user WITH PASSWORD 'debug_password';
 GRANT ALL PRIVILEGES ON DATABASE debug_player_framework TO debug_user;
+
+# Connect to the database to grant schema permissions
+\c debug_player_framework
+GRANT ALL ON SCHEMA public TO debug_user;
+GRANT ALL PRIVILEGES ON ALL TABLES IN SCHEMA public TO debug_user;
+GRANT ALL PRIVILEGES ON ALL SEQUENCES IN SCHEMA public TO debug_user;
+
+# Exit PostgreSQL
 \q
+```
+
+**If you need to recreate the user:**
+```bash
+# Connect to PostgreSQL
+sudo -u postgres psql
+
+# If the user already exists, revoke privileges first
+REVOKE ALL PRIVILEGES ON DATABASE debug_player_framework FROM debug_user;
+\c debug_player_framework
+REVOKE ALL ON SCHEMA public FROM debug_user;
+\c postgres
+DROP USER debug_user;
+
+# Then recreate as shown above
 ```
 
 #### Alternative: Using Docker for PostgreSQL
@@ -180,15 +209,8 @@ docker run --name debug-postgres \
 
 #### Create .env File
 ```bash
-# Create .env file in project root
-cp .env.example .env
-
-# Edit .env file
-nano .env
-```
-
-#### .env File Contents
-```env
+# Create .env file in project root (there's no .env.example, so create directly)
+cat > .env << 'EOF'
 # Database Configuration
 DATABASE_URL=postgresql://debug_user:debug_password@localhost:5432/debug_player_framework
 
@@ -200,10 +222,25 @@ PYTHON_BACKEND_PORT=8000
 # Optional: Python Backend Configuration
 PYTHON_BACKEND_HOST=localhost
 PYTHON_BACKEND_URL=http://localhost:8000
+EOF
+```
+
+#### Verify Environment Variables
+```bash
+# Check that the file was created correctly
+cat .env
 ```
 
 ### 6. Database Migration
 ```bash
+# Test database connection first
+psql -d debug_player_framework -U debug_user -h localhost -c "\dt"
+# Password: debug_password
+# Expected output: "Did not find any relations." (this is normal for empty database)
+
+# Install dotenv package (required for environment variables)
+npm install dotenv
+
 # Push database schema
 npm run db:push
 
@@ -272,7 +309,13 @@ uvicorn main:app --host 0.0.0.0 --port 8000 --reload
 
 ### 2. Start the Frontend & Express Backend
 ```bash
-# In a new terminal, from project root
+# Check if port 5000 is available
+sudo lsof -i :5000
+
+# Kill any existing processes if needed
+sudo pkill -f node
+
+# Start the development server
 npm run dev
 ```
 
@@ -328,6 +371,51 @@ npm run dev
 
 # Both services will auto-reload on changes
 ```
+
+## Common Issues and Solutions
+
+### 1. NumPy Installation Issues
+**Error**: `BackendUnavailable: Cannot import 'setuptools.build_meta'`
+**Solution**: Use Python 3.11 instead of Python 3.12 (see troubleshooting section above)
+
+### 2. PostgreSQL Authentication Failed
+**Error**: `password authentication failed for user "debug_user"`
+**Solution**: Recreate the user with proper privileges (see database setup section)
+
+### 3. Environment Variables Not Loading
+**Error**: `DATABASE_URL must be set`
+**Solution**: Install dotenv package: `npm install dotenv`
+
+### 4. Port Already in Use
+**Error**: `EADDRINUSE: address already in use 0.0.0.0:5000`
+**Solution**: Kill existing processes: `sudo pkill -f node` or `sudo lsof -i :5000`
+
+### 5. Virtual Environment Creation Failed
+**Error**: `No module named venv`
+**Solution**: Install venv package: `sudo apt install python3.11-venv`
+
+### 6. Package Lock File Conflicts
+**Issue**: Many changed files in `package-lock.json`
+**Explanation**: This is normal when switching between local and Replit environments
+**Solution**: Commit your local changes if the setup is working correctly
+
+### 7. Database Connection Test
+**Expected Output**: `Did not find any relations.` (this means connection works, just no tables yet)
+**Next Step**: Run `npm run db:push` to create the tables
+
+## Environment Differences
+
+### Local vs Replit
+- **Node.js Version**: Local may differ from Replit's Node.js version
+- **Package Lock**: Different environments generate different lock files
+- **Python Version**: Local Python version may differ from Replit
+- **Database**: Local PostgreSQL vs Replit's managed database
+
+### Keeping Environments in Sync
+1. Use the same Node.js version (check `package.json` engines field)
+2. Use Python 3.11 for consistency
+3. Commit working `package-lock.json` for your environment
+4. Document any environment-specific configurations
 
 ### 2. Database Changes
 ```bash

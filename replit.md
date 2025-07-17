@@ -146,6 +146,12 @@ The application is designed as a single-page application with a clear separation
 - ✅ **NumPy Build Issue Fix**: Added comprehensive troubleshooting for setuptools.build_meta error
 - ✅ **Python 3.11 Recommendation**: Updated documentation to recommend Python 3.11 for better NumPy compatibility
 - ✅ **Python 3.11 Venv Package**: Added python3.11-venv prerequisite to avoid venv creation issues
+- ✅ **Comprehensive Real-World Issues**: Added all actual setup issues encountered during local development
+- ✅ **PostgreSQL Authentication**: Fixed user privilege issues and added proper database user setup
+- ✅ **Environment Variable Loading**: Added dotenv package installation and configuration
+- ✅ **Port Conflict Resolution**: Added instructions for handling port conflicts and process management
+- ✅ **Database Connection Testing**: Added proper connection testing procedures and expected outputs
+- ✅ **Package Lock File Guidance**: Added explanation for package-lock.json changes between environments
 
 ### Real Trip Data Integration (July 16, 2025)
 - ✅ **Authentic Data Dataset**: Integrated actual Kia Niro EV trip data from 2025-07-15T12_06_02 (50MB)
