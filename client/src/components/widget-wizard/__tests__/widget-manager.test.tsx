@@ -59,41 +59,41 @@ describe('WidgetManager', () => {
     jest.clearAllMocks();
     mockGetInstances.mockReturnValue(mockWidgetInstances);
     mockSetWidgetStatus.mockImplementation(() => {});
-    mockRemoveWidget.mockResolvedValue(undefined);
+    mockRemoveWidget.mockResolvedValue(undefined as never);
   });
 
   describe('Widget Display', () => {
     it('should display all widgets', () => {
       render(<WidgetManager />);
       
-      expect(screen.getByText('Test Widget 1')).toBeInTheDocument();
-      expect(screen.getByText('Test Widget 2')).toBeInTheDocument();
-      expect(screen.getByText('Test Widget 3')).toBeInTheDocument();
+      expect(screen.getByText('Test Widget 1')).toBeTruthy();
+      expect(screen.getByText('Test Widget 2')).toBeTruthy();
+      expect(screen.getByText('Test Widget 3')).toBeTruthy();
     });
 
     it('should show widget status correctly', () => {
       render(<WidgetManager />);
       
-      expect(screen.getByText('active')).toBeInTheDocument();
-      expect(screen.getByText('paused')).toBeInTheDocument();
-      expect(screen.getByText('error')).toBeInTheDocument();
+      expect(screen.getByText('active')).toBeTruthy();
+      expect(screen.getByText('paused')).toBeTruthy();
+      expect(screen.getByText('error')).toBeTruthy();
     });
 
     it('should display widget inputs and outputs', () => {
       render(<WidgetManager />);
       
-      expect(screen.getByText('x')).toBeInTheDocument();
-      expect(screen.getByText('y')).toBeInTheDocument();
-      expect(screen.getByText('chart')).toBeInTheDocument();
-      expect(screen.getByText('speed')).toBeInTheDocument();
-      expect(screen.getByText('analysis')).toBeInTheDocument();
+      expect(screen.getByText('x')).toBeTruthy();
+      expect(screen.getByText('y')).toBeTruthy();
+      expect(screen.getByText('chart')).toBeTruthy();
+      expect(screen.getByText('speed')).toBeTruthy();
+      expect(screen.getByText('analysis')).toBeTruthy();
     });
 
     it('should show last updated time', () => {
       render(<WidgetManager />);
       
       // Check that dates are formatted and displayed
-      expect(screen.getByText(/Last updated:/)).toBeInTheDocument();
+      expect(screen.getByText(/Last updated:/)).toBeTruthy();
     });
   });
 
@@ -152,8 +152,8 @@ describe('WidgetManager', () => {
     });
 
     it('should handle widget deletion errors', async () => {
-      const consoleErrorSpy = jest.spyOn(console, 'error').mockImplementation();
-      mockRemoveWidget.mockRejectedValue(new Error('Deletion failed'));
+      const consoleErrorSpy = jest.spyOn(console, 'error').mockImplementation(() => {});
+      mockRemoveWidget.mockRejectedValue(new Error('Deletion failed') as never);
       
       render(<WidgetManager />);
       
@@ -180,12 +180,12 @@ describe('WidgetManager', () => {
       render(<WidgetManager />);
       
       // Active tab should be selected by default
-      expect(screen.getByText('Active (1)')).toBeInTheDocument();
+      expect(screen.getByText('Active (1)')).toBeTruthy();
       
       // Should show only active widgets
-      expect(screen.getByText('Test Widget 1')).toBeInTheDocument();
-      expect(screen.queryByText('Test Widget 2')).not.toBeInTheDocument();
-      expect(screen.queryByText('Test Widget 3')).not.toBeInTheDocument();
+      expect(screen.getByText('Test Widget 1')).toBeTruthy();
+      expect(screen.queryByText('Test Widget 2')).not.toBeTruthy();
+      expect(screen.queryByText('Test Widget 3')).not.toBeTruthy();
     });
 
     it('should show all widgets in all tab', () => {
@@ -193,9 +193,9 @@ describe('WidgetManager', () => {
       
       fireEvent.click(screen.getByText('All Widgets (3)'));
       
-      expect(screen.getByText('Test Widget 1')).toBeInTheDocument();
-      expect(screen.getByText('Test Widget 2')).toBeInTheDocument();
-      expect(screen.getByText('Test Widget 3')).toBeInTheDocument();
+      expect(screen.getByText('Test Widget 1')).toBeTruthy();
+      expect(screen.getByText('Test Widget 2')).toBeTruthy();
+      expect(screen.getByText('Test Widget 3')).toBeTruthy();
     });
 
     it('should filter paused widgets', () => {
@@ -203,17 +203,17 @@ describe('WidgetManager', () => {
       
       fireEvent.click(screen.getByText('Paused (1)'));
       
-      expect(screen.getByText('Test Widget 2')).toBeInTheDocument();
-      expect(screen.queryByText('Test Widget 1')).not.toBeInTheDocument();
-      expect(screen.queryByText('Test Widget 3')).not.toBeInTheDocument();
+      expect(screen.getByText('Test Widget 2')).toBeTruthy();
+      expect(screen.queryByText('Test Widget 1')).not.toBeTruthy();
+      expect(screen.queryByText('Test Widget 3')).not.toBeTruthy();
     });
 
     it('should show correct widget counts in tabs', () => {
       render(<WidgetManager />);
       
-      expect(screen.getByText('Active (1)')).toBeInTheDocument();
-      expect(screen.getByText('All Widgets (3)')).toBeInTheDocument();
-      expect(screen.getByText('Paused (1)')).toBeInTheDocument();
+      expect(screen.getByText('Active (1)')).toBeTruthy();
+      expect(screen.getByText('All Widgets (3)')).toBeTruthy();
+      expect(screen.getByText('Paused (1)')).toBeTruthy();
     });
   });
 
@@ -223,7 +223,7 @@ describe('WidgetManager', () => {
       
       render(<WidgetManager />);
       
-      expect(screen.getByText('No active widgets.')).toBeInTheDocument();
+      expect(screen.getByText('No active widgets.')).toBeTruthy();
     });
 
     it('should show empty state for no paused widgets', () => {
@@ -233,7 +233,7 @@ describe('WidgetManager', () => {
       
       fireEvent.click(screen.getByText('Paused (0)'));
       
-      expect(screen.getByText('No paused widgets.')).toBeInTheDocument();
+      expect(screen.getByText('No paused widgets.')).toBeTruthy();
     });
   });
 
@@ -241,7 +241,7 @@ describe('WidgetManager', () => {
     it('should include widget wizard component', () => {
       render(<WidgetManager />);
       
-      expect(screen.getByText('Add Widget')).toBeInTheDocument();
+      expect(screen.getByText('Add Widget')).toBeTruthy();
     });
 
     it('should refresh widgets periodically', () => {
@@ -264,8 +264,8 @@ describe('WidgetManager', () => {
     it('should show system status information', () => {
       render(<WidgetManager />);
       
-      expect(screen.getByText(/Widget System Active/)).toBeInTheDocument();
-      expect(screen.getByText(/widgets running/)).toBeInTheDocument();
+      expect(screen.getByText(/Widget System Active/)).toBeTruthy();
+      expect(screen.getByText(/widgets running/)).toBeTruthy();
     });
   });
 });

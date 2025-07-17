@@ -131,7 +131,7 @@ export class PythonBackendIntegration {
           return {
             success: true,
             plugin_name: `${pluginType}_plugin`,
-            time_range: [0, 300.0],
+            time_range: [0, 300.0] as [number, number],
             signals: this.generateSignalDefinitions(pluginType),
             data_points: 15000,
             isDemoMode: true,
@@ -154,7 +154,7 @@ export class PythonBackendIntegration {
               return {
                 success: true,
                 plugin_name: `${pluginType}_plugin`,
-                time_range: [0, 300.0],
+                time_range: [0, 300.0] as [number, number],
                 signals: this.generateSignalDefinitions(pluginType),
                 data_points: 15000,
                 isDemoMode: true,
@@ -209,22 +209,22 @@ export class PythonBackendIntegration {
       return {
         success: true,
         plugin_name: `${pluginType}_plugin`,
-        time_range: timeRange,
+        time_range: timeRange as [number, number],
         signals,
         data_points: dataPoints,
-        hasRealTrajectoryData: true,
-        trajectoryFiles: {
-          pathTrajectory: files.includes('path_trajectory.csv'),
-          carPose: files.includes('car_pose.csv'),
-          gps: files.includes('gps.csv')
-        }
+        // hasRealTrajectoryData: true,
+        // trajectoryFiles: {
+        //   pathTrajectory: files.includes('path_trajectory.csv'),
+        //   carPose: files.includes('car_pose.csv'),
+        //   gps: files.includes('gps.csv')
+        // }
       };
     } catch (error: any) {
       // Return demo data even if file analysis fails
       return {
         success: true,
         plugin_name: `${pluginType}_plugin`,
-        time_range: [0, 300.0],
+        time_range: [0, 300.0] as [number, number],
         signals: this.generateSignalDefinitions(pluginType),
         data_points: 15000,
         isDemoMode: true,

@@ -120,7 +120,13 @@ export default function DebugPlayer() {
         {/* Left Sidebar */}
         {leftSidebarOpen && (
           <SidebarLeft
-            plugins={plugins}
+            plugins={plugins.map(p => ({
+              id: p.id,
+              name: p.name,
+              description: p.description || '',
+              isActive: p.isActive || false,
+              version: p.version
+            }))}
             dataSession={dataSession}
             activeSignals={activeSignals}
             bookmarks={bookmarks}

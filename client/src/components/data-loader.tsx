@@ -124,7 +124,10 @@ export default function DataLoader({ onLoadComplete }: DataLoaderProps) {
         userId: 1 // Default user for now
       };
 
-      const sessionResponse = await apiRequest('POST', '/api/sessions', sessionData);
+      const sessionResponse = await apiRequest('/api/sessions', {
+        method: 'POST',
+        body: JSON.stringify(sessionData),
+      });
       const session = await sessionResponse.json();
 
       clearInterval(progressInterval);
@@ -216,7 +219,10 @@ export default function DataLoader({ onLoadComplete }: DataLoaderProps) {
         userId: 1 // Default user for now
       };
 
-      const sessionResponse = await apiRequest('POST', '/api/sessions', sessionData);
+      const sessionResponse = await apiRequest('/api/sessions', {
+        method: 'POST',
+        body: JSON.stringify(sessionData),
+      });
       const session = await sessionResponse.json();
 
       clearInterval(progressInterval);

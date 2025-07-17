@@ -24,7 +24,7 @@ export default function PluginManager() {
   const { toast } = useToast();
   const queryClient = useQueryClient();
 
-  const { data: plugins, isLoading } = useQuery({
+  const { data: plugins = [], isLoading } = useQuery({
     queryKey: ["/api/plugins"],
   });
 
@@ -152,7 +152,7 @@ export default function PluginManager() {
       </div>
 
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-        {plugins?.map((plugin: Plugin) => (
+        {(plugins as Plugin[])?.map((plugin: Plugin) => (
           <Card key={plugin.id} className="relative">
             <CardHeader className="pb-2">
               <div className="flex justify-between items-start">
@@ -201,7 +201,7 @@ export default function PluginManager() {
         ))}
       </div>
 
-      {plugins?.length === 0 && (
+      {(plugins as Plugin[])?.length === 0 && (
         <Card className="p-12 text-center">
           <div className="space-y-4">
             <Settings className="h-12 w-12 mx-auto text-muted-foreground" />

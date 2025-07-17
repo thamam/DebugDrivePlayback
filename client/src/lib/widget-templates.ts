@@ -55,13 +55,13 @@ const trajectoryVisualizerImplementation: WidgetImplementation = {
   render: (data) => {
     const { spatial_chart } = data;
     
-    return React.createElement(ResponsiveContainer, { width: '100%', height: 300 }, 
-      React.createElement(ScatterChart, { data: spatial_chart },
-        React.createElement(CartesianGrid, { strokeDasharray: '3 3' }),
-        React.createElement(XAxis, { dataKey: 'x', type: 'number' as const }),
-        React.createElement(YAxis, { dataKey: 'y', type: 'number' as const }),
-        React.createElement(Tooltip),
-        React.createElement(Scatter, { dataKey: 'x', fill: '#8884d8' })
+    return React.createElement(ResponsiveContainer as any, { width: '100%', height: 300 }, 
+      React.createElement(Scatter as any, { data: spatial_chart },
+        React.createElement(CartesianGrid as any, { strokeDasharray: '3 3' }),
+        React.createElement(XAxis as any, { dataKey: 'x', type: 'number' as const }),
+        React.createElement(YAxis as any, { dataKey: 'y', type: 'number' as const }),
+        React.createElement(Tooltip as any),
+        React.createElement(Scatter as any, { dataKey: 'x', fill: '#8884d8' })
       )
     );
   }
@@ -108,14 +108,14 @@ const speedAnalyzerImplementation: WidgetImplementation = {
   render: (data) => {
     const { speed_chart } = data;
     
-    return React.createElement(ResponsiveContainer, { width: '100%', height: 300 },
-      React.createElement(LineChart, { data: speed_chart },
-        React.createElement(CartesianGrid, { strokeDasharray: '3 3' }),
-        React.createElement(XAxis, { dataKey: 'time' }),
-        React.createElement(YAxis),
-        React.createElement(Tooltip),
-        React.createElement(Line, { type: 'monotone', dataKey: 'current', stroke: '#8884d8', name: 'Current Speed' }),
-        React.createElement(Line, { type: 'monotone', dataKey: 'target', stroke: '#82ca9d', name: 'Target Speed' })
+    return React.createElement(ResponsiveContainer as any, { width: '100%', height: 300 },
+      React.createElement(Line as any, { data: speed_chart },
+        React.createElement(CartesianGrid as any, { strokeDasharray: '3 3' }),
+        React.createElement(XAxis as any, { dataKey: 'time' }),
+        React.createElement(YAxis as any),
+        React.createElement(Tooltip as any),
+        React.createElement(Line as any, { type: 'monotone' as const, dataKey: 'current', stroke: '#8884d8', name: 'Current Speed' }),
+        React.createElement(Line as any, { type: 'monotone' as const, dataKey: 'target', stroke: '#82ca9d', name: 'Target Speed' })
       )
     );
   }
@@ -140,7 +140,7 @@ const signalMonitorImplementation: WidgetImplementation = {
       
       Object.entries(signals).forEach(([key, value]) => {
         if (typeof value === 'number') {
-          dataPoint[key] = value;
+          (dataPoint as any)[key] = value;
         }
       });
       
@@ -159,13 +159,13 @@ const signalMonitorImplementation: WidgetImplementation = {
   render: (data) => {
     const { signal_chart } = data;
     
-    return React.createElement(ResponsiveContainer, { width: '100%', height: 300 },
-      React.createElement(LineChart, { data: signal_chart },
-        React.createElement(CartesianGrid, { strokeDasharray: '3 3' }),
-        React.createElement(XAxis, { dataKey: 'time' }),
-        React.createElement(YAxis),
-        React.createElement(Tooltip),
-        React.createElement(Line, { type: 'monotone', dataKey: 'value', stroke: '#8884d8' })
+    return React.createElement(ResponsiveContainer as any, { width: '100%', height: 300 },
+      React.createElement(Line as any, { data: signal_chart },
+        React.createElement(CartesianGrid as any, { strokeDasharray: '3 3' }),
+        React.createElement(XAxis as any, { dataKey: 'time' }),
+        React.createElement(YAxis as any),
+        React.createElement(Tooltip as any),
+        React.createElement(Line as any, { type: 'monotone' as const, dataKey: 'value', stroke: '#8884d8' })
       )
     );
   }
