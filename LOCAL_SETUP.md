@@ -428,11 +428,12 @@ cd python_backend && python run_server.py
 # Delete node_modules and package-lock.json
 rm -rf node_modules package-lock.json
 
-# Use npm ci to install exact versions from package-lock.json
-npm ci
+# Use legacy peer deps to bypass strict version checking
+npm install --legacy-peer-deps
 
-# Or if that fails, clean install
-npm install
+# Or use the provided fix script
+chmod +x fix-dependencies.sh
+./fix-dependencies.sh
 ```
 
 ### 8. Database Connection Test
