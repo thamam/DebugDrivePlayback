@@ -372,6 +372,21 @@ npm run dev
 # Both services will auto-reload on changes
 ```
 
+### 2. After System Reboot
+```bash
+# Reactivate Python environment
+source venv/bin/activate
+
+# Verify Python dependencies are still installed
+pip list | grep -E "(fastapi|uvicorn|numpy|pandas)"
+
+# If packages are missing, reinstall
+pip install -r python_backend/requirements.txt
+
+# Start Python backend
+cd python_backend && python run_server.py
+```
+
 ## Common Issues and Solutions
 
 ### 1. NumPy Installation Issues
