@@ -136,12 +136,18 @@ pip install -r python_backend/requirements.txt
 **Alternative: Use Python 3.11**
 If the above steps fail, you can switch to Python 3.11 (which has official NumPy wheels):
 ```bash
-# Ubuntu/Debian
+# Ubuntu/Debian - Install Python 3.11 and required packages
 sudo apt install python3.11 python3.11-venv python3.11-dev
+
+# Remove existing venv (if it exists)
+rm -rf venv
 
 # Create venv with Python 3.11
 python3.11 -m venv venv
 source venv/bin/activate
+
+# Upgrade pip and install dependencies
+pip install --upgrade pip setuptools wheel
 pip install -r python_backend/requirements.txt
 ```
 
