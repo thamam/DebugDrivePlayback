@@ -153,7 +153,7 @@ export class WidgetEngine {
 
     } catch (error) {
       instance.status = 'error';
-      instance.metadata = { ...instance.metadata, error: error.message };
+      instance.metadata = { ...instance.metadata, error: error instanceof Error ? error.message : String(error) };
     }
   }
 

@@ -38,9 +38,36 @@ export const mockBookmarks: Bookmark[] = [
 ];
 
 export const mockPlugins: Plugin[] = [
-  { id: 1, name: 'CarPosePlugin', description: 'Vehicle positioning data', isActive: true, version: '1.0.0' },
-  { id: 2, name: 'PathViewPlugin', description: 'Path visualization', isActive: true, version: '1.2.0' },
-  { id: 3, name: 'CollisionPlugin', description: 'Collision detection', isActive: true, version: '2.1.0' }
+  { 
+    id: 1, 
+    name: 'CarPosePlugin', 
+    description: 'Vehicle positioning data', 
+    isActive: true, 
+    version: '1.0.0',
+    pluginType: 'visualization',
+    configuration: '{}',
+    createdAt: new Date()
+  },
+  { 
+    id: 2, 
+    name: 'PathViewPlugin', 
+    description: 'Path visualization', 
+    isActive: true, 
+    version: '1.2.0',
+    pluginType: 'visualization',
+    configuration: '{}',
+    createdAt: new Date()
+  },
+  { 
+    id: 3, 
+    name: 'CollisionPlugin', 
+    description: 'Collision detection', 
+    isActive: true, 
+    version: '2.1.0',
+    pluginType: 'analysis',
+    configuration: '{}',
+    createdAt: new Date()
+  }
 ];
 
 export const mockDataSession = {

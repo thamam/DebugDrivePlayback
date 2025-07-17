@@ -55,11 +55,11 @@ const trajectoryVisualizerImplementation: WidgetImplementation = {
   render: (data) => {
     const { spatial_chart } = data;
     
-    return React.createElement(ResponsiveContainer, { width: '100%', height: 300 },
+    return React.createElement(ResponsiveContainer, { width: '100%', height: 300 }, 
       React.createElement(ScatterChart, { data: spatial_chart },
         React.createElement(CartesianGrid, { strokeDasharray: '3 3' }),
-        React.createElement(XAxis, { dataKey: 'x', type: 'number' }),
-        React.createElement(YAxis, { dataKey: 'y', type: 'number' }),
+        React.createElement(XAxis, { dataKey: 'x', type: 'number' as const }),
+        React.createElement(YAxis, { dataKey: 'y', type: 'number' as const }),
         React.createElement(Tooltip),
         React.createElement(Scatter, { dataKey: 'x', fill: '#8884d8' })
       )

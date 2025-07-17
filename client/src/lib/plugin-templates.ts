@@ -82,7 +82,7 @@ export const pluginTemplates: Record<string, PluginTypeTemplate> = {
           handlerFunction: "get_timestamps",
           outputFormat: {
             type: "array",
-            structure: "List[float]",
+            structure: { type: "List[float]" },
             examples: [
               [1609459200.0, 1609459201.0, 1609459202.0]
             ]
@@ -612,8 +612,8 @@ export const pluginTemplates: Record<string, PluginTypeTemplate> = {
           handlerFunction: "get_current_speed_at_timestamp",
           outputFormat: {
             type: "single_value",
-            structure: "float",
-            examples: [15.6]
+            structure: { type: "float" },
+            examples: [{ value: 15.6 }]
           }
         },
         {
@@ -624,8 +624,8 @@ export const pluginTemplates: Record<string, PluginTypeTemplate> = {
           handlerFunction: "get_current_steering_angle",
           outputFormat: {
             type: "single_value",
-            structure: "float",
-            examples: [12.5]
+            structure: { type: "float" },
+            examples: [{ value: 12.5 }]
           }
         },
         {
@@ -637,8 +637,8 @@ export const pluginTemplates: Record<string, PluginTypeTemplate> = {
           categories: ["MANUAL", "AUTONOMOUS", "PARK_ASSIST", "EMERGENCY"],
           outputFormat: {
             type: "single_value",
-            structure: "string",
-            examples: ["AUTONOMOUS"]
+            structure: { type: "string" },
+            examples: [{ value: "AUTONOMOUS" }]
           }
         }
       ],

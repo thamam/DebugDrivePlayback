@@ -51,7 +51,7 @@ export function useDebugPlayer() {
   const toggleSignal = (signal: string) => {
     setActiveSignals(prev => ({
       ...prev,
-      [signal]: !prev[signal]
+      [signal]: !prev[signal as keyof typeof prev]
     }));
   };
 
