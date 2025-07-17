@@ -383,6 +383,12 @@ pip list | grep -E "(fastapi|uvicorn|numpy|pandas)"
 # If packages are missing, reinstall
 pip install -r python_backend/requirements.txt
 
+# Check if dotenv is installed for Node.js
+npm list dotenv
+
+# If dotenv is missing, install it
+npm install dotenv
+
 # Start Python backend
 cd python_backend && python run_server.py
 ```
@@ -398,7 +404,7 @@ cd python_backend && python run_server.py
 **Solution**: Recreate the user with proper privileges (see database setup section)
 
 ### 3. Environment Variables Not Loading
-**Error**: `DATABASE_URL must be set`
+**Error**: `DATABASE_URL must be set` or `Cannot find package 'dotenv'`
 **Solution**: Install dotenv package: `npm install dotenv`
 
 ### 4. Port Already in Use
