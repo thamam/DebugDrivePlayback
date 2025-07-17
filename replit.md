@@ -131,6 +131,16 @@ The application is designed as a single-page application with a clear separation
 
 ## Recent Changes (July 2025)
 
+### Local Setup Instructions Added (July 17, 2025)
+- ✅ **Comprehensive Local Setup Guide**: Complete instructions for local development in `LOCAL_SETUP.md`
+- ✅ **Automated Setup Script**: `local-setup.sh` script for one-command setup
+- ✅ **Development Scripts**: Helper scripts for starting Python backend and frontend
+- ✅ **Environment Configuration**: Detailed .env setup and database configuration
+- ✅ **Real Data Instructions**: Guide for using authentic vehicle data locally
+- ✅ **Performance Optimization**: Local setup recommended for real data processing
+- ✅ **Prerequisites Documentation**: Complete list of required software and versions
+- ✅ **Troubleshooting Guide**: Common issues and solutions for local development
+
 ### Real Trip Data Integration (July 16, 2025)
 - ✅ **Authentic Data Dataset**: Integrated actual Kia Niro EV trip data from 2025-07-15T12_06_02 (50MB)
 - ✅ **Repository Data Storage**: Trip data permanently stored in `/data/trips/2025-07-15T12_06_02/`
