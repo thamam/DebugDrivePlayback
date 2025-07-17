@@ -1,0 +1,52 @@
+70 http fetch GET 200 https://registry.npmjs.org/yaml 94ms (cache revalidated)
+71 silly packumentCache full:https://registry.npmjs.org/yaml set size:357940 disposed:false
+72 verbose stack Error: could not resolve
+72 verbose stack     at PlaceDep.failPeerConflict (/home/thh3/.nvm/versions/node/v22.17.0/lib/node_modules/npm/node_modules/@npmcli/arborist/lib/place-dep.js:503:25)
+72 verbose stack     at new PlaceDep (/home/thh3/.nvm/versions/node/v22.17.0/lib/node_modules/npm/node_modules/@npmcli/arborist/lib/place-dep.js:157:21)
+72 verbose stack     at #buildDepStep (/home/thh3/.nvm/versions/node/v22.17.0/lib/node_modules/npm/node_modules/@npmcli/arborist/lib/arborist/build-ideal-tree.js:931:18)
+72 verbose stack     at async Arborist.buildIdealTree (/home/thh3/.nvm/versions/node/v22.17.0/lib/node_modules/npm/node_modules/@npmcli/arborist/lib/arborist/build-ideal-tree.js:182:7)
+72 verbose stack     at async Promise.all (index 1)
+72 verbose stack     at async Arborist.reify (/home/thh3/.nvm/versions/node/v22.17.0/lib/node_modules/npm/node_modules/@npmcli/arborist/lib/arborist/reify.js:131:5)
+72 verbose stack     at async Install.exec (/home/thh3/.nvm/versions/node/v22.17.0/lib/node_modules/npm/lib/commands/install.js:149:5)
+72 verbose stack     at async Npm.exec (/home/thh3/.nvm/versions/node/v22.17.0/lib/node_modules/npm/lib/npm.js:208:9)
+72 verbose stack     at async module.exports (/home/thh3/.nvm/versions/node/v22.17.0/lib/node_modules/npm/lib/cli/entry.js:67:5)
+73 error code ERESOLVE
+74 error ERESOLVE could not resolve
+75 error
+76 error While resolving: @tailwindcss/vite@4.1.3
+76 error Found: vite@7.0.5
+76 error node_modules/vite
+76 error   peer vite@"^4.2.0 || ^5.0.0 || ^6.0.0 || ^7.0.0-beta.0" from @vitejs/plugin-react@4.6.0
+76 error   node_modules/@vitejs/plugin-react
+76 error     dev @vitejs/plugin-react@"^4.3.2" from the root project
+76 error   dev vite@"^7.0.5" from the root project
+76 error
+76 error Could not resolve dependency:
+76 error peer vite@"^5.2.0 || ^6" from @tailwindcss/vite@4.1.3
+76 error node_modules/@tailwindcss/vite
+76 error   dev @tailwindcss/vite@"^4.1.3" from the root project
+76 error
+76 error Conflicting peer dependency: vite@6.3.5
+76 error node_modules/vite
+76 error   peer vite@"^5.2.0 || ^6" from @tailwindcss/vite@4.1.3
+76 error   node_modules/@tailwindcss/vite
+76 error     dev @tailwindcss/vite@"^4.1.3" from the root project
+76 error
+76 error Fix the upstream dependency conflict, or retry
+76 error this command with --force or --legacy-peer-deps
+76 error to accept an incorrect (and potentially broken) dependency resolution.
+77 error
+77 error
+77 error For a full report see:
+77 error /home/thh3/.npm/_logs/2025-07-17T23_00_50_308Z-eresolve-report.txt
+78 silly unfinished npm timer reify 1752793250423
+79 silly unfinished npm timer reify:loadTrees 1752793250423
+80 silly unfinished npm timer idealTree:buildDeps 1752793250559
+81 silly unfinished npm timer idealTree:node_modules/@tailwindcss/vite 1752793250695
+82 verbose cwd /home/thh3/personal/DebugDrivePlayback
+83 verbose os Linux 6.8.0-60-generic
+84 verbose node v22.17.0
+85 verbose npm  v11.4.2
+86 verbose exit 1
+87 verbose code 1
+88 error A complete log of this run can be found in: /home/thh3/.npm/_logs/2025-07-17T23_00_50_308Z-debug-0.log

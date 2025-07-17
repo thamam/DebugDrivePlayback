@@ -399,7 +399,22 @@ npm run dev
 **Explanation**: This is normal when switching between local and Replit environments
 **Solution**: Commit your local changes if the setup is working correctly
 
-### 7. Database Connection Test
+### 7. Vite Version Conflict
+**Error**: `ERESOLVE could not resolve` with @tailwindcss/vite and Vite version mismatch
+**Cause**: Local Node.js/npm version differs from project requirements
+**Solution**: 
+```bash
+# Delete node_modules and package-lock.json
+rm -rf node_modules package-lock.json
+
+# Use npm ci to install exact versions from package-lock.json
+npm ci
+
+# Or if that fails, clean install
+npm install
+```
+
+### 8. Database Connection Test
 **Expected Output**: `Did not find any relations.` (this means connection works, just no tables yet)
 **Next Step**: Run `npm run db:push` to create the tables
 
@@ -416,6 +431,24 @@ npm run dev
 2. Use Python 3.11 for consistency
 3. Commit working `package-lock.json` for your environment
 4. Document any environment-specific configurations
+
+### Node.js Version Compatibility
+**Issue**: Your local Node.js v22.17.0 with npm v11.4.2 may have different dependency resolution than Replit
+**Recommendation**: Use Node.js v20.x for better compatibility
+```bash
+# Check your current versions
+node --version
+npm --version
+
+# Install Node.js v20 (recommended)
+curl -fsSL https://deb.nodesource.com/setup_20.x | sudo -E bash -
+sudo apt-get install -y nodejs
+
+# Or use nvm for version management
+curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.0/install.sh | bash
+nvm install 20
+nvm use 20
+```
 
 ### 2. Database Changes
 ```bash
