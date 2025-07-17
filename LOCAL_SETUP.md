@@ -389,7 +389,25 @@ npm list dotenv
 # If dotenv is missing, install it
 npm install dotenv
 
-# Start Python backend
+# Start Python backend (from project root, not python_backend directory)
+cd python_backend && python run_server.py
+```
+
+### 3. Common Python Backend Issues
+**Error**: `ModuleNotFoundError: No module named 'uvicorn'`
+**Cause**: Virtual environment not activated
+**Solution**: 
+```bash
+# Go back to project root
+cd ~/personal/DebugDrivePlayback
+
+# Activate virtual environment
+source venv/bin/activate
+
+# Verify environment is active (should show (venv) in prompt)
+which python
+
+# Then start Python backend
 cd python_backend && python run_server.py
 ```
 
