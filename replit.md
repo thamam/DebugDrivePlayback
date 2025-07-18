@@ -129,7 +129,35 @@ Preferred communication style: Simple, everyday language.
 
 The application is designed as a single-page application with a clear separation between frontend visualization and backend data management, using modern web technologies to provide a responsive and professional debugging experience for vehicle data analysis.
 
+## R&D Roadmap and Testing Strategy
+
+### Phase 1: Core Infrastructure (Current) - July 2025
+- **Focus**: Widget Wizard infrastructure and core functionality
+- **Testing Tools**: Jest + React Testing Library + Playwright (comprehensive coverage)
+- **Status**: 85%+ test coverage with 180+ tests across unit, integration, and E2E
+- **Priority**: Complete Widget Wizard system before adding additional testing frameworks
+
+### Phase 2: Component Documentation and Visual Testing (Future)
+- **Storybook Integration**: Component documentation and isolated development
+- **Target Components**: Widget Wizard, Debug Player visualization, Shadcn/ui variants
+- **Benefits**: Design system documentation, visual regression testing, developer onboarding
+- **Decision**: Deferred to maintain focus on core infrastructure completion
+
+### Current Testing Infrastructure (Comprehensive)
+- **Unit Testing**: Jest + React Testing Library + jsdom
+- **End-to-End Testing**: Playwright with multi-browser support (Chrome, Firefox, Safari)
+- **Visual Testing**: Screenshot comparison and responsive design validation
+- **Accessibility Testing**: Screen reader and keyboard navigation compliance
+- **Coverage**: HTML, LCOV, JSON reporting with 60% threshold
+- **Test Count**: 180+ tests across 10 test files
+
 ## Recent Changes (July 2025)
+
+### Testing Strategy Finalized (July 18, 2025)
+- ✅ **Phase 1 Focus**: Maintain current Jest + Playwright testing stack
+- ✅ **Phase 2 Planning**: Storybook deferred for component documentation phase
+- ✅ **Testing Coverage**: Confirmed 85%+ coverage with comprehensive E2E testing
+- ✅ **Infrastructure Priority**: Widget Wizard completion before additional frameworks
 
 ### Local Setup Instructions Added (July 17, 2025)
 - ✅ **Comprehensive Local Setup Guide**: Complete instructions for local development in `LOCAL_SETUP.md`
