@@ -1,6 +1,6 @@
 import { Layers, Upload, Save, Download, Settings, RefreshCw, Filter } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { useDebugPlayer } from '@/hooks/use-debug-player';
+import { useDebugPlayer } from '@/hooks/use-debug-player-fixed';
 import { SidebarLeft } from '@/components/debug-player/sidebar-left';
 import { SidebarRight } from '@/components/debug-player/sidebar-right';
 import { VisualizationArea } from '@/components/debug-player/visualization-area';
