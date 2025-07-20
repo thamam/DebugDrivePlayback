@@ -33,11 +33,16 @@ services:
         condition: service_healthy
     command: >
       bash -c "
+        echo 'Setting up Node.js dependencies...' &&
         npm install --legacy-peer-deps &&
+        echo 'Setting up Python environment...' &&
         python3.11 -m venv venv &&
         source venv/bin/activate &&
+        pip install --upgrade pip &&
         pip install -r python_backend/requirements.txt &&
+        echo 'Setting up database...' &&
         npm run db:push &&
+        echo 'Starting development server...' &&
         npm run dev
       "
 

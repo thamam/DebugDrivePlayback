@@ -1,4 +1,4 @@
-FROM node:22-bullseye
+FROM node:22-bookworm
 
 # Install Python 3.11 and minimal system dependencies
 RUN apt-get update && apt-get install -y \
@@ -8,6 +8,9 @@ RUN apt-get update && apt-get install -y \
     build-essential \
     postgresql-client \
     && rm -rf /var/lib/apt/lists/*
+
+# Create symlinks for python3 to point to python3.11
+RUN ln -sf /usr/bin/python3.11 /usr/bin/python3
 
 # Set working directory
 WORKDIR /app
