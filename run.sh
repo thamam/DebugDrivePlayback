@@ -23,6 +23,11 @@ echo "================================================"
 # Check if already set up
 if [[ -f ".env" && -d "venv" && -d "node_modules" ]]; then
     print_success "Setup detected, starting application..."
+    echo ""
+    print_info "🌐 Application will be available at:"
+    echo -e "${GREEN}   → http://localhost:5000${NC}"
+    echo -e "${BLUE}   → Click the link above to open the Debug Player Framework${NC}"
+    echo ""
     npm run dev
     exit 0
 fi
@@ -48,6 +53,11 @@ if command -v docker >/dev/null 2>&1; then
     
     # Start application
     print_success "Starting application..."
+    echo ""
+    print_info "🌐 Application will be available at:"
+    echo -e "${GREEN}   → http://localhost:5000${NC}"
+    echo -e "${BLUE}   → Click the link above to open the Debug Player Framework${NC}"
+    echo ""
     npm run dev
     
 elif command -v psql >/dev/null 2>&1; then
@@ -69,6 +79,11 @@ elif command -v psql >/dev/null 2>&1; then
     
     # Start application
     print_success "Starting application..."
+    echo ""
+    print_info "🌐 Application will be available at:"
+    echo -e "${GREEN}   → http://localhost:5000${NC}"
+    echo -e "${BLUE}   → Click the link above to open the Debug Player Framework${NC}"
+    echo ""
     npm run dev
     
 else
