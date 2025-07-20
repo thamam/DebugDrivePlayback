@@ -17,12 +17,10 @@ import { useToast } from "@/hooks/use-toast";
 const customPluginSchema = z.object({
   name: z.string().min(1, "Plugin name is required"),
   description: z.string().min(10, "Description must be at least 10 characters"),
-  pluginType: z.enum(["data_source", "visualization", "analysis", "streaming", "hybrid"]),
+  type: z.string(),
   version: z.string().default("1.0.0"),
-  dataColumns: z.array(z.string()).min(1, "At least one data column is required"),
-  visualizationType: z.enum(["line_chart", "scatter_plot", "spatial_2d", "spatial_3d", "gauge", "table"]).optional(),
-  processingMode: z.enum(["real_time", "batch", "streaming"]),
-  configuration: z.record(z.any()).optional(),
+  isActive: z.boolean().default(true),
+  configuration: z.string().optional(),
 });
 
 type CustomPluginFormData = z.infer<typeof customPluginSchema>;
@@ -80,11 +78,10 @@ export default function CustomPluginCreator({ onPluginCreate }: CustomPluginCrea
     defaultValues: {
       name: "",
       description: "",
-      pluginType: "visualization",
+      type: "visualization",
       version: "1.0.0",
-      dataColumns: [],
-      processingMode: "real_time",
-      configuration: {},
+      isActive: true,
+      configuration: "{}",
     },
   });
 
@@ -92,25 +89,53 @@ export default function CustomPluginCreator({ onPluginCreate }: CustomPluginCrea
     setSelectedTemplate(template.id);
     form.setValue("name", template.name);
     form.setValue("description", template.description);
-    form.setValue("pluginType", template.type);
-    form.setValue("dataColumns", template.defaultColumns);
-    form.setValue("visualizationType", template.visualization);
+    form.setValue("type", template.type);
+    form.setValue("configuration", JSON.stringify({
+      dataColumns: template.defaultColumns,
+      visualizationType: template.visualization,
+      processingMode: "real_time"
+    }));
   };
 
-  const handleSubmit = (data: CustomPluginFormData) => {
-    // Here you would typically send this to your backend
-    console.log("Creating custom plugin:", data);
-    
-    onPluginCreate?.(data);
-    
-    toast({
-      title: "Custom Plugin Created",
-      description: `Plugin "${data.name}" has been created successfully`,
-    });
-    
-    form.reset();
-    setSelectedTemplate(null);
-    setOpen(false);
+  const handleSubmit = async (data: CustomPluginFormData) => {
+    try {
+      const response = await fetch('/api/plugins', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(data),
+      });
+
+      if (!response.ok) {
+        const error = await response.text();
+        throw new Error(`Failed to create plugin: ${error}`);
+      }
+
+      const result = await response.json();
+      console.log('Plugin created:', result);
+      
+      toast({
+        title: "Plugin Created",
+        description: `${data.name} has been created successfully.`,
+      });
+      
+      setOpen(false);
+      form.reset();
+      setSelectedTemplate(null);
+      
+      // Trigger a refresh of the plugin list if onPluginCreate callback is provided
+      if (onPluginCreate) {
+        onPluginCreate(result);
+      }
+    } catch (error) {
+      console.error('Error creating plugin:', error);
+      toast({
+        title: "Error",
+        description: error instanceof Error ? error.message : "Failed to create plugin",
+        variant: "destructive",
+      });
+    }
   };
 
   return (
@@ -224,7 +249,7 @@ export default function CustomPluginCreator({ onPluginCreate }: CustomPluginCrea
               <div className="grid grid-cols-2 gap-4">
                 <FormField
                   control={form.control}
-                  name="pluginType"
+                  name="type"
                   render={({ field }) => (
                     <FormItem>
                       <FormLabel>Plugin Type</FormLabel>

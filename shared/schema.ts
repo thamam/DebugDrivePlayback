@@ -50,7 +50,7 @@ export const plugins = pgTable("plugins", {
   description: text("description"),
   isActive: boolean("is_active").default(true),
   version: text("version").notNull(),
-  pluginType: text("plugin_type").notNull(),
+  type: text("type").notNull(),
   configuration: text("configuration"), // JSON string
   createdAt: timestamp("created_at").defaultNow(),
 });
@@ -76,9 +76,6 @@ export const insertBookmarkSchema = createInsertSchema(bookmarks).omit({
 export const insertPluginSchema = createInsertSchema(plugins).omit({
   id: true,
   createdAt: true,
-}).extend({
-  pluginType: z.string(),
-  configuration: z.string().optional(),
 });
 
 export type User = typeof users.$inferSelect;
