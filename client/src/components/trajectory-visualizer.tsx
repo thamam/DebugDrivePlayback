@@ -228,18 +228,26 @@ export default function TrajectoryVisualizer({ tripData, isRealData }: Trajector
           <div className="grid grid-cols-4 gap-4">
             <div className="bg-muted p-3 rounded-lg">
               <div className="text-sm font-medium">Data Points</div>
-              <div className="text-lg">{mockTrajectoryData.length}</div>
+              <div className="text-lg">{trajectoryData.length}</div>
             </div>
             <div className="bg-muted p-3 rounded-lg">
               <div className="text-sm font-medium">Max Speed</div>
-              <div className="text-lg">{Math.max(...mockTrajectoryData.map(d => d.speed)).toFixed(1)} m/s</div>
+              <div className="text-lg">
+                {trajectoryData.length > 0 
+                  ? Math.max(...trajectoryData.map(d => d.speed)).toFixed(1) 
+                  : '0.0'} m/s
+              </div>
             </div>
             <div className="bg-muted p-3 rounded-lg">
               <div className="text-sm font-medium">Distance</div>
-              <div className="text-lg">{Math.sqrt(
-                Math.pow(mockTrajectoryData[mockTrajectoryData.length - 1].x - mockTrajectoryData[0].x, 2) +
-                Math.pow(mockTrajectoryData[mockTrajectoryData.length - 1].y - mockTrajectoryData[0].y, 2)
-              ).toFixed(1)} m</div>
+              <div className="text-lg">
+                {trajectoryData.length > 1 
+                  ? Math.sqrt(
+                      Math.pow(trajectoryData[trajectoryData.length - 1].x - trajectoryData[0].x, 2) +
+                      Math.pow(trajectoryData[trajectoryData.length - 1].y - trajectoryData[0].y, 2)
+                    ).toFixed(1)
+                  : '0.0'} m
+              </div>
             </div>
             <div className="bg-muted p-3 rounded-lg">
               <div className="text-sm font-medium">Data Source</div>
