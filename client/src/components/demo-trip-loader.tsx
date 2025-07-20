@@ -6,9 +6,14 @@ import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Progress } from "@/components/ui/progress";
 import { CheckCircle, Database, Play, Car, Clock, FileCheck, Activity } from "lucide-react";
 
-export default function DemoTripLoader() {
+interface DemoTripLoaderProps {
+  onLoadComplete?: (data: any) => void;
+}
+
+export default function DemoTripLoader({ onLoadComplete }: DemoTripLoaderProps) {
   const [loadingStep, setLoadingStep] = useState(0);
   const [isLoading, setIsLoading] = useState(false);
+  const [isLoaded, setIsLoaded] = useState(false);
   
   const realDataFiles = [
     "path_trajectory.csv (14.5MB)",
@@ -41,6 +46,23 @@ export default function DemoTripLoader() {
     }
     
     setIsLoading(false);
+    setIsLoaded(true);
+    
+    // Trigger completion callback with mock session data
+    if (onLoadComplete) {
+      onLoadComplete({
+        session: {
+          id: 'demo-session-2025-07-15',
+          name: 'Kia Niro EV - Real Trip Data',
+          duration: 179.2,
+          frequency: 10,
+          signalCount: 23,
+          description: 'Authentic vehicle telemetry from July 15, 2025'
+        },
+        pluginType: 'Vehicle Data Plugin',
+        dataPath: '/data/trips/2025-07-15T12_06_02/'
+      });
+    }
   };
 
   const progress = (loadingStep + 1) / loadingSteps.length * 100;
@@ -100,19 +122,25 @@ export default function DemoTripLoader() {
           <div className="space-y-4">
             <Button 
               onClick={handleDemoLoad}
-              disabled={isLoading}
+              disabled={isLoading || isLoaded}
               className="w-full"
               size="lg"
+              variant={isLoaded ? "outline" : "default"}
             >
               {isLoading ? (
                 <>
                   <Activity className="h-4 w-4 mr-2 animate-spin" />
                   Loading Real Data...
                 </>
+              ) : isLoaded ? (
+                <>
+                  <CheckCircle className="h-4 w-4 mr-2 text-green-600" />
+                  Trip Data Loaded
+                </>
               ) : (
                 <>
                   <Play className="h-4 w-4 mr-2" />
-                  Demo: Load Your Trip Data
+                  Load Trip Data
                 </>
               )}
             </Button>
@@ -127,7 +155,7 @@ export default function DemoTripLoader() {
               </div>
             )}
 
-            {!isLoading && loadingStep === loadingSteps.length - 1 && (
+            {isLoaded && (
               <Alert className="border-green-200 bg-green-50">
                 <CheckCircle className="h-4 w-4 text-green-600" />
                 <AlertDescription>
