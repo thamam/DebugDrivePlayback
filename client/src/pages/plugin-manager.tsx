@@ -17,6 +17,7 @@ import { apiRequest } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
 import PluginWizard from "@/components/plugin-wizard";
 import PluginWizardDemo from "@/components/plugin-wizard-demo";
+import CustomPluginCreator from "@/components/plugin-wizard/custom-plugin-creator";
 
 export default function PluginManager() {
   const [isWizardOpen, setIsWizardOpen] = useState(false);
@@ -113,6 +114,7 @@ export default function PluginManager() {
           </p>
         </div>
         <div className="flex items-center gap-2">
+          <CustomPluginCreator onPluginCreate={(data) => createPluginMutation.mutate(data)} />
           <Dialog open={isDemoMode} onOpenChange={setIsDemoMode}>
             <DialogTrigger asChild>
               <Button variant="outline" className="flex items-center gap-2">

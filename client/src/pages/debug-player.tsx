@@ -48,12 +48,42 @@ export default function DebugPlayer() {
             <span className="font-bold text-primary text-lg">Debug Player</span>
           </div>
           <nav className="flex space-x-6 text-sm text-muted-foreground">
-            <button className="hover:text-primary transition-colors">File</button>
-            <button className="hover:text-primary transition-colors">Edit</button>
-            <button className="hover:text-primary transition-colors">View</button>
-            <button className="hover:text-primary transition-colors">Tools</button>
+            <button 
+              disabled 
+              className="opacity-50 cursor-not-allowed"
+              title="Coming Soon - File operations"
+            >
+              File
+            </button>
+            <button 
+              disabled 
+              className="opacity-50 cursor-not-allowed"
+              title="Coming Soon - Edit operations"
+            >
+              Edit
+            </button>
+            <button 
+              disabled 
+              className="opacity-50 cursor-not-allowed"
+              title="Coming Soon - View options"
+            >
+              View
+            </button>
+            <button 
+              disabled 
+              className="opacity-50 cursor-not-allowed"
+              title="Coming Soon - Tool utilities"
+            >
+              Tools
+            </button>
             <button className="hover:text-primary transition-colors">Plugins</button>
-            <button className="hover:text-primary transition-colors">Help</button>
+            <button 
+              disabled 
+              className="opacity-50 cursor-not-allowed"
+              title="Coming Soon - Help documentation"
+            >
+              Help
+            </button>
           </nav>
         </div>
         <div className="flex items-center space-x-4">
@@ -75,11 +105,21 @@ export default function DebugPlayer() {
               <Upload size={16} />
               <span>Load Dataset</span>
             </Button>
-            <Button variant="secondary" className="flex items-center space-x-2 text-sm">
+            <Button 
+              variant="secondary" 
+              disabled 
+              className="flex items-center space-x-2 text-sm opacity-50 cursor-not-allowed"
+              title="Coming Soon - Save session functionality"
+            >
               <Save size={16} />
               <span>Save Session</span>
             </Button>
-            <Button variant="secondary" className="flex items-center space-x-2 text-sm">
+            <Button 
+              variant="secondary" 
+              disabled 
+              className="flex items-center space-x-2 text-sm opacity-50 cursor-not-allowed"
+              title="Coming Soon - Export data functionality"
+            >
               <Download size={16} />
               <span>Export Data</span>
             </Button>
@@ -88,11 +128,21 @@ export default function DebugPlayer() {
           <div className="h-4 w-px bg-border" />
           
           <div className="flex items-center space-x-2">
-            <Button variant="secondary" className="flex items-center space-x-2 text-sm">
+            <Button 
+              variant="secondary" 
+              disabled 
+              className="flex items-center space-x-2 text-sm opacity-50 cursor-not-allowed"
+              title="Coming Soon - Plugin reload functionality"
+            >
               <RefreshCw size={16} />
               <span>Reload Plugins</span>
             </Button>
-            <Button variant="secondary" className="flex items-center space-x-2 text-sm">
+            <Button 
+              variant="secondary" 
+              disabled 
+              className="flex items-center space-x-2 text-sm opacity-50 cursor-not-allowed"
+              title="Coming Soon - Signal filtering interface"
+            >
               <Filter size={16} />
               <span>Filter Signals</span>
             </Button>

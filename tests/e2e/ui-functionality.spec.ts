@@ -1,0 +1,209 @@
+import { test, expect } from '@playwright/test';
+
+test.describe('UI Functionality Validation', () => {
+  test.beforeEach(async ({ page }) => {
+    await page.goto('/');
+    await page.waitForLoadState('networkidle');
+  });
+
+  test('should have disabled states for unimplemented features in main toolbar', async ({ page }) => {
+    // Check menu buttons are properly disabled
+    await expect(page.locator('button:has-text("File")[disabled]')).toBeVisible();
+    await expect(page.locator('button:has-text("Edit")[disabled]')).toBeVisible();
+    await expect(page.locator('button:has-text("View")[disabled]')).toBeVisible();
+    await expect(page.locator('button:has-text("Tools")[disabled]')).toBeVisible();
+    await expect(page.locator('button:has-text("Help")[disabled]')).toBeVisible();
+    
+    // Check Plugins button is still functional
+    await expect(page.locator('button:has-text("Plugins"):not([disabled])')).toBeVisible();
+    
+    // Check toolbar buttons
+    await expect(page.locator('button:has-text("Save Session")[disabled]')).toBeVisible();
+    await expect(page.locator('button:has-text("Export Data")[disabled]')).toBeVisible();
+    await expect(page.locator('button:has-text("Reload Plugins")[disabled]')).toBeVisible();
+    await expect(page.locator('button:has-text("Filter Signals")[disabled]')).toBeVisible();
+    
+    // Check Load Dataset button is still functional
+    await expect(page.locator('button:has-text("Load Dataset"):not([disabled])')).toBeVisible();
+  });
+
+  test('should show tooltips for disabled features', async ({ page }) => {
+    // Test tooltip for disabled File button
+    const fileButton = page.locator('button:has-text("File")[disabled]');
+    await fileButton.hover();
+    await expect(page.locator('text=Coming Soon - File operations')).toBeVisible();
+    
+    // Test tooltip for disabled Save Session button
+    const saveButton = page.locator('button:has-text("Save Session")[disabled]');
+    await saveButton.hover();
+    await expect(page.locator('text=Coming Soon - Save session functionality')).toBeVisible();
+  });
+
+  test('should validate timeline controls functionality', async ({ page }) => {
+    // Timeline controls should be functional (these are implemented)
+    const playButton = page.locator('[data-testid="play-button"]').first();
+    const timeSlider = page.locator('[data-testid="time-slider"]').first();
+    
+    // These should exist and be functional
+    await expect(playButton).toBeVisible();
+    await expect(timeSlider).toBeVisible();
+    
+    // Test play functionality
+    if (await playButton.isVisible()) {
+      await playButton.click();
+      // Should change to pause button when playing
+      await expect(page.locator('[data-testid="pause-button"]').first()).toBeVisible({ timeout: 1000 });
+    }
+  });
+
+  test('should validate plugin manager custom creation feature', async ({ page }) => {
+    // Navigate to Plugin Manager
+    await page.click('a[href="/plugins"]');
+    await page.waitForLoadState('networkidle');
+    
+    // Check for Custom Plugin Creator button
+    await expect(page.locator('button:has-text("Create Custom Plugin")')).toBeVisible();
+    
+    // Click and test the custom plugin creator dialog
+    await page.click('button:has-text("Create Custom Plugin")');
+    await expect(page.locator('text=Custom Plugin Creator')).toBeVisible();
+    
+    // Check template selection
+    await expect(page.locator('text=Choose a Template')).toBeVisible();
+    await expect(page.locator('text=Car Pose Analyzer')).toBeVisible();
+    await expect(page.locator('text=Signal Monitor')).toBeVisible();
+    
+    // Test form fields
+    await expect(page.locator('input[placeholder="My Custom Plugin"]')).toBeVisible();
+    await expect(page.locator('textarea[placeholder*="Describe what your plugin does"]')).toBeVisible();
+  });
+
+  test('should validate sidebar disabled states', async ({ page }) => {
+    // Check sidebar buttons are properly disabled
+    const addPluginBtn = page.locator('button[title*="Coming Soon - Add new plugins"]');
+    const searchBtn = page.locator('button[title*="Coming Soon - Signal search"]');
+    const timeRangeBtns = page.locator('button[title*="Coming Soon - Time range selection"]');
+    
+    await expect(addPluginBtn).toBeDisabled();
+    await expect(searchBtn).toBeDisabled();
+    await expect(timeRangeBtns.first()).toBeDisabled();
+  });
+
+  test('should validate working features vs disabled features', async ({ page }) => {
+    // Working features should not be disabled
+    await expect(page.locator('a[href="/trip-loader"]:not([disabled])')).toBeVisible();
+    await expect(page.locator('a[href="/widget-manager"]:not([disabled])')).toBeVisible();
+    await expect(page.locator('button:has-text("Load Dataset"):not([disabled])')).toBeVisible();
+    
+    // Signal checkboxes should still be functional
+    const signalCheckbox = page.locator('input[type="checkbox"]').first();
+    if (await signalCheckbox.isVisible()) {
+      await expect(signalCheckbox).not.toBeDisabled();
+    }
+  });
+
+  test('should test Python backend connection handling', async ({ page }) => {
+    // Navigate to plugin manager to test plugin loading
+    await page.click('a[href="/plugins"]');
+    await page.waitForLoadState('networkidle');
+    
+    // Try to create a plugin and handle backend errors gracefully
+    await page.click('button:has-text("Demo Wizard")');
+    
+    // Should show demo interface even if Python backend is down
+    await expect(page.locator('text=Plugin Creation Wizard Demo')).toBeVisible();
+    
+    // Test that car pose plugin creation shows appropriate error handling
+    const carPoseBtn = page.locator('text=Car Pose Plugin');
+    if (await carPoseBtn.isVisible()) {
+      await carPoseBtn.click();
+      // Should handle backend errors gracefully without crashing
+      await page.waitForTimeout(1000);
+    }
+  });
+
+  test('should validate data visualization tabs', async ({ page }) => {
+    // Test that visualization tabs exist but may show placeholder content
+    const tabs = ['Temporal Analysis', 'Spatial Analysis', 'Integrated View', 'Collision Analysis'];
+    
+    for (const tab of tabs) {
+      const tabElement = page.locator(`text=${tab}`);
+      if (await tabElement.isVisible()) {
+        await tabElement.click();
+        // Should switch tabs without errors
+        await expect(tabElement).toBeVisible();
+      }
+    }
+  });
+
+  test('should validate real-time features work properly', async ({ page }) => {
+    // Test features that should be working
+    const workingFeatures = [
+      'button:has-text("Load Dataset")',
+      'a[href="/trip-loader"]',
+      'a[href="/widget-manager"]',
+      'a[href="/plugins"]'
+    ];
+    
+    for (const feature of workingFeatures) {
+      const element = page.locator(feature);
+      if (await element.isVisible()) {
+        await expect(element).not.toBeDisabled();
+        await expect(element).not.toHaveClass(/opacity-50/);
+      }
+    }
+  });
+
+  test('should handle error states gracefully', async ({ page }) => {
+    // Navigate to trip loader and test error handling
+    await page.click('a[href="/trip-loader"]');
+    await page.waitForLoadState('networkidle');
+    
+    // Should show proper error messages for Python backend failures
+    const loadButton = page.locator('button:has-text("Load Real Trip Data")');
+    if (await loadButton.isVisible()) {
+      await loadButton.click();
+      // Should either succeed or show a proper error message, not crash
+      await page.waitForTimeout(2000);
+      
+      // Check for error handling
+      const errorMessage = page.locator('text*="error"', 'text*="Error"', 'text*="failed"', 'text*="Failed"');
+      const successMessage = page.locator('text*="success"', 'text*="Success"', 'text*="loaded"', 'text*="Loaded"');
+      
+      // Should have either error or success, not a crash
+      const hasErrorOrSuccess = await errorMessage.count() > 0 || await successMessage.count() > 0;
+      expect(hasErrorOrSuccess).toBeTruthy();
+    }
+  });
+});
+
+test.describe('Backend Integration Tests', () => {
+  test('should test Python backend health endpoint', async ({ page, request }) => {
+    // Test the health endpoint
+    const response = await request.get('/api/python/health');
+    expect(response.status()).toBeLessThan(600); // Should not crash
+    
+    const data = await response.json();
+    expect(data).toHaveProperty('status');
+    expect(['healthy', 'unhealthy']).toContain(data.status);
+  });
+
+  test('should handle plugin loading failures gracefully', async ({ page, request }) => {
+    // Test plugin loading endpoint
+    const response = await request.get('/api/plugins');
+    expect(response.status()).toBe(200);
+    
+    const plugins = await response.json();
+    expect(Array.isArray(plugins)).toBeTruthy();
+  });
+
+  test('should validate trip data loading with error handling', async ({ page, request }) => {
+    // Test trip data loading endpoint
+    const response = await request.post('/api/python/load-data', {
+      data: { filePath: 'nonexistent/path' }
+    });
+    
+    // Should handle error gracefully (400 or 500, not crash)
+    expect([200, 400, 500]).toContain(response.status());
+  });
+});

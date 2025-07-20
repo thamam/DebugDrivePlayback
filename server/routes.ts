@@ -443,6 +443,36 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Add improved Python backend health endpoint with better error handling  
+  app.get("/api/python/health-status", async (req, res) => {
+    try {
+      const response = await fetch("http://127.0.0.1:8000/health", {
+        method: 'GET',
+        headers: { 'Content-Type': 'application/json' },
+        signal: AbortSignal.timeout(5000),
+      });
+      
+      if (!response.ok) {
+        throw new Error(`HTTP ${response.status}`);
+      }
+      
+      const data = await response.json();
+      res.json({
+        status: "healthy",
+        backend_type: data.backend_type || "python",
+        plugins_loaded: data.plugins_loaded || [],
+        message: "Python backend connected successfully"
+      });
+    } catch (error) {
+      res.json({
+        status: "unhealthy", 
+        backend_type: "demo",
+        error: error instanceof Error ? error.message : "Connection failed",
+        message: "Using demo mode - Python backend unavailable"
+      });
+    }
+  });
+
   const httpServer = createServer(app);
   return httpServer;
 }

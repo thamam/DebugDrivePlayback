@@ -53,7 +53,13 @@ export function SidebarLeft({
             <Layers size={16} className="mr-2" />
             Plugin System
           </div>
-          <Button variant="ghost" size="sm" className="p-1 dark-hover">
+          <Button 
+            variant="ghost" 
+            size="sm" 
+            disabled 
+            className="p-1 opacity-50 cursor-not-allowed" 
+            title="Coming Soon - Add new plugins"
+          >
             <Plus size={16} />
           </Button>
         </h3>
@@ -67,7 +73,13 @@ export function SidebarLeft({
                   <div className="text-xs text-muted-foreground">{plugin.description}</div>
                 </div>
               </div>
-              <Button variant="ghost" size="sm" className="p-1 dark-hover">
+              <Button 
+                variant="ghost" 
+                size="sm" 
+                disabled 
+                className="p-1 opacity-50 cursor-not-allowed" 
+                title="Coming Soon - Plugin configuration"
+              >
                 <Settings size={16} />
               </Button>
             </div>
@@ -112,7 +124,13 @@ export function SidebarLeft({
             <Radio size={16} className="mr-2" />
             Signal Selection
           </div>
-          <Button variant="ghost" size="sm" className="p-1 dark-hover">
+          <Button 
+            variant="ghost" 
+            size="sm" 
+            disabled 
+            className="p-1 opacity-50 cursor-not-allowed" 
+            title="Coming Soon - Signal search functionality"
+          >
             <Search size={16} />
           </Button>
         </h3>
@@ -161,9 +179,33 @@ export function SidebarLeft({
             />
           </div>
           <div className="flex space-x-2">
-            <Button variant="secondary" size="sm" className="text-xs">All</Button>
-            <Button variant="secondary" size="sm" className="text-xs">Last 30s</Button>
-            <Button variant="secondary" size="sm" className="text-xs">Custom</Button>
+            <Button 
+              variant="secondary" 
+              size="sm" 
+              disabled 
+              className="text-xs opacity-50 cursor-not-allowed" 
+              title="Coming Soon - Time range selection"
+            >
+              All
+            </Button>
+            <Button 
+              variant="secondary" 
+              size="sm" 
+              disabled 
+              className="text-xs opacity-50 cursor-not-allowed" 
+              title="Coming Soon - Time range selection"
+            >
+              Last 30s
+            </Button>
+            <Button 
+              variant="secondary" 
+              size="sm" 
+              disabled 
+              className="text-xs opacity-50 cursor-not-allowed" 
+              title="Coming Soon - Time range selection"
+            >
+              Custom
+            </Button>
           </div>
         </div>
       </div>
