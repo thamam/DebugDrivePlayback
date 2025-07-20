@@ -76,7 +76,12 @@ export default function DebugPlayer() {
             >
               Tools
             </button>
-            <button className="hover:text-primary transition-colors">Plugins</button>
+            <button 
+              className="hover:text-primary transition-colors text-primary font-medium"
+              onClick={() => window.location.href = '/plugins'}
+            >
+              Plugins
+            </button>
             <button 
               disabled 
               className="opacity-50 cursor-not-allowed"
