@@ -1,24 +1,26 @@
 # Debug Player Framework
 
-A comprehensive debug tool for self-driving car data analysis, featuring an advanced modular plugin-based architecture with dynamic widget creation and real-time visualization capabilities.
+A comprehensive debug tool for self-driving car data analysis, featuring real-time visualization and authentic vehicle data processing.
 
-## 🚀 Quick Start
+## 🚀 Quick Start (2 Commands Max)
 
-### Running Locally (Recommended for Real Data)
-
-For optimal performance with real vehicle data, run the application locally:
-
+### One Command (Automatic Detection)
 ```bash
-# Automated setup
-./local-setup.sh
-
-# Manual setup
-# See LOCAL_SETUP.md for detailed instructions
+./run.sh
 ```
 
-### Running in Replit
+### Manual Options
+```bash
+# Docker database + manual app
+./start-postgres-only.sh && ./local-setup.sh && npm run dev
 
-The application is already configured to run in Replit, but may be slower with large datasets.
+# Fully manual (requires Node.js 22, Python 3.11+, PostgreSQL)  
+./local-setup.sh && npm run dev
+```
+
+**Open:** http://localhost:5000
+
+📖 **[Complete Quick Start Guide](QUICK_START.md)**
 
 ## 🏗️ Architecture
 
