@@ -14,40 +14,74 @@ interface TrajectoryVisualizerProps {
 export default function TrajectoryVisualizer({ tripData, isRealData }: TrajectoryVisualizerProps) {
   const [visualizationMode, setVisualizationMode] = useState<'spatial' | 'temporal'>('spatial');
   const [selectedSignal, setSelectedSignal] = useState<string>('w_car_pose_now_x_');
+  const [trajectoryData, setTrajectoryData] = useState<any[]>([]);
 
-  // Mock trajectory data from the real CSV structure
-  const mockTrajectoryData = [
-    { timestamp: 1752570361.788, x: 35.5772, y: 19.7998, yaw: 0.421913, speed: 5.26852 },
-    { timestamp: 1752570362.092, x: 36.0804, y: 20.0157, yaw: 0.419509, speed: 5.45234 },
-    { timestamp: 1752570362.396, x: 36.4522, y: 20.1741, yaw: 0.418156, speed: 5.63821 },
-    { timestamp: 1752570362.700, x: 37.0655, y: 20.4328, yaw: 0.415905, speed: 5.82154 },
-    { timestamp: 1752570363.004, x: 37.4469, y: 20.5915, yaw: 0.413509, speed: 6.00234 },
-    { timestamp: 1752570363.308, x: 38.0544, y: 20.8398, yaw: 0.40951, speed: 6.18765 },
-    { timestamp: 1752570363.612, x: 38.856, y: 21.1575, yaw: 0.403464, speed: 6.37892 },
-    { timestamp: 1752570363.916, x: 39.2538, y: 21.3107, yaw: 0.397714, speed: 6.56234 },
-    { timestamp: 1752570364.220, x: 39.705, y: 21.4819, yaw: 0.395231, speed: 6.74123 },
-    { timestamp: 1752570364.524, x: 40.234, y: 21.672, yaw: 0.392847, speed: 6.91827 },
-    { timestamp: 1752570364.828, x: 40.8123, y: 21.891, yaw: 0.390562, speed: 7.09456 },
-    { timestamp: 1752570365.132, x: 41.4567, y: 22.134, yaw: 0.388377, speed: 7.27012 },
-    { timestamp: 1752570365.436, x: 42.1234, y: 22.398, yaw: 0.386292, speed: 7.44495 },
-    { timestamp: 1752570365.740, x: 42.8156, y: 22.683, yaw: 0.384307, speed: 7.61905 },
-    { timestamp: 1752570366.044, x: 43.5342, y: 22.989, yaw: 0.382422, speed: 7.79242 },
-    { timestamp: 1752570366.348, x: 44.2789, y: 23.316, yaw: 0.380637, speed: 7.96506 },
-    { timestamp: 1752570366.652, x: 45.0456, y: 23.662, yaw: 0.378952, speed: 8.13697 },
-    { timestamp: 1752570366.956, x: 45.8321, y: 24.027, yaw: 0.377367, speed: 8.30815 },
-    { timestamp: 1752570367.260, x: 46.6345, y: 24.411, yaw: 0.375882, speed: 8.4786 },
-    { timestamp: 1752570367.564, x: 47.4512, y: 24.813, yaw: 0.374497, speed: 8.64832 }
-  ];
+  // Load real trajectory data from API
+  useEffect(() => {
+    if (isRealData) {
+      const loadTrajectoryData = async () => {
+        try {
+          // For demo purposes, use session ID 1. In production, this should come from the active session
+          const response = await fetch('/api/trajectory/1');
+          const data = await response.json();
+          
+          if (data.success && data.trajectory) {
+            console.log('Loaded trajectory data for visualization:', data.trajectory.length, 'points');
+            setTrajectoryData(data.trajectory.map((point: any) => ({
+              timestamp: point.timestamp,
+              x: point.x,
+              y: point.y,
+              yaw: point.yaw,
+              speed: point.speed
+            })));
+          } else {
+            console.error('Failed to load trajectory data for visualization');
+            // Fallback to empty array for now
+            setTrajectoryData([]);
+          }
+        } catch (error) {
+          console.error('Error loading trajectory data for visualization:', error);
+          setTrajectoryData([]);
+        }
+      };
+      
+      loadTrajectoryData();
+    } else {
+      // Use mock data for demo mode
+      setTrajectoryData([
+        { timestamp: 1752570361.788, x: 35.5772, y: 19.7998, yaw: 0.421913, speed: 5.26852 },
+        { timestamp: 1752570362.092, x: 36.0804, y: 20.0157, yaw: 0.419509, speed: 5.45234 },
+        { timestamp: 1752570362.396, x: 36.4522, y: 20.1741, yaw: 0.418156, speed: 5.63821 },
+        { timestamp: 1752570362.700, x: 37.0655, y: 20.4328, yaw: 0.415905, speed: 5.82154 },
+        { timestamp: 1752570363.004, x: 37.4469, y: 20.5915, yaw: 0.413509, speed: 6.00234 },
+        { timestamp: 1752570363.308, x: 38.0544, y: 20.8398, yaw: 0.40951, speed: 6.18765 },
+        { timestamp: 1752570363.612, x: 38.856, y: 21.1575, yaw: 0.403464, speed: 6.37892 },
+        { timestamp: 1752570363.916, x: 39.2538, y: 21.3107, yaw: 0.397714, speed: 6.56234 },
+        { timestamp: 1752570364.220, x: 39.705, y: 21.4819, yaw: 0.395231, speed: 6.74123 },
+        { timestamp: 1752570364.524, x: 40.234, y: 21.672, yaw: 0.392847, speed: 6.91827 },
+        { timestamp: 1752570364.828, x: 40.8123, y: 21.891, yaw: 0.390562, speed: 7.09456 },
+        { timestamp: 1752570365.132, x: 41.4567, y: 22.134, yaw: 0.388377, speed: 7.27012 },
+        { timestamp: 1752570365.436, x: 42.1234, y: 22.398, yaw: 0.386292, speed: 7.44495 },
+        { timestamp: 1752570365.740, x: 42.8156, y: 22.683, yaw: 0.384307, speed: 7.61905 },
+        { timestamp: 1752570366.044, x: 43.5342, y: 22.989, yaw: 0.382422, speed: 7.79242 },
+        { timestamp: 1752570366.348, x: 44.2789, y: 23.316, yaw: 0.380637, speed: 7.96506 },
+        { timestamp: 1752570366.652, x: 45.0456, y: 23.662, yaw: 0.378952, speed: 8.13697 },
+        { timestamp: 1752570366.956, x: 45.8321, y: 24.027, yaw: 0.377367, speed: 8.30815 },
+        { timestamp: 1752570367.260, x: 46.6345, y: 24.411, yaw: 0.375882, speed: 8.4786 },
+        { timestamp: 1752570367.564, x: 47.4512, y: 24.813, yaw: 0.374497, speed: 8.64832 }
+      ]);
+    }
+  }, [isRealData]);
 
-  const temporalData = mockTrajectoryData.map(point => ({
-    timestamp: point.timestamp - mockTrajectoryData[0].timestamp,
+  const temporalData = trajectoryData.map(point => ({
+    timestamp: trajectoryData.length > 0 ? point.timestamp - trajectoryData[0].timestamp : 0,
     speed: point.speed,
     yaw: point.yaw * 180 / Math.PI, // Convert to degrees
     x_position: point.x,
     y_position: point.y
   }));
 
-  const spatialData = mockTrajectoryData.map(point => ({
+  const spatialData = trajectoryData.map(point => ({
     x: point.x,
     y: point.y,
     speed: point.speed,
@@ -69,7 +103,7 @@ export default function TrajectoryVisualizer({ tripData, isRealData }: Trajector
           <AlertDescription>
             <div className="font-medium text-green-800">Real Trajectory Data Active</div>
             <div className="text-sm text-green-700">
-              Visualizing actual vehicle trajectory from path_trajectory.csv with {mockTrajectoryData.length} data points
+              Visualizing actual vehicle trajectory from path_trajectory.csv with {trajectoryData.length} data points
             </div>
           </AlertDescription>
         </Alert>

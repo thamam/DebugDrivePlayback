@@ -18,6 +18,24 @@ export interface PythonBackendResponse {
   isDemoMode?: boolean;
 }
 
+export interface TrajectoryData {
+  success: boolean;
+  trajectory?: Array<{
+    timestamp: number;
+    x: number;
+    y: number;
+    yaw: number;
+    speed: number;
+    target_speed: number;
+    turn_signal?: string;
+    intent?: string;
+  }>;
+  planned_paths?: Record<string, Array<{x: number, y: number}>>;
+  time_range?: [number, number];
+  total_points?: number;
+  error?: string;
+}
+
 export interface SignalData {
   timestamp: number;
   value: number | string | boolean;
@@ -405,6 +423,121 @@ export class PythonBackendIntegration {
       units: config.units,
       signal_type: 'temporal'
     };
+  }
+
+  async loadTrajectoryData(tripDataPath: string): Promise<TrajectoryData> {
+    try {
+      // Try to load from Python backend first
+      const isHealthy = await this.checkHealth();
+      
+      if (isHealthy) {
+        try {
+          const response = await fetch('http://localhost:8000/trajectory', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+              trip_path: tripDataPath
+            }),
+          });
+
+          if (response.ok) {
+            const result = await response.json();
+            return { success: true, ...result };
+          }
+        } catch (error) {
+          console.log('Python backend trajectory error, using CSV fallback');
+        }
+      }
+
+      // Fallback: Load trajectory data directly from CSV
+      return await this.loadTrajectoryFromCSV(tripDataPath);
+      
+    } catch (error: any) {
+      return {
+        success: false,
+        error: `Failed to load trajectory data: ${error.message}`
+      };
+    }
+  }
+
+  async loadTrajectoryFromCSV(tripDataPath: string): Promise<TrajectoryData> {
+    try {
+      const trajectoryFile = path.join(tripDataPath, 'path_trajectory.csv');
+      
+      // Check if trajectory file exists
+      const fileExists = await fs.access(trajectoryFile).then(() => true).catch(() => false);
+      
+      if (!fileExists) {
+        return {
+          success: false,
+          error: `Trajectory file not found: ${trajectoryFile}`
+        };
+      }
+
+      // Read and parse CSV data
+      const csvContent = await fs.readFile(trajectoryFile, 'utf8');
+      const lines = csvContent.split('\n');
+      const header = lines[0].split(',');
+      
+      // Find column indices
+      const timestampIdx = header.indexOf('data_timestamp_sec');
+      const xIdx = header.indexOf('w_car_pose_now_x_');
+      const yIdx = header.indexOf('w_car_pose_now_y');
+      const yawIdx = header.indexOf('w_car_pose_now_yaw_rad');
+      const speedIdx = header.indexOf('current_speed_mps');
+      const targetSpeedIdx = header.indexOf('target_speed_mps');
+      const turnSignalIdx = header.indexOf('turn_signal_state');
+      const intentIdx = header.indexOf('intent');
+
+      const trajectory = [];
+      let minTime = Infinity;
+      let maxTime = -Infinity;
+
+      // Parse data rows
+      for (let i = 1; i < lines.length; i++) {
+        const row = lines[i].split(',');
+        
+        if (row.length >= Math.max(timestampIdx, xIdx, yIdx, yawIdx, speedIdx) + 1) {
+          const timestamp = parseFloat(row[timestampIdx]);
+          const x = parseFloat(row[xIdx]);
+          const y = parseFloat(row[yIdx]);
+          const yaw = parseFloat(row[yawIdx]);
+          const speed = parseFloat(row[speedIdx]);
+          const targetSpeed = parseFloat(row[targetSpeedIdx] || '0');
+          
+          if (!isNaN(timestamp) && !isNaN(x) && !isNaN(y)) {
+            trajectory.push({
+              timestamp,
+              x,
+              y,
+              yaw: isNaN(yaw) ? 0 : yaw,
+              speed: isNaN(speed) ? 0 : speed,
+              target_speed: isNaN(targetSpeed) ? speed : targetSpeed,
+              turn_signal: turnSignalIdx >= 0 ? row[turnSignalIdx] : '',
+              intent: intentIdx >= 0 ? row[intentIdx] : ''
+            });
+            
+            minTime = Math.min(minTime, timestamp);
+            maxTime = Math.max(maxTime, timestamp);
+          }
+        }
+      }
+
+      return {
+        success: true,
+        trajectory,
+        time_range: [minTime, maxTime],
+        total_points: trajectory.length
+      };
+
+    } catch (error: any) {
+      return {
+        success: false,
+        error: `Failed to parse trajectory CSV: ${error.message}`
+      };
+    }
   }
 
   async shutdown(): Promise<void> {

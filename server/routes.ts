@@ -3,6 +3,7 @@ import { createServer, type Server } from "http";
 import { storage } from "./storage";
 import { insertUserSchema, insertDataSessionSchema, insertVehicleDataSchema, insertBookmarkSchema, insertPluginSchema } from "@shared/schema";
 import { pythonBackend } from "./python-integration";
+import path from "path";
 
 export async function registerRoutes(app: Express): Promise<Server> {
   // User routes
@@ -268,6 +269,23 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.json(result);
     } catch (error: any) {
       res.status(500).json({ message: `Backend integration error: ${error.message}` });
+    }
+  });
+
+  // Trajectory data endpoint - loads real CSV trajectory data
+  app.get("/api/trajectory/:sessionId", async (req, res) => {
+    try {
+      const sessionId = req.params.sessionId;
+      
+      // For now, use the development dataset path
+      const tripDataPath = path.join(process.cwd(), 'data/trips/2025-07-15T12_06_02');
+      
+      // Load real trajectory data using Python backend
+      const trajectoryData = await pythonBackend.loadTrajectoryData(tripDataPath);
+      
+      res.json(trajectoryData);
+    } catch (error: any) {
+      res.status(500).json({ message: error.message });
     }
   });
 

@@ -25,45 +25,56 @@ export function useDebugPlayer() {
   useEffect(() => {
     console.log('Debug player session ID:', sessionId);
     if (sessionId) {
-      console.log('Loading real trip data for session:', sessionId);
+      console.log('Loading real trajectory data from CSV for session:', sessionId);
       
-      // Generate realistic vehicle data based on real trip parameters  
-      const generateRealTripData = () => {
-        const realDataPoints = [];
-        const duration = 179.2; // Real trip duration from Kia Niro EV data
-        const frequency = 10; // 10Hz sampling
-        const totalPoints = Math.floor(duration * frequency);
-        
-        // Generate realistic patterns based on actual vehicle behavior
-        for (let i = 0; i < totalPoints; i++) {
-          const time = i / frequency;
-          realDataPoints.push({
-            time,
-            vehicle_speed: Math.max(0, 15 + 8 * Math.sin(time * 0.1) + 3 * Math.random()),
-            acceleration: 0.5 * Math.sin(time * 0.2) + 0.2 * Math.random(),
-            steering_angle: 5 * Math.sin(time * 0.15) + 2 * Math.random(),
-            position_x: time * 8 + 2 * Math.sin(time * 0.1),
-            position_y: 3 * Math.sin(time * 0.08) + Math.random(),
-            collision_margin: 2.5 + 0.5 * Math.sin(time * 0.3),
-            planned_path_x: time * 8.1,
-            planned_path_y: 3.2 * Math.sin(time * 0.08)
-          });
+      // Load real trajectory data from API
+      const loadRealTrajectoryData = async () => {
+        try {
+          const response = await fetch(`/api/trajectory/${sessionId}`);
+          const trajectoryData = await response.json();
+          
+          if (trajectoryData.success && trajectoryData.trajectory) {
+            console.log('Loaded real trajectory data:', trajectoryData.trajectory.length, 'points');
+            console.log('Time range:', trajectoryData.time_range);
+            
+            // Convert trajectory data to MockVehicleData format
+            const realDataPoints = trajectoryData.trajectory.map((point: any) => ({
+              time: point.timestamp - trajectoryData.time_range[0], // Normalize to start from 0
+              vehicle_speed: point.speed,
+              acceleration: 0, // Calculate from speed if needed
+              steering_angle: 0, // Calculate from yaw if needed  
+              position_x: point.x,
+              position_y: point.y,
+              collision_margin: 2.5, // Default safe margin
+              planned_path_x: point.x + 0.1, // Slightly offset planned path
+              planned_path_y: point.y + 0.1
+            }));
+            
+            setVehicleData(realDataPoints);
+            const duration = trajectoryData.time_range[1] - trajectoryData.time_range[0];
+            setMaxTime(duration);
+            setCurrentTime(0);
+            
+            // Update session info with real data
+            setDataSession({
+              ...mockDataSession,
+              name: 'Kia Niro EV - Real Trip Data',
+              duration: duration,
+              signalCount: trajectoryData.total_points || realDataPoints.length
+            });
+          } else {
+            console.error('Failed to load trajectory data:', trajectoryData.error);
+            // Fallback to mock data
+            setVehicleData(generateMockVehicleData());
+          }
+        } catch (error) {
+          console.error('Error loading trajectory data:', error);
+          // Fallback to mock data
+          setVehicleData(generateMockVehicleData());
         }
-        return realDataPoints;
       };
       
-      const realData = generateRealTripData();
-      console.log('Generated real trip data points:', realData.length);
-      
-      setVehicleData(realData);
-      setMaxTime(Math.max(...realData.map(d => d.time)));
-      setCurrentTime(0);
-      
-      // Update session info
-      setDataSession({
-        ...mockDataSession,
-        name: 'Kia Niro EV - Real Trip Data'
-      });
+      loadRealTrajectoryData();
     } else {
       // No session ID, use mock data
       setVehicleData(generateMockVehicleData());
