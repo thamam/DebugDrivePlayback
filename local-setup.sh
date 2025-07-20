@@ -1,17 +1,18 @@
 #!/bin/bash
 
-# Debug Player Framework - Local Setup Script
-# This script automates the setup process for local development
+# Debug Player Framework - Streamlined Setup Script
+# Installs only essential dependencies for local development
 
 set -e
 
-echo "🚀 Debug Player Framework - Local Setup Script"
-echo "================================================="
+echo "🚀 Debug Player Framework - Streamlined Setup Script"
+echo "====================================================="
 
 # Colors for output
 RED='\033[0;31m'
 GREEN='\033[0;32m'
 YELLOW='\033[1;33m'
+BLUE='\033[0;34m'
 NC='\033[0m' # No Color
 
 # Helper functions
@@ -28,7 +29,13 @@ print_error() {
 }
 
 print_info() {
-    echo -e "ℹ $1"
+    echo -e "${BLUE}ℹ $1${NC}"
+}
+
+print_header() {
+    echo -e "\n${BLUE}========================================${NC}"
+    echo -e "${BLUE} $1${NC}"
+    echo -e "${BLUE}========================================${NC}\n"
 }
 
 # Check if command exists
@@ -36,43 +43,179 @@ command_exists() {
     command -v "$1" >/dev/null 2>&1
 }
 
-# Check prerequisites
-check_prerequisites() {
-    print_info "Checking prerequisites..."
+# Install Node.js via nvm if not present
+setup_nodejs() {
+    print_header "Node.js Setup"
     
-    # Check Node.js
-    if command_exists node; then
-        NODE_VERSION=$(node --version)
-        print_success "Node.js found: $NODE_VERSION"
+    # Check if nvm exists
+    if [[ -s "$HOME/.nvm/nvm.sh" ]]; then
+        source "$HOME/.nvm/nvm.sh"
+        print_success "nvm already installed"
     else
-        print_error "Node.js not found. Please install Node.js v18 or v20"
+        print_info "Installing nvm..."
+        curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.40.3/install.sh | bash
+        source "$HOME/.nvm/nvm.sh"
+        print_success "nvm installed"
+    fi
+    
+    # Install Node.js 22
+    print_info "Installing Node.js 22..."
+    nvm install 22
+    nvm use 22
+    
+    # Verify installation
+    NODE_VERSION=$(node --version)
+    NPM_VERSION=$(npm --version)
+    print_success "Node.js $NODE_VERSION installed"
+    print_success "npm $NPM_VERSION installed"
+    
+    # Expected versions check
+    if [[ "$NODE_VERSION" == v22.* ]]; then
+        print_success "Node.js version is compatible"
+    else
+        print_warning "Expected Node.js v22.x, got $NODE_VERSION"
+    fi
+}
+
+# Setup Python environment
+setup_python() {
+    print_header "Python Environment Setup"
+    
+    # Check Python 3.11
+    if command_exists python3.11; then
+        PYTHON_CMD="python3.11"
+        print_success "Python 3.11 found"
+    elif command_exists python3; then
+        PYTHON_VERSION=$(python3 --version | cut -d' ' -f2)
+        if [[ "$PYTHON_VERSION" == 3.11.* ]] || [[ "$PYTHON_VERSION" == 3.12.* ]]; then
+            PYTHON_CMD="python3"
+            print_success "Compatible Python found: $PYTHON_VERSION"
+        else
+            print_warning "Python $PYTHON_VERSION found, but 3.11+ recommended"
+            PYTHON_CMD="python3"
+        fi
+    else
+        print_error "Python 3.11+ not found. Please install Python 3.11"
+        echo "Ubuntu/Debian: sudo apt install python3.11 python3.11-venv"
+        echo "macOS: brew install python@3.11"
         exit 1
     fi
     
-    # Check npm
-    if command_exists npm; then
-        NPM_VERSION=$(npm --version)
-        print_success "npm found: $NPM_VERSION"
+    # Create virtual environment
+    print_info "Creating Python virtual environment..."
+    if [[ -d "venv" ]]; then
+        print_warning "Virtual environment already exists, removing..."
+        rm -rf venv
+    fi
+    
+    $PYTHON_CMD -m venv venv
+    source venv/bin/activate
+    
+    # Upgrade pip and install dependencies
+    print_info "Installing Python dependencies..."
+    pip install --upgrade pip
+    pip install -r python_backend/requirements.txt
+    
+    print_success "Python environment setup complete"
+}
+
+# Setup database (Docker PostgreSQL)
+setup_database() {
+    print_header "Database Setup"
+    
+    if command_exists docker; then
+        print_info "Using Docker for PostgreSQL (recommended)..."
+        
+        # Stop existing container if running
+        docker stop debug-postgres 2>/dev/null || true
+        docker rm debug-postgres 2>/dev/null || true
+        
+        # Start PostgreSQL container
+        docker run --name debug-postgres \
+            -e POSTGRES_PASSWORD=debug_pass \
+            -e POSTGRES_USER=debug_user \
+            -e POSTGRES_DB=debug_player \
+            -p 5432:5432 \
+            -d postgres:15
+        
+        print_success "PostgreSQL container started"
+        
+        # Wait for database to be ready
+        print_info "Waiting for database to be ready..."
+        sleep 5
+        
     else
-        print_error "npm not found. Please install npm"
+        print_warning "Docker not found. Please install PostgreSQL manually or install Docker"
+        print_info "Manual PostgreSQL installation:"
+        echo "Ubuntu/Debian: sudo apt install postgresql postgresql-contrib"
+        echo "macOS: brew install postgresql"
+        echo ""
+        print_info "After installation, create database:"
+        echo "sudo -u postgres createuser debug_user"
+        echo "sudo -u postgres createdb debug_player"
+        echo "sudo -u postgres psql -c \"ALTER USER debug_user WITH PASSWORD 'debug_pass';\""
+        echo "sudo -u postgres psql -c \"GRANT ALL PRIVILEGES ON DATABASE debug_player TO debug_user;\""
+    fi
+    
+    # Create .env file
+    print_info "Creating environment configuration..."
+    echo 'DATABASE_URL="postgresql://debug_user:debug_pass@localhost:5432/debug_player"' > .env
+    print_success "Environment configuration created"
+}
+
+# Main setup function
+main() {
+    print_header "Debug Player Framework Setup"
+    
+    # Check if we're in the right directory
+    if [[ ! -f "package.json" ]]; then
+        print_error "package.json not found. Please run this script from the project root directory."
         exit 1
     fi
     
-    # Check Python
-    if command_exists python3; then
-        PYTHON_VERSION=$(python3 --version)
-        print_success "Python found: $PYTHON_VERSION"
-    else
-        print_error "Python3 not found. Please install Python 3.8+"
-        exit 1
-    fi
+    # Run setup steps
+    setup_nodejs
     
-    # Check PostgreSQL
-    if command_exists psql; then
-        POSTGRES_VERSION=$(psql --version)
-        print_success "PostgreSQL found: $POSTGRES_VERSION"
-    else
-        print_warning "PostgreSQL not found. You'll need to install it manually or use Docker"
+    # Install Node.js dependencies
+    print_header "Installing Node.js Dependencies"
+    print_info "Installing packages with legacy peer deps..."
+    npm install --legacy-peer-deps
+    print_success "Node.js dependencies installed"
+    
+    setup_python
+    setup_database
+    
+    # Install dotenv for environment variables
+    print_info "Installing dotenv package..."
+    npm install dotenv
+    
+    # Push database schema
+    print_header "Database Schema Setup"
+    print_info "Pushing database schema..."
+    npm run db:push
+    print_success "Database schema created"
+    
+    # Final instructions
+    print_header "Setup Complete!"
+    print_success "Debug Player Framework is ready for local development"
+    echo ""
+    print_info "To start the application:"
+    echo "1. Terminal 1 - Python backend:"
+    echo "   cd python_backend"
+    echo "   source ../venv/bin/activate"
+    echo "   python run_server.py"
+    echo ""
+    echo "2. Terminal 2 - Frontend:"
+    echo "   npm run dev"
+    echo ""
+    echo "3. Open browser: http://localhost:5000"
+    echo ""
+    print_info "For Docker alternative: see DOCKER_SETUP.md"
+    print_info "For troubleshooting: see LOCAL_SETUP.md"
+}
+
+# Run main function
+main "$@"
     fi
     
     # Check pip

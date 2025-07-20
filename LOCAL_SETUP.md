@@ -75,8 +75,8 @@ sudo apt install git
 
 ### 1. Clone the Repository
 ```bash
-git clone <your-repository-url>
-cd debug-player-framework
+git clone git@github.com:thamam/DebugDrivePlayback.git
+cd DebugDrivePlayback
 ```
 
 ### 2. Install Node.js Dependencies
