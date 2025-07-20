@@ -106,7 +106,10 @@ export default function DebugPlayer() {
       <div className="dark-panel border-b px-4 py-2">
         <div className="flex items-center space-x-4">
           <div className="flex items-center space-x-2">
-            <Button className="flex items-center space-x-2 text-sm">
+            <Button 
+              className="flex items-center space-x-2 text-sm"
+              onClick={() => window.location.href = '/trip-loader'}
+            >
               <Upload size={16} />
               <span>Load Dataset</span>
             </Button>
