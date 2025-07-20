@@ -25,7 +25,7 @@ export default function TripLoaderPage() {
   const handleStartAnalysis = () => {
     if (loadedSession) {
       // Navigate to debug player with session data
-      setLocation(`/debug-player?session=${loadedSession.session.id}`);
+      setLocation(`/?session=${loadedSession.session.id}`);
     }
   };
 
