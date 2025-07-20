@@ -70,10 +70,25 @@ services:
       "
 ```
 
-### Option 2: PostgreSQL Only (Recommended for Issues)
+### Option 2: PostgreSQL Only (Recommended for Build Issues)
 
-If Docker build keeps failing, just use Docker for PostgreSQL:
+**This is the most reliable approach when Docker builds fail:**
 
+```bash
+# Quick setup script
+chmod +x start-postgres-only.sh
+./start-postgres-only.sh
+
+# Then continue with manual setup
+npm install --legacy-peer-deps
+python3 -m venv venv
+source venv/bin/activate
+pip install -r python_backend/requirements.txt
+npm run db:push
+npm run dev
+```
+
+**Or manually:**
 ```bash
 # Start only PostgreSQL in Docker
 docker run --name debug-postgres \
@@ -83,8 +98,10 @@ docker run --name debug-postgres \
   -p 5432:5432 \
   -d postgres:15
 
-# Then run the app manually on your system
+# Create environment file
 echo 'DATABASE_URL="postgresql://debug_user:debug_pass@localhost:5432/debug_player"' > .env
+
+# Then run the app manually on your system
 npm install --legacy-peer-deps
 python3 -m venv venv
 source venv/bin/activate

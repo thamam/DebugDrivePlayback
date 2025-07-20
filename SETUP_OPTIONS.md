@@ -17,7 +17,8 @@ docker-compose up --build
 **Pros:** No dependencies on your system, identical across platforms, easy cleanup  
 **Cons:** Slightly slower performance, requires Docker
 
-📖 **[Complete Docker Setup Guide](DOCKER_SETUP.md)**
+📖 **[Complete Docker Setup Guide](DOCKER_SETUP.md)**  
+📖 **[Simple Docker Setup (For Build Issues)](DOCKER_SETUP_SIMPLE.md)**
 
 ---
 

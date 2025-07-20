@@ -1,0 +1,43 @@
+ => => sha256:06772a4eff3df697497bb68b4dcdeb97fdb9338b5e7dde7d1a53579c3203c9ba 54.76MB / 54.76MB                                   3.0s
+ => => sha256:1d476778f5bb12bb2fd08ef4e3eb97b2bf6a3e35c29a61751f2be0380a7d8406 3.92kB / 3.92kB                                     0.0s
+ => => sha256:135d1f87d9058e54b5843cd3615665253e82cba7a0ce506207ac795fe3a150c9 6.62kB / 6.62kB                                     0.0s
+ => => sha256:6fd49c17bd36c59d7bf7afe446ee52f36cad8a6393628526989f2db44b4486c1 197.14MB / 197.14MB                                 7.1s
+ => => extracting sha256:2d765646d883a37610a09973a079fbba4c7596e54d18d0447bdfff142389d1f7                                          0.7s
+ => => sha256:58f694cdf31deb9bedfc44b7340b5b788faa94968d59fdd922adda8ee8c74891 56.45MB / 56.45MB                                   4.9s
+ => => sha256:9752a412074a023b65bbd770a9cddd094b4ab6a8674308766cdf83a65e596ec0 4.09kB / 4.09kB                                     3.7s
+ => => extracting sha256:06408a499c9b569e198473b636afa8c383e459ee6fe76ba4159b758c84e68f10                                          0.1s
+ => => sha256:d5c8c838020871f488b691d8fccb46792715bce80e60c697d29626c28efdd49d 1.25MB / 1.25MB                                     5.4s
+ => => extracting sha256:06772a4eff3df697497bb68b4dcdeb97fdb9338b5e7dde7d1a53579c3203c9ba                                          0.7s
+ => => sha256:5dca6a60422e7ac161dd4652bf1104c85ec60f9739585fa3197fbfb4603639d9 446B / 446B                                         5.7s
+ => => extracting sha256:6fd49c17bd36c59d7bf7afe446ee52f36cad8a6393628526989f2db44b4486c1                                          1.8s
+ => => extracting sha256:9752a412074a023b65bbd770a9cddd094b4ab6a8674308766cdf83a65e596ec0                                          0.0s
+ => => extracting sha256:58f694cdf31deb9bedfc44b7340b5b788faa94968d59fdd922adda8ee8c74891                                          0.7s
+ => => extracting sha256:d5c8c838020871f488b691d8fccb46792715bce80e60c697d29626c28efdd49d                                          0.0s
+ => => extracting sha256:5dca6a60422e7ac161dd4652bf1104c85ec60f9739585fa3197fbfb4603639d9                                          0.0s
+ => [backend internal] load build context                                                                                          0.9s
+ => => transferring context: 452.25kB                                                                                              0.9s
+ => ERROR [backend 2/7] RUN apt-get update && apt-get install -y     python3.11     python3.11-venv     python3.11-dev     build-  2.9s
+------                                                                                                                                  
+ > [backend 2/7] RUN apt-get update && apt-get install -y     python3.11     python3.11-venv     python3.11-dev     build-essential     postgresql-client     && rm -rf /var/lib/apt/lists/*:                                                                                   
+0.561 Get:1 http://deb.debian.org/debian bullseye InRelease [116 kB]                                                                    
+0.755 Get:2 http://deb.debian.org/debian-security bullseye-security InRelease [27.2 kB]                                                 
+0.816 Get:3 http://deb.debian.org/debian bullseye-updates InRelease [44.0 kB]                                                           
+0.885 Get:4 http://deb.debian.org/debian bullseye/main amd64 Packages [8066 kB]
+1.272 Get:5 http://deb.debian.org/debian-security bullseye-security/main amd64 Packages [384 kB]
+1.330 Get:6 http://deb.debian.org/debian bullseye-updates/main amd64 Packages [18.8 kB]
+1.764 Fetched 8656 kB in 2s (5353 kB/s)
+1.764 Reading package lists...
+1.995 Reading package lists...
+2.195 Building dependency tree...
+2.243 Reading state information...
+2.306 E: Unable to locate package python3.11
+2.306 E: Couldn't find any package by glob 'python3.11'
+2.306 E: Couldn't find any package by regex 'python3.11'
+2.306 E: Unable to locate package python3.11-venv
+2.306 E: Couldn't find any package by glob 'python3.11-venv'
+2.306 E: Couldn't find any package by regex 'python3.11-venv'
+2.306 E: Unable to locate package python3.11-dev
+2.306 E: Couldn't find any package by glob 'python3.11-dev'
+2.306 E: Couldn't find any package by regex 'python3.11-dev'
+------
+failed to solve: process "/bin/sh -c apt-get update && apt-get install -y     python3.11     python3.11-venv     python3.11-dev     build-essential     postgresql-client     && rm -rf /var/lib/apt/lists/*" did not complete successfully: exit code: 100
