@@ -62,8 +62,7 @@ export function useDebugPlayer() {
       // Update session info
       setDataSession({
         ...mockDataSession,
-        name: 'Kia Niro EV - Real Trip Data',
-        description: 'Authentic vehicle telemetry from July 15, 2025'
+        name: 'Kia Niro EV - Real Trip Data'
       });
     } else {
       // No session ID, use mock data
