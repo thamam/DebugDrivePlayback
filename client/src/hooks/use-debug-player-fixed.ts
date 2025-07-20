@@ -23,7 +23,8 @@ export function useDebugPlayer() {
 
   // Load real data when session ID is present
   useEffect(() => {
-    if (sessionId && sessionId.startsWith('demo-session')) {
+    console.log('Debug player session ID:', sessionId);
+    if (sessionId) {
       console.log('Loading real trip data for session:', sessionId);
       
       // Generate realistic vehicle data based on real trip parameters  
