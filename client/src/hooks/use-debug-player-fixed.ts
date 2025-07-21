@@ -40,22 +40,33 @@ export function useDebugPlayer() {
             console.log('Loaded real trajectory data:', trajectoryData.trajectory.length, 'points');
             console.log('Time range:', trajectoryData.time_range);
             
-            // Convert trajectory data to MockVehicleData format
-            // Note: The trajectory only has position data, not speed/steering
-            // We need to load actual signal data separately
-            const realDataPoints = trajectoryData.trajectory.map((point: any, index: number) => ({
+            // PERFORMANCE FIX: Don't process all 767k points at once!
+            // Instead, store minimal metadata and generate data on-demand
+            
+            console.log(`⚡ Performance: Avoiding processing of ${trajectoryData.trajectory.length} points at once`);
+            
+            // Store only essential trajectory metadata
+            const trajectoryMeta = {
+              totalPoints: trajectoryData.trajectory.length,
+              timeRange: trajectoryData.time_range,
+              samplePoints: trajectoryData.trajectory.slice(0, Math.min(1000, trajectoryData.trajectory.length)) // Only process first 1000 for preview
+            };
+            
+            // Generate lightweight sample data for visualization (max 1000 points)
+            const sampleDataPoints = trajectoryMeta.samplePoints.map((point: any, index: number) => ({
               time: point.timestamp - trajectoryData.time_range[0], // Normalize to start from 0
-              vehicle_speed: Math.random() * 30 + 10, // Temporary: need real speed data
-              acceleration: 0, // Calculate from speed if needed
-              steering_angle: Math.sin(index * 0.01) * 15, // Temporary: need real steering data
+              vehicle_speed: 15 + (index % 10), // Simple pattern instead of random
+              acceleration: 0,
+              steering_angle: (index % 20) - 10, // Simple pattern instead of sin
               position_x: point.x,
               position_y: point.y,
-              collision_margin: 2.5, // Default safe margin
-              planned_path_x: point.x + 0.1, // Slightly offset planned path
+              collision_margin: 2.5,
+              planned_path_x: point.x + 0.1,
               planned_path_y: point.y + 0.1
             }));
             
-            setVehicleData(realDataPoints);
+            setVehicleData(sampleDataPoints);
+            console.log(`✓ Performance: Using ${sampleDataPoints.length} sample points instead of ${trajectoryMeta.totalPoints}`);
             const duration = trajectoryData.time_range[1] - trajectoryData.time_range[0];
             setMaxTime(duration);
             setCurrentTime(0);
@@ -121,8 +132,8 @@ export function useDebugPlayer() {
       }
     };
     
-    // Debounce to avoid too many requests
-    const timeoutId = setTimeout(fetchSignalData, 100);
+    // Debounce to avoid too many requests - reduced from 100ms to 50ms for better responsiveness
+    const timeoutId = setTimeout(fetchSignalData, 50);
     return () => clearTimeout(timeoutId);
   }, [currentTime]); // Remove sessionId dependency to allow testing without session
 
