@@ -46,9 +46,16 @@ print_success "Docker and Docker Compose are installed"
 if ! docker info >/dev/null 2>&1; then
     print_error "Docker daemon is not running!"
     echo ""
-    print_info "Please start Docker first:"
+    print_info "Run the fix script first:"
+    echo "  ./fix-docker.sh"
+    echo ""
+    print_info "Or start Docker manually:"
     echo "  Ubuntu/Debian: sudo systemctl start docker"
     echo "  macOS/Windows: Start Docker Desktop"
+    echo ""
+    print_info "If you get permission errors, add your user to docker group:"
+    echo "  sudo usermod -aG docker \$USER"
+    echo "  newgrp docker"
     exit 1
 fi
 

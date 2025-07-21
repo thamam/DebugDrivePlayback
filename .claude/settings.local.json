@@ -9,7 +9,16 @@
       "Bash(rm:.DS_Store)",
       "Bash(rm:*.pyc)",
       "Bash(rm:*.pyo)",
-      "Bash(rm:*.pyd)"
+      "Bash(rm:*.pyd)",
+      "Bash(mv:*)",
+      "Bash(chmod:*)",
+      "Bash(docker:*)",
+      "Bash(docker-compose:*)",
+      "Bash(groups)",
+      "Bash(./setup-docker.sh:*)",
+      "Bash(pwdx:*)",
+      "Bash(python:*)",
+      "Bash(NODE_ENV=development tsx server/index.ts)"
     ],
     "deny": [
       "Bash(sudo:*)",

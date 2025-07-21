@@ -109,6 +109,24 @@ uvicorn main:app --reload --host 0.0.0.0 --port 8000
 - **Coverage**: Maintained through `test-reports/coverage/`
 - **Python Tests**: Located in `python_backend/test_backend.py`
 
+## 📖 Documentation
+
+All documentation has been organized in the `docs/` directory:
+
+### Setup Documentation
+- **Local Setup**: [docs/LOCAL_SETUP.md](docs/LOCAL_SETUP.md) - Manual installation guide
+- **Docker Setup**: [docs/DOCKER_SETUP.md](docs/DOCKER_SETUP.md) - Docker installation guide  
+- **Backend Setup**: [docs/BACKEND_SETUP.md](docs/BACKEND_SETUP.md) - Python backend details
+- **Trip Data**: [docs/TRIP_DATA_SETUP.md](docs/TRIP_DATA_SETUP.md) - Data loading instructions
+
+### Testing Documentation  
+- **Test Runner**: [docs/TEST_RUNNER_GUIDE.md](docs/TEST_RUNNER_GUIDE.md) - Test execution guide
+- **Testing Strategy**: [docs/TESTING_STRATEGY.md](docs/TESTING_STRATEGY.md) - Comprehensive testing approach
+- **Interactive Testing**: [docs/INTERACTIVE_TESTING_GUIDE.md](docs/INTERACTIVE_TESTING_GUIDE.md) - Manual testing guide
+
+### Features Documentation
+- **Widget System**: [docs/WIDGET_WIZARD_DOCUMENTATION.md](docs/WIDGET_WIZARD_DOCUMENTATION.md) - Widget creation guide
+
 ## Important Notes
 
 - Always use port 5000 for the main application (hardcoded for Replit compatibility)
@@ -117,3 +135,5 @@ uvicorn main:app --reload --host 0.0.0.0 --port 8000
 - Real vehicle data is included in `data/trips/2025-07-15T12_06_02/`
 - Widget templates are defined in `client/src/lib/widget-templates.ts`
 - Plugin interfaces are defined in `client/src/types/plugin-interfaces.ts`
+- Use `./fix-docker.sh` to troubleshoot Docker daemon issues
+- Run `./cleanup-obsolete.sh` to remove duplicate/outdated files

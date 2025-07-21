@@ -19,6 +19,7 @@ from contextlib import asynccontextmanager
 from core.plot_manager import PlotManager
 from plugins.vehicle_data_plugin import VehicleDataPlugin
 from plugins.collision_detection_plugin import CollisionDetectionPlugin
+from plugins.trip_data_plugin import TripDataPlugin
 
 
 # Configure logging
@@ -136,9 +137,13 @@ async def load_data(request: DataLoadRequest):
         if not file_path.exists():
             raise HTTPException(status_code=404, detail=f"File not found: {request.file_path}")
         
-        # Create appropriate plugin
+        # Create appropriate plugin based on path type and plugin type
         if request.plugin_type == "vehicle_data":
-            plugin = VehicleDataPlugin(str(file_path))
+            # Use TripDataPlugin for directories, VehicleDataPlugin for single files
+            if file_path.is_dir():
+                plugin = TripDataPlugin(str(file_path))
+            else:
+                plugin = VehicleDataPlugin(str(file_path))
         elif request.plugin_type == "collision_detection":
             plugin = CollisionDetectionPlugin(str(file_path))
         else:

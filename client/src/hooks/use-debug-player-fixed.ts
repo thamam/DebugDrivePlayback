@@ -20,6 +20,7 @@ export function useDebugPlayer() {
   const [vehicleData, setVehicleData] = useState<MockVehicleData[]>([]);
   const [dataSession, setDataSession] = useState(mockDataSession);
   const [maxTime, setMaxTime] = useState(932);
+  const [error, setError] = useState<string | null>(null);
 
   // Load real data when session ID is present
   useEffect(() => {
@@ -64,20 +65,21 @@ export function useDebugPlayer() {
             });
           } else {
             console.error('Failed to load trajectory data:', trajectoryData.error);
-            // Fallback to mock data
-            setVehicleData(generateMockVehicleData());
+            setError(`Failed to load trajectory data: ${trajectoryData.error}`);
+            setVehicleData([]);
           }
         } catch (error) {
           console.error('Error loading trajectory data:', error);
-          // Fallback to mock data
-          setVehicleData(generateMockVehicleData());
+          setError(`Error loading trajectory data: ${error}`);
+          setVehicleData([]);
         }
       };
       
       loadRealTrajectoryData();
     } else {
-      // No session ID, use mock data
-      setVehicleData(generateMockVehicleData());
+      // No session ID - require user to load data
+      setError('Please load trip data to begin analysis');
+      setVehicleData([]);
     }
   }, [sessionId]);
 
@@ -171,6 +173,8 @@ export function useDebugPlayer() {
     collisionViolations,
     vehicleData,
     dataSession,
+    error,
+    isLoadingRealData: false,
     
     // Computed
     getCurrentDataPoint,

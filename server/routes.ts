@@ -6,6 +6,23 @@ import { pythonBackend } from "./python-integration";
 import path from "path";
 
 export async function registerRoutes(app: Express): Promise<Server> {
+  // Health check endpoint for Docker
+  app.get("/api/health", async (req, res) => {
+    try {
+      res.json({
+        status: "healthy",
+        timestamp: new Date().toISOString(),
+        service: "debug-player-backend",
+        version: "1.0.0"
+      });
+    } catch (error: any) {
+      res.status(500).json({
+        status: "unhealthy",
+        error: error.message
+      });
+    }
+  });
+
   // User routes
   app.post("/api/auth/register", async (req, res) => {
     try {
@@ -254,18 +271,25 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(400).json({ message: "File path is required" });
       }
       
-      // Load trip data using the Python backend integration
-      const result = await pythonBackend.loadTripData(filePath, pluginType);
+      // Convert relative paths to be correct for Python backend working directory
+      let pythonBackendPath = filePath;
+      if (!path.isAbsolute(filePath)) {
+        // Python backend runs from python_backend/ directory, so add ../ prefix
+        pythonBackendPath = path.join('..', filePath);
+      }
       
-      // Handle demo mode responses (they're considered successful)
-      if (!result.success && !result.isDemoMode) {
+      console.log(`Loading data: original path="${filePath}", python backend path="${pythonBackendPath}"`);
+      
+      // Load trip data using the Python backend integration
+      const result = await pythonBackend.loadTripData(pythonBackendPath, pluginType);
+      
+      // Return the actual result - no demo mode fallbacks!
+      if (!result.success) {
         return res.status(400).json({ 
-          message: result.error,
-          availableTrips: result.availableTrips 
+          message: result.error
         });
       }
       
-      // For demo mode, return success with demo data
       res.json(result);
     } catch (error: any) {
       res.status(500).json({ message: `Backend integration error: ${error.message}` });
@@ -293,31 +317,21 @@ export async function registerRoutes(app: Express): Promise<Server> {
     try {
       const isHealthy = await pythonBackend.checkHealth();
       
-      if (isHealthy) {
-        const response = await fetch("http://localhost:8000/plugins");
-        if (response.ok) {
-          const result = await response.json();
-          return res.json(result);
-        }
+      if (!isHealthy) {
+        return res.status(503).json({ 
+          message: "Python backend is not running or not healthy. Please start the Python backend first." 
+        });
       }
       
-      // Return demo plugins if Python backend is not available
-      res.json([
-        {
-          name: "Vehicle Data Plugin",
-          version: "1.0.0",
-          description: "Processes vehicle telemetry data",
-          is_loaded: true,
-          signals: ["vehicle_speed", "steering_angle", "position_x", "position_y", "acceleration"]
-        },
-        {
-          name: "Collision Detection Plugin",
-          version: "1.0.0",
-          description: "Analyzes collision risks and safety margins",
-          is_loaded: true,
-          signals: ["collision_margin", "safety_score", "alert_level"]
-        }
-      ]);
+      const response = await fetch("http://localhost:8000/plugins");
+      if (!response.ok) {
+        return res.status(response.status).json({ 
+          message: `Python backend error: ${response.statusText}` 
+        });
+      }
+      
+      const result = await response.json();
+      res.json(result);
     } catch (error: any) {
       res.status(500).json({ message: `Backend integration error: ${error.message}` });
     }
@@ -327,47 +341,21 @@ export async function registerRoutes(app: Express): Promise<Server> {
     try {
       const isHealthy = await pythonBackend.checkHealth();
       
-      if (isHealthy) {
-        const response = await fetch("http://localhost:8000/signals");
-        if (response.ok) {
-          const result = await response.json();
-          return res.json(result);
-        }
+      if (!isHealthy) {
+        return res.status(503).json({ 
+          message: "Python backend is not running or not healthy. Please start the Python backend first." 
+        });
       }
       
-      // Return demo signals if Python backend is not available
-      res.json({
-        'vehicle_speed': {
-          name: 'vehicle_speed',
-          type: 'temporal',
-          units: 'm/s',
-          description: 'Vehicle speed over time'
-        },
-        'steering_angle': {
-          name: 'steering_angle',
-          type: 'temporal',
-          units: 'degrees',
-          description: 'Steering wheel angle'
-        },
-        'position_x': {
-          name: 'position_x',
-          type: 'spatial',
-          units: 'm',
-          description: 'Vehicle X position'
-        },
-        'position_y': {
-          name: 'position_y',
-          type: 'spatial',
-          units: 'm',
-          description: 'Vehicle Y position'
-        },
-        'collision_margin': {
-          name: 'collision_margin',
-          type: 'temporal',
-          units: 'm',
-          description: 'Distance to nearest obstacle'
-        }
-      });
+      const response = await fetch("http://localhost:8000/signals");
+      if (!response.ok) {
+        return res.status(response.status).json({ 
+          message: `Python backend error: ${response.statusText}` 
+        });
+      }
+      
+      const result = await response.json();
+      res.json(result);
     } catch (error: any) {
       res.status(500).json({ message: `Backend integration error: ${error.message}` });
     }
@@ -377,30 +365,24 @@ export async function registerRoutes(app: Express): Promise<Server> {
     try {
       const isHealthy = await pythonBackend.checkHealth();
       
-      if (isHealthy) {
-        const response = await fetch("http://localhost:8000/upload-data", {
-          method: "POST",
-          body: req.body,
+      if (!isHealthy) {
+        return res.status(503).json({ 
+          message: "Python backend is not running or not healthy. Please start the Python backend first." 
         });
-        
-        if (response.ok) {
-          const result = await response.json();
-          return res.json(result);
-        }
       }
       
-      // Return demo response for file upload
-      res.json({
-        success: true,
-        plugin_name: "demo_plugin",
-        message: "File upload functionality ready - Python backend will process when available",
-        data_points: 1000,
-        time_range: [0, 300],
-        signals: {
-          'vehicle_speed': { name: 'vehicle_speed', type: 'temporal', units: 'm/s' },
-          'steering_angle': { name: 'steering_angle', type: 'temporal', units: 'degrees' }
-        }
+      const response = await fetch("http://localhost:8000/upload-data", {
+        method: "POST",
+        body: req.body,
       });
+      
+      if (!response.ok) {
+        const error = await response.json();
+        return res.status(response.status).json(error);
+      }
+      
+      const result = await response.json();
+      res.json(result);
     } catch (error: any) {
       res.status(500).json({ message: `Backend integration error: ${error.message}` });
     }
@@ -482,11 +464,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
         message: "Python backend connected successfully"
       });
     } catch (error) {
-      res.json({
+      res.status(503).json({
         status: "unhealthy", 
-        backend_type: "demo",
+        backend_type: "python",
         error: error instanceof Error ? error.message : "Connection failed",
-        message: "Using demo mode - Python backend unavailable"
+        message: "Python backend is not running or not healthy"
       });
     }
   });

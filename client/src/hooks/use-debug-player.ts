@@ -21,6 +21,7 @@ export function useDebugPlayer() {
   const [dataSession, setDataSession] = useState(mockDataSession);
   const [maxTime, setMaxTime] = useState(932);
   const [isLoadingRealData, setIsLoadingRealData] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
   // Load real data when session ID is present
   useEffect(() => {
@@ -72,14 +73,16 @@ export function useDebugPlayer() {
           });
         }
       } catch (error) {
-        console.warn('Failed to generate real data, using mock data:', error);
-        setVehicleData(generateMockVehicleData());
+        console.error('Failed to load real data:', error);
+        setError(`Failed to load data: ${error}`);
+        setVehicleData([]);
       } finally {
         setIsLoadingRealData(false);
       }
     } else {
-      // No session ID, use mock data
-      setVehicleData(generateMockVehicleData());
+      // No session ID - require user to load data
+      setError('Please load trip data to begin analysis');
+      setVehicleData([]);
     }
   }, [sessionId]);
 
@@ -173,6 +176,7 @@ export function useDebugPlayer() {
     collisionViolations,
     vehicleData,
     dataSession,
+    error,
     
     // Computed
     getCurrentDataPoint,

@@ -70,8 +70,9 @@ class PlotManager:
                 self.performance_monitor.start_timing("plugin_registration")
                 
                 if plugin.name in self.plugins:
-                    self.logger.warning(f"Plugin {plugin.name} already registered")
-                    return False
+                    self.logger.info(f"Plugin {plugin.name} already registered, updating...")
+                    # Unregister the existing plugin first
+                    self.unregister_plugin(plugin.name)
                 
                 if not plugin.load():
                     self.logger.error(f"Failed to load plugin {plugin.name}")
