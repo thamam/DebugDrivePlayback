@@ -4,6 +4,7 @@
 
 import { widgetEngineV3 } from './widget-engine-v3';
 import type { WidgetMessage, WidgetInstance } from './widget-engine';
+import { safeEvaluator, type FilterCondition, type TransformOperation } from './safe-expression-evaluator';
 
 export interface WidgetWorkflow {
   id: string;
@@ -230,6 +231,7 @@ export class WidgetCollaboration {
     }
 
     // Create a composite widget template that encapsulates the entire workflow
+    const collaborationInstance = this;
     const template = {
       id: `composite-${templateName.toLowerCase().replace(/\s+/g, '-')}`,
       name: templateName,
@@ -245,7 +247,7 @@ export class WidgetCollaboration {
         
         async process(inputs: any) {
           // Execute the workflow with inputs
-          return await this.executeWorkflow(workflowId, inputs);
+          return await collaborationInstance.executeWorkflow(workflowId, inputs);
         },
         
         render(outputs: any, config: any) {
@@ -387,12 +389,21 @@ export class WidgetCollaboration {
   private async executeConditionCheck(step: WorkflowStep, context: any): Promise<boolean> {
     const { expression } = step.parameters || {};
     
-    // Simple expression evaluation (in production, use a proper expression engine)
     try {
-      const result = eval(expression.replace(/\$\{([^}]+)\}/g, (match: string, key: string) => {
-        return JSON.stringify(context[key]);
-      }));
-      return Boolean(result);
+      // Replace context variables with actual values
+      const processedExpression = expression.replace(/\$\{([^}]+)\}/g, (match: string, key: string) => {
+        const value = context[key];
+        return typeof value === 'string' ? `'${value}'` : String(value);
+      });
+      
+      // Parse and evaluate using safe evaluator
+      const condition = safeEvaluator.parseConditionExpression(processedExpression);
+      if (condition) {
+        return safeEvaluator.evaluateFilter(context, condition);
+      }
+      
+      console.warn('Could not parse condition expression:', expression);
+      return false;
     } catch (error) {
       console.error('Condition evaluation failed:', error);
       return false;
@@ -581,13 +592,45 @@ export class WidgetCollaboration {
   private filterData(data: any, config: any): any {
     if (!Array.isArray(data)) return data;
     const { condition } = config;
-    return data.filter((item: any) => eval(condition.replace(/\$item/g, JSON.stringify(item))));
+    
+    try {
+      // Parse the condition into a safe format
+      const filterCondition = safeEvaluator.parseConditionExpression(
+        condition.replace(/\$item\./g, '')
+      );
+      
+      if (filterCondition) {
+        return data.filter((item: any) => safeEvaluator.evaluateFilter(item, filterCondition));
+      }
+      
+      console.warn('Could not parse filter condition:', condition);
+      return data;
+    } catch (error) {
+      console.error('Filter operation failed:', error);
+      return data;
+    }
   }
 
   private mapData(data: any, config: any): any {
     if (!Array.isArray(data)) return data;
     const { transform } = config;
-    return data.map((item: any) => eval(transform.replace(/\$item/g, JSON.stringify(item))));
+    
+    try {
+      // Parse the transform into a safe format
+      const transformOperation = safeEvaluator.parseTransformExpression(
+        transform.replace(/\$item\./g, '')
+      );
+      
+      if (transformOperation) {
+        return data.map((item: any) => safeEvaluator.applyTransform(item, transformOperation));
+      }
+      
+      console.warn('Could not parse transform expression:', transform);
+      return data;
+    } catch (error) {
+      console.error('Map operation failed:', error);
+      return data;
+    }
   }
 
   private aggregateData(data: any, config: any): any {

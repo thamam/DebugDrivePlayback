@@ -4,7 +4,7 @@
 
 import { db } from "./db";
 import { widgetDefinitions, widgetInstances, widgetData, type InsertWidgetDefinition, type InsertWidgetInstance, type InsertWidgetData, type WidgetDefinition, type WidgetInstance } from "@shared/schema";
-import { eq, and, desc } from "drizzle-orm";
+import { eq, and, desc, lt, sql } from "drizzle-orm";
 
 export class WidgetService {
   
@@ -172,32 +172,32 @@ export class WidgetService {
     activeInstances: number;
     totalDataPoints: number;
   }> {
-    const [definitionsCount] = await db.select({ count: "count(*)" }).from(widgetDefinitions);
-    const [instancesCount] = await db.select({ count: "count(*)" }).from(widgetInstances);
-    const [activeInstancesCount] = await db.select({ count: "count(*)" })
+    const [definitionsCount] = await db.select({ count: sql<string>`count(*)` }).from(widgetDefinitions);
+    const [instancesCount] = await db.select({ count: sql<string>`count(*)` }).from(widgetInstances);
+    const [activeInstancesCount] = await db.select({ count: sql<string>`count(*)` })
       .from(widgetInstances)
       .where(eq(widgetInstances.status, 'active'));
-    const [dataPointsCount] = await db.select({ count: "count(*)" }).from(widgetData);
+    const [dataPointsCount] = await db.select({ count: sql<string>`count(*)` }).from(widgetData);
 
     return {
-      totalDefinitions: parseInt(definitionsCount.count as string),
-      totalInstances: parseInt(instancesCount.count as string),
-      activeInstances: parseInt(activeInstancesCount.count as string),
-      totalDataPoints: parseInt(dataPointsCount.count as string)
+      totalDefinitions: parseInt(definitionsCount.count),
+      totalInstances: parseInt(instancesCount.count),
+      activeInstances: parseInt(activeInstancesCount.count),
+      totalDataPoints: parseInt(dataPointsCount.count)
     };
   }
 
   async cleanupOldData(daysOld: number = 30): Promise<number> {
     const cutoffDate = new Date();
     cutoffDate.setDate(cutoffDate.getDate() - daysOld);
+    const cutoffTimestamp = cutoffDate.getTime() / 1000; // Convert to Unix timestamp
 
     const result = await db.delete(widgetData)
       .where(
-        // Assuming createdAt is a timestamp column
-        // You might need to adjust this based on your exact schema
+        lt(widgetData.timestamp, cutoffTimestamp)
       );
 
-    return result.rowCount;
+    return result.rowCount || 0;
   }
 }
 

@@ -1,12 +1,20 @@
 {
   "permissions": {
     "allow": [
-      "Bash(chmod:*)",
-      "Bash(sudo chown:*)",
-      "Bash(mv:*)",
-      "Bash(rm:*)",
-      "Bash(sudo rm:*)"
+      "Bash(chmod:./setup-docker.sh)",
+      "Bash(chmod:./cleanup.sh)",
+      "Bash(mv:./cleanup.sh)",
+      "Bash(rm:venv/*)",
+      "Bash(rm:__pycache__/*)",
+      "Bash(rm:.DS_Store)",
+      "Bash(rm:*.pyc)",
+      "Bash(rm:*.pyo)",
+      "Bash(rm:*.pyd)"
     ],
-    "deny": []
+    "deny": [
+      "Bash(sudo:*)",
+      "Bash(rm:/)",
+      "Bash(rm:/*)"
+    ]
   }
 }

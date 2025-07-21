@@ -37,6 +37,8 @@ export function useLoadSession() {
  * Hook to get session data
  */
 export function useSession(sessionId: string | null) {
+  const queryClient = useQueryClient();
+  
   return useQuery({
     queryKey: ['session', sessionId],
     queryFn: async () => {
@@ -158,5 +160,3 @@ export function usePlaybackState(sessionId: string | null) {
     setSpeed
   };
 }
-
-const queryClient = useQueryClient();
