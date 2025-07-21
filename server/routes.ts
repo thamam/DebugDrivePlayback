@@ -1,7 +1,7 @@
 import type { Express } from "express";
 import { createServer, type Server } from "http";
-import { storage } from "./storage";
-import { insertUserSchema, insertDataSessionSchema, insertVehicleDataSchema, insertBookmarkSchema, insertPluginSchema } from "@shared/schema";
+// import { storage } from "./storage"; // Temporarily disabled to avoid database connection
+// import { insertUserSchema, insertDataSessionSchema, insertVehicleDataSchema, insertBookmarkSchema, insertPluginSchema } from "@shared/schema";
 import { pythonBackend } from "./python-integration";
 import path from "path";
 
@@ -23,7 +23,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // User routes
+  // Database-dependent routes - temporarily disabled to avoid connection issues
+  /*
   app.post("/api/auth/register", async (req, res) => {
     try {
       const user = insertUserSchema.parse(req.body);
@@ -69,24 +70,38 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.status(500).json({ message: error.message });
     }
   });
+  */
 
-  // Data session routes
+  // Data session routes - simplified for testing
   app.get("/api/sessions", async (req, res) => {
     try {
-      // For now, return sessions for user ID 1 (demo user)
-      const sessions = await storage.getUserDataSessions(1);
-      res.json(sessions);
+      // Return empty sessions for testing (no database)
+      res.json([]);
     } catch (error: any) {
       res.status(500).json({ message: error.message });
     }
   });
 
-  app.post("/api/sessions", async (req, res) => {
+  app.post("/api/sessions", (req, res) => {
     try {
-      const session = insertDataSessionSchema.parse(req.body);
-      const newSession = await storage.createDataSession(session);
-      res.json(newSession);
+      // Simple session creation without any database or schema dependencies
+      const mockSession = {
+        id: Date.now(),
+        name: req.body.name || "Test Session",
+        filePath: req.body.filePath || "/test",
+        filename: req.body.filename || "test",
+        fileSize: req.body.fileSize || 1000,
+        duration: req.body.duration || 300,
+        frequency: req.body.frequency || 10,
+        signalCount: req.body.signalCount || 100,
+        userId: req.body.userId || 1,
+        createdAt: new Date().toISOString()
+      };
+      
+      console.log('Creating mock session:', mockSession);
+      res.json(mockSession);
     } catch (error: any) {
+      console.error('Session creation error:', error);
       res.status(400).json({ message: error.message });
     }
   });
@@ -94,18 +109,22 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.get("/api/sessions/:id", async (req, res) => {
     try {
       const id = parseInt(req.params.id);
-      const session = await storage.getDataSession(id);
-      
-      if (!session) {
-        return res.status(404).json({ message: "Session not found" });
-      }
-      
-      res.json(session);
+      // Return mock session for testing
+      const mockSession = {
+        id: id,
+        name: "Mock Session",
+        filePath: "/home/thh3/data/trips/2025-07-15T12_06_02",
+        duration: 300,
+        signalCount: 100
+      };
+      res.json(mockSession);
     } catch (error: any) {
       res.status(500).json({ message: error.message });
     }
   });
 
+  // Temporarily disable database-dependent routes to avoid connection issues
+  /*
   app.get("/api/users/:userId/sessions", async (req, res) => {
     try {
       const userId = parseInt(req.params.userId);
@@ -115,152 +134,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.status(500).json({ message: error.message });
     }
   });
-
-  app.put("/api/sessions/:id", async (req, res) => {
-    try {
-      const id = parseInt(req.params.id);
-      const updates = req.body;
-      const session = await storage.updateDataSession(id, updates);
-      res.json(session);
-    } catch (error: any) {
-      res.status(400).json({ message: error.message });
-    }
-  });
-
-  app.delete("/api/sessions/:id", async (req, res) => {
-    try {
-      const id = parseInt(req.params.id);
-      const success = await storage.deleteDataSession(id);
-      
-      if (!success) {
-        return res.status(404).json({ message: "Session not found" });
-      }
-      
-      res.json({ message: "Session deleted successfully" });
-    } catch (error: any) {
-      res.status(500).json({ message: error.message });
-    }
-  });
-
-  // Vehicle data routes
-  app.post("/api/vehicle-data", async (req, res) => {
-    try {
-      const data = insertVehicleDataSchema.parse(req.body);
-      const newData = await storage.createVehicleData(data);
-      res.json(newData);
-    } catch (error: any) {
-      res.status(400).json({ message: error.message });
-    }
-  });
-
-  app.get("/api/sessions/:sessionId/vehicle-data", async (req, res) => {
-    try {
-      const sessionId = parseInt(req.params.sessionId);
-      const data = await storage.getVehicleDataBySession(sessionId);
-      res.json(data);
-    } catch (error: any) {
-      res.status(500).json({ message: error.message });
-    }
-  });
-
-  app.get("/api/sessions/:sessionId/vehicle-data/range", async (req, res) => {
-    try {
-      const sessionId = parseInt(req.params.sessionId);
-      const startTime = parseFloat(req.query.startTime as string);
-      const endTime = parseFloat(req.query.endTime as string);
-      
-      const data = await storage.getVehicleDataByTimeRange(sessionId, startTime, endTime);
-      res.json(data);
-    } catch (error: any) {
-      res.status(400).json({ message: error.message });
-    }
-  });
-
-  // Bookmark routes
-  app.post("/api/bookmarks", async (req, res) => {
-    try {
-      const bookmark = insertBookmarkSchema.parse(req.body);
-      const newBookmark = await storage.createBookmark(bookmark);
-      res.json(newBookmark);
-    } catch (error: any) {
-      res.status(400).json({ message: error.message });
-    }
-  });
-
-  app.get("/api/sessions/:sessionId/bookmarks", async (req, res) => {
-    try {
-      const sessionId = parseInt(req.params.sessionId);
-      const bookmarks = await storage.getBookmarksBySession(sessionId);
-      res.json(bookmarks);
-    } catch (error: any) {
-      res.status(500).json({ message: error.message });
-    }
-  });
-
-  app.delete("/api/bookmarks/:id", async (req, res) => {
-    try {
-      const id = parseInt(req.params.id);
-      const success = await storage.deleteBookmark(id);
-      
-      if (!success) {
-        return res.status(404).json({ message: "Bookmark not found" });
-      }
-      
-      res.json({ message: "Bookmark deleted successfully" });
-    } catch (error: any) {
-      res.status(500).json({ message: error.message });
-    }
-  });
-
-  // Plugin routes
-  app.post("/api/plugins", async (req, res) => {
-    try {
-      const plugin = insertPluginSchema.parse(req.body);
-      // Convert configuration object to JSON string
-      if (plugin.configuration && typeof plugin.configuration === 'object') {
-        plugin.configuration = JSON.stringify(plugin.configuration);
-      }
-      const newPlugin = await storage.createPlugin(plugin);
-      res.json(newPlugin);
-    } catch (error: any) {
-      res.status(400).json({ message: error.message });
-    }
-  });
-
-  app.get("/api/plugins", async (req, res) => {
-    try {
-      const plugins = await storage.getPlugins();
-      res.json(plugins);
-    } catch (error: any) {
-      res.status(500).json({ message: error.message });
-    }
-  });
-
-  app.put("/api/plugins/:id", async (req, res) => {
-    try {
-      const id = parseInt(req.params.id);
-      const updates = req.body;
-      const plugin = await storage.updatePlugin(id, updates);
-      res.json(plugin);
-    } catch (error: any) {
-      res.status(400).json({ message: error.message });
-    }
-  });
-
-  app.delete("/api/plugins/:id", async (req, res) => {
-    try {
-      const id = parseInt(req.params.id);
-      const success = await storage.deletePlugin(id);
-      
-      if (!success) {
-        return res.status(404).json({ message: "Plugin not found" });
-      }
-      
-      res.json({ message: "Plugin deleted successfully" });
-    } catch (error: any) {
-      res.status(500).json({ message: error.message });
-    }
-  });
+  */ // ... other database routes disabled for testing
 
   // Python backend integration routes
   app.post("/api/python/load-data", async (req, res) => {
@@ -308,6 +182,35 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const trajectoryData = await pythonBackend.loadTrajectoryData(tripDataPath);
       
       res.json(trajectoryData);
+    } catch (error: any) {
+      res.status(500).json({ message: error.message });
+    }
+  });
+
+  // Get all vehicle data for visualization
+  app.get("/api/vehicle-data/:sessionId", async (req, res) => {
+    try {
+      const sessionId = req.params.sessionId;
+      
+      // Get data from Python backend for all time points
+      const response = await fetch("http://localhost:8000/data-range", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          start_time: 0,
+          end_time: 10000, // Large time to get all data
+          signals: ["speed", "steering", "brake", "throttle", "car_pose_car_pose_front_axle_x_meters", "car_pose_car_pose_front_axle_y_meters"]
+        }),
+      });
+      
+      if (!response.ok) {
+        throw new Error(`Python backend error: ${response.statusText}`);
+      }
+      
+      const data = await response.json();
+      res.json(data);
     } catch (error: any) {
       res.status(500).json({ message: error.message });
     }
@@ -392,7 +295,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     try {
       const { timestamp, signals } = req.body;
       
-      const response = await fetch("http://localhost:8000/data/timestamp", {
+      const response = await fetch("http://localhost:8000/data", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -419,7 +322,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     try {
       const { start_time, end_time, signals } = req.body;
       
-      const response = await fetch("http://localhost:8000/data/range", {
+      const response = await fetch("http://localhost:8000/data-range", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

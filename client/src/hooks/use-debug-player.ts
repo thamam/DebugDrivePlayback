@@ -90,6 +90,40 @@ export function useDebugPlayer() {
     return vehicleData.find(d => Math.abs(d.time - currentTime) < 0.05) || vehicleData[0];
   }, [vehicleData, currentTime]);
 
+  // Fetch real signal data when timestamp changes
+  useEffect(() => {
+    if (!sessionId || currentTime === null) return;
+    
+    const fetchSignalData = async () => {
+      try {
+        // Calculate absolute timestamp (add back the base time)
+        const absoluteTime = currentTime + 1752570362.062682; // base timestamp from trajectory
+        
+        const response = await fetch('/api/python/data/timestamp', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            timestamp: absoluteTime,
+            signals: ['speed', 'steering', 'brake', 'throttle', 'driving_mode']
+          }),
+        });
+        
+        if (response.ok) {
+          const signalData = await response.json();
+          console.log(`Signals at time ${currentTime.toFixed(2)}s:`, signalData);
+        }
+      } catch (error) {
+        console.error('Failed to fetch signal data:', error);
+      }
+    };
+    
+    // Debounce to avoid too many requests
+    const timeoutId = setTimeout(fetchSignalData, 100);
+    return () => clearTimeout(timeoutId);
+  }, [currentTime, sessionId]);
+
   // Auto-play functionality
   useEffect(() => {
     let interval: NodeJS.Timeout;

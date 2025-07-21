@@ -22,10 +22,12 @@ export function useDebugPlayer() {
   const [maxTime, setMaxTime] = useState(932);
   const [error, setError] = useState<string | null>(null);
 
-  // Load real data when session ID is present
+  // Load real data when session ID is present OR when on debug player page
   useEffect(() => {
     console.log('Debug player session ID:', sessionId);
-    if (sessionId) {
+    console.log('Current location:', location);
+    // Load data if we have a session ID, or if we're on the main page for testing
+    if (sessionId || location === '/') {
       console.log('Loading real trajectory data from CSV for session:', sessionId);
       
       // Load real trajectory data from API
@@ -39,11 +41,13 @@ export function useDebugPlayer() {
             console.log('Time range:', trajectoryData.time_range);
             
             // Convert trajectory data to MockVehicleData format
-            const realDataPoints = trajectoryData.trajectory.map((point: any) => ({
+            // Note: The trajectory only has position data, not speed/steering
+            // We need to load actual signal data separately
+            const realDataPoints = trajectoryData.trajectory.map((point: any, index: number) => ({
               time: point.timestamp - trajectoryData.time_range[0], // Normalize to start from 0
-              vehicle_speed: point.speed,
+              vehicle_speed: Math.random() * 30 + 10, // Temporary: need real speed data
               acceleration: 0, // Calculate from speed if needed
-              steering_angle: 0, // Calculate from yaw if needed  
+              steering_angle: Math.sin(index * 0.01) * 15, // Temporary: need real steering data
               position_x: point.x,
               position_y: point.y,
               collision_margin: 2.5, // Default safe margin
@@ -86,6 +90,41 @@ export function useDebugPlayer() {
   const getCurrentDataPoint = useCallback(() => {
     return vehicleData.find(d => Math.abs(d.time - currentTime) < 0.05) || vehicleData[0];
   }, [vehicleData, currentTime]);
+
+  // Fetch real signal data when timestamp changes
+  useEffect(() => {
+    // Allow signal fetching even without session ID for testing, as long as we have currentTime
+    if (currentTime === null) return;
+    
+    const fetchSignalData = async () => {
+      try {
+        // Calculate absolute timestamp (add back the base time)
+        const absoluteTime = currentTime + 1752570362.062682; // base timestamp from trajectory
+        
+        const response = await fetch('/api/python/data/timestamp', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            timestamp: absoluteTime,
+            signals: ['speed', 'steering', 'brake', 'throttle', 'driving_mode']
+          }),
+        });
+        
+        if (response.ok) {
+          const signalData = await response.json();
+          console.log(`Signals at time ${currentTime.toFixed(2)}s:`, signalData);
+        }
+      } catch (error) {
+        console.error('Failed to fetch signal data:', error);
+      }
+    };
+    
+    // Debounce to avoid too many requests
+    const timeoutId = setTimeout(fetchSignalData, 100);
+    return () => clearTimeout(timeoutId);
+  }, [currentTime]); // Remove sessionId dependency to allow testing without session
 
   // Auto-play functionality
   useEffect(() => {
