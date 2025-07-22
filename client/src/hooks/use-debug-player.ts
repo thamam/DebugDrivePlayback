@@ -3,6 +3,9 @@ import { useLocation } from 'wouter';
 import { generateMockVehicleData, mockBookmarks, mockPlugins, mockDataSession, mockActiveSignals, type MockVehicleData, type CollisionViolation } from '@/lib/mock-data';
 import { Bookmark, Plugin } from '@shared/schema';
 
+// Constants for timeline data processing
+const BASE_TIMESTAMP_OFFSET = 1752570362.062682; // Base timestamp from trajectory data
+
 export function useDebugPlayer() {
   const [location] = useLocation();
   const sessionId = new URLSearchParams(location.split('?')[1] || '').get('session');
@@ -97,7 +100,7 @@ export function useDebugPlayer() {
     const fetchSignalData = async () => {
       try {
         // Calculate absolute timestamp (add back the base time)
-        const absoluteTime = currentTime + 1752570362.062682; // base timestamp from trajectory
+        const absoluteTime = currentTime + BASE_TIMESTAMP_OFFSET;
         
         const response = await fetch('/api/python/data/timestamp', {
           method: 'POST',

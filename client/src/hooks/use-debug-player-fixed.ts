@@ -3,6 +3,9 @@ import { useLocation } from 'wouter';
 import { generateMockVehicleData, mockBookmarks, mockPlugins, mockDataSession, mockActiveSignals, type MockVehicleData, type CollisionViolation } from '@/lib/mock-data';
 import { Bookmark, Plugin } from '@shared/schema';
 
+// Constants for timeline data processing
+const BASE_TIMESTAMP_OFFSET = 1752570362.062682; // Base timestamp from trajectory data
+
 export function useDebugPlayer() {
   const [location] = useLocation();
   const sessionId = new URLSearchParams(location.split('?')[1] || '').get('session');
@@ -124,7 +127,7 @@ export function useDebugPlayer() {
     // For uncached data, fetch immediately (no debouncing)
     const fetchSignalData = async () => {
       try {
-        const absoluteTime = currentTime + 1752570362.062682;
+        const absoluteTime = currentTime + BASE_TIMESTAMP_OFFSET;
         
         const response = await fetch('/api/python/data/timestamp', {
           method: 'POST',
@@ -175,7 +178,7 @@ export function useDebugPlayer() {
         if (!signalCacheRef.current.has(cacheKey)) {
           // Prefetch in background (fire and forget)
           setTimeout(() => {
-            const absoluteTime = adjTime + 1752570362.062682;
+            const absoluteTime = adjTime + BASE_TIMESTAMP_OFFSET;
             fetch('/api/python/data/timestamp', {
               method: 'POST',
               headers: { 'Content-Type': 'application/json' },
@@ -191,7 +194,9 @@ export function useDebugPlayer() {
               if (data) {
                 signalCacheRef.current.set(cacheKey, data);
               }
-            }).catch(() => {}); // Ignore prefetch errors
+            }).catch((err) => { 
+              console.warn('Prefetch failed:', err); 
+            }); // Log prefetch errors for debugging
           }, 10); // Small delay to not interfere with main request
         }
       }

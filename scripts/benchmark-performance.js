@@ -281,7 +281,7 @@ class PerformanceBenchmark {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          filePath: '/home/thh3/data/trips/2025-07-15T12_06_02',
+          filePath: process.env.TEST_TRIP_PATH || '/home/thh3/data/trips/2025-07-15T12_06_02',
           pluginType: 'vehicle_data'
         }),
       });

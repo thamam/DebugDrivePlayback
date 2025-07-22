@@ -4,7 +4,12 @@
  */
 
 import { describe, it, expect, beforeEach, jest } from '@jest/globals';
-import { WidgetEngine, WidgetDefinition, WidgetInstance } from '../../../lib/widget-engine';
+import { WidgetEngine, WidgetDefinition, WidgetInstance, WidgetImplementation } from '../../../lib/widget-engine';
+
+// Mock type for widget implementation
+type MockWidgetImplementation = {
+  [K in keyof WidgetImplementation]: jest.MockedFunction<WidgetImplementation[K]>;
+};
 
 describe('WidgetEngine', () => {
   let engine: WidgetEngine;
@@ -44,10 +49,10 @@ describe('WidgetEngine', () => {
         }
       },
       implementation: {
-        initialize: jest.fn().mockResolvedValue(undefined) as any,
-        process: jest.fn().mockResolvedValue({ test_output: { data: 'test' } }) as any,
-        render: jest.fn().mockReturnValue('test render') as any
-      }
+        initialize: jest.fn().mockResolvedValue(undefined),
+        process: jest.fn().mockResolvedValue({ test_output: { data: 'test' } }),
+        render: jest.fn().mockReturnValue('test render')
+      } as MockWidgetImplementation
     };
   });
 
@@ -143,7 +148,7 @@ describe('WidgetEngine', () => {
 
     it('should handle processing errors gracefully', async () => {
       const mockError = new Error('Processing failed');
-      (mockWidgetDefinition.implementation.process as any).mockRejectedValue(mockError);
+      (mockWidgetDefinition.implementation.process as jest.MockedFunction<any>).mockRejectedValue(mockError);
       
       await engine.processWidget('test-instance', { test_input: 42 });
       
@@ -192,7 +197,7 @@ describe('WidgetEngine', () => {
     });
 
     it('should remove widget instance', async () => {
-      const mockCleanup = jest.fn().mockResolvedValue(undefined) as any;
+      const mockCleanup = jest.fn().mockResolvedValue(undefined);
       mockWidgetDefinition.implementation.cleanup = mockCleanup;
       
       await engine.removeWidget('test-instance');

@@ -45,7 +45,7 @@ echo "----------------------------"
 echo "Test 1: Loading trip data..."
 LOAD_RESPONSE=$(curl -s -X POST "http://localhost:5000/api/python/load-data" \
   -H "Content-Type: application/json" \
-  -d '{"filePath":"/home/thh3/data/trips/2025-07-15T12_06_02","pluginType":"vehicle_data"}')
+  -d '{"filePath":"'${TEST_TRIP_PATH:-/home/thh3/data/trips/2025-07-15T12_06_02}'","pluginType":"vehicle_data"}')
 
 if echo "$LOAD_RESPONSE" | grep -q '"success":true'; then
     echo "✅ Trip data loaded successfully"

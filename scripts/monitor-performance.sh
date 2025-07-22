@@ -3,6 +3,9 @@
 # Performance Monitoring Script
 # Continuously monitors Debug Player Framework performance
 # Alerts when performance targets are exceeded
+#
+# Environment Variables:
+#   TEST_TRIP_PATH - Path to test trip data directory (default: /home/thh3/data/trips/2025-07-15T12_06_02)
 
 set -euo pipefail
 
@@ -160,7 +163,7 @@ test_data_loading() {
     
     if curl -s -X POST "http://localhost:5000/api/python/load-data" \
         -H "Content-Type: application/json" \
-        -d '{"filePath": "/home/thh3/data/trips/2025-07-15T12_06_02", "pluginType": "vehicle_data"}' \
+        -d '{"filePath": "'${TEST_TRIP_PATH:-/home/thh3/data/trips/2025-07-15T12_06_02}'", "pluginType": "vehicle_data"}' \
         > /dev/null 2>&1; then
         
         local end_time=$(date +%s%3N)
