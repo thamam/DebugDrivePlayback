@@ -1,5 +1,5 @@
 import { users, dataSessions, vehicleData, bookmarks, plugins, type User, type InsertUser, type DataSession, type InsertDataSession, type VehicleData, type InsertVehicleData, type Bookmark, type InsertBookmark, type Plugin, type InsertPlugin } from "@shared/schema";
-import { db } from "./db";
+import { db } from "./db-local";
 import { eq, and, gte, lte, sql } from "drizzle-orm";
 
 export interface IStorage {

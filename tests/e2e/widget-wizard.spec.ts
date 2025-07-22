@@ -16,7 +16,7 @@ test.describe('Widget Wizard GUI Tests', () => {
     await expect(page.locator('text=Widget System Active')).toBeVisible();
     
     // Check that "Add Widget" button is visible
-    await expect(page.locator('button', { hasText: 'Add Widget' })).toBeVisible();
+    await expect(page.locator('button:has-text("Add Widget")').first()).toBeVisible();
   });
 
   test('should open widget wizard dialog', async ({ page }) => {

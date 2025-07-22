@@ -21,6 +21,11 @@ class TestIntegrationFlow:
         cls.python_url = "http://localhost:8000"
         cls.test_trip_path = "/home/thh3/data/trips/2025-07-15T12_06_02"
         
+        # Initialize shared test data
+        cls.loaded_data = None
+        cls.session_id = None
+        cls.time_range = None
+        
     def test_01_backends_are_running(self):
         """Verify both backends are accessible"""
         # Test Express backend
@@ -54,13 +59,22 @@ class TestIntegrationFlow:
         
         result = response.json()
         assert result.get("success") == True, f"Load operation failed: {result}"
-        assert "duration" in result, "Missing duration in response"
-        assert "signal_count" in result, "Missing signal count in response"
+        assert "time_range" in result, "Missing time_range in response"
+        assert "signals" in result, "Missing signals in response"
+        assert "data_points" in result, "Missing data_points in response"
         
-        print(f"✓ Trip data loaded: {result['signal_count']} signals, {result['duration']}s duration")
+        # Calculate duration from time range
+        time_range = result['time_range']
+        duration = time_range[1] - time_range[0] if len(time_range) == 2 else 0
+        signal_count = len(result['signals'])
+        
+        print(f"✓ Trip data loaded: {signal_count} signals, {duration:.1f}s duration, {result['data_points']} data points")
         
         # Store for later tests
-        self.loaded_data = result
+        self.__class__.loaded_data = result
+        self.__class__.loaded_data['duration'] = duration
+        self.__class__.loaded_data['signal_count'] = signal_count
+        self.__class__.time_range = time_range
         
     def test_03_create_session(self):
         """Test creating a data session"""
@@ -89,7 +103,7 @@ class TestIntegrationFlow:
         print(f"✓ Session created: ID {session['id']}")
         
         # Store for later tests
-        self.session_id = session["id"]
+        self.__class__.session_id = session["id"]
         
     def test_04_load_trajectory_data(self):
         """Test loading trajectory data for visualization"""
@@ -138,13 +152,16 @@ class TestIntegrationFlow:
             assert response.status_code == 200, f"Failed to fetch signals at {timestamp}: {response.text}"
             
             signal_data = response.json()
-            assert "signals" in signal_data, f"Missing signals in response at timestamp {timestamp}"
+            assert "data" in signal_data, f"Missing data in response at timestamp {timestamp}"
             
             # Verify we got some signal data (not all signals may be present)
-            signals_found = signal_data["signals"]
+            signals_found = signal_data["data"]
             assert len(signals_found) > 0, f"No signals found at timestamp {timestamp}"
             
-            print(f"✓ Timestamp {i+1}/5: {len(signals_found)} signals at time {timestamp:.2f}")
+            # Count signals that have actual values (not None)
+            signals_with_values = sum(1 for v in signals_found.values() if v.get('value') is not None)
+            
+            print(f"✓ Timestamp {i+1}/5: {signals_with_values}/{len(signals_found)} signals with values at time {timestamp:.2f}")
             
     def test_06_session_navigation_flow(self):
         """Test complete session navigation flow (simulating user actions)"""

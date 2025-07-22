@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import { useLocation } from 'wouter';
 import { generateMockVehicleData, mockBookmarks, mockPlugins, mockDataSession, mockActiveSignals, type MockVehicleData, type CollisionViolation } from '@/lib/mock-data';
 import { Bookmark, Plugin } from '@shared/schema';
@@ -21,6 +21,10 @@ export function useDebugPlayer() {
   const [dataSession, setDataSession] = useState(mockDataSession);
   const [maxTime, setMaxTime] = useState(932);
   const [error, setError] = useState<string | null>(null);
+  
+  // Performance optimization: Local signal data cache for instant timeline response
+  const signalCacheRef = useRef<Map<number, any>>(new Map());
+  const lastFetchedTimeRef = useRef<number | null>(null);
 
   // Load real data when session ID is present OR when on debug player page
   useEffect(() => {
@@ -102,21 +106,29 @@ export function useDebugPlayer() {
     return vehicleData.find(d => Math.abs(d.time - currentTime) < 0.05) || vehicleData[0];
   }, [vehicleData, currentTime]);
 
-  // Fetch real signal data when timestamp changes
+  // ZERO-DELAY signal data fetching with intelligent caching
   useEffect(() => {
-    // Allow signal fetching even without session ID for testing, as long as we have currentTime
     if (currentTime === null) return;
     
+    // Round timestamp to nearest 0.1s for cache efficiency
+    const roundedTime = Math.round(currentTime * 10) / 10;
+    const cacheKey = roundedTime;
+    
+    // Check cache first for INSTANT response
+    if (signalCacheRef.current.has(cacheKey)) {
+      const cachedData = signalCacheRef.current.get(cacheKey);
+      console.log(`⚡ INSTANT: Signals at ${currentTime.toFixed(2)}s (cached):`, cachedData);
+      return;
+    }
+    
+    // For uncached data, fetch immediately (no debouncing)
     const fetchSignalData = async () => {
       try {
-        // Calculate absolute timestamp (add back the base time)
-        const absoluteTime = currentTime + 1752570362.062682; // base timestamp from trajectory
+        const absoluteTime = currentTime + 1752570362.062682;
         
         const response = await fetch('/api/python/data/timestamp', {
           method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
+          headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
             timestamp: absoluteTime,
             signals: ['speed', 'steering', 'brake', 'throttle', 'driving_mode']
@@ -125,17 +137,66 @@ export function useDebugPlayer() {
         
         if (response.ok) {
           const signalData = await response.json();
-          console.log(`Signals at time ${currentTime.toFixed(2)}s:`, signalData);
+          
+          // Cache the result for instant future access
+          signalCacheRef.current.set(cacheKey, signalData);
+          
+          // Limit cache size to prevent memory issues (keep last 1000 entries)
+          if (signalCacheRef.current.size > 1000) {
+            const firstKey = signalCacheRef.current.keys().next().value;
+            signalCacheRef.current.delete(firstKey);
+          }
+          
+          console.log(`🔥 FETCHED: Signals at ${currentTime.toFixed(2)}s:`, signalData);
+          
+          // Pre-fetch adjacent timestamps for even smoother scrubbing
+          prefetchAdjacentTimestamps(currentTime);
         }
       } catch (error) {
         console.error('Failed to fetch signal data:', error);
       }
     };
     
-    // Debounce to avoid too many requests - reduced from 100ms to 50ms for better responsiveness
-    const timeoutId = setTimeout(fetchSignalData, 50);
-    return () => clearTimeout(timeoutId);
-  }, [currentTime]); // Remove sessionId dependency to allow testing without session
+    // NO DEBOUNCING - fetch immediately for zero-delay response
+    fetchSignalData();
+    
+  }, [currentTime]);
+  
+  // Pre-fetch function for smoother timeline scrubbing
+  const prefetchAdjacentTimestamps = useCallback((time: number) => {
+    const adjacentTimes = [
+      time - 0.5, time - 0.3, time - 0.1,
+      time + 0.1, time + 0.3, time + 0.5
+    ];
+    
+    adjacentTimes.forEach(adjTime => {
+      if (adjTime >= 0 && adjTime <= maxTime) {
+        const cacheKey = Math.round(adjTime * 10) / 10;
+        if (!signalCacheRef.current.has(cacheKey)) {
+          // Prefetch in background (fire and forget)
+          setTimeout(() => {
+            const absoluteTime = adjTime + 1752570362.062682;
+            fetch('/api/python/data/timestamp', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({
+                timestamp: absoluteTime,
+                signals: ['speed', 'steering', 'brake', 'throttle', 'driving_mode']
+              }),
+            }).then(response => {
+              if (response.ok) {
+                return response.json();
+              }
+            }).then(data => {
+              if (data) {
+                signalCacheRef.current.set(cacheKey, data);
+              }
+            }).catch(() => {}); // Ignore prefetch errors
+          }, 10); // Small delay to not interfere with main request
+        }
+      }
+    });
+  }, [maxTime]);
 
   // Auto-play functionality
   useEffect(() => {

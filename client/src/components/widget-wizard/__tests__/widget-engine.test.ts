@@ -44,9 +44,9 @@ describe('WidgetEngine', () => {
         }
       },
       implementation: {
-        initialize: jest.fn().mockResolvedValue(undefined),
-        process: jest.fn().mockResolvedValue({ test_output: { data: 'test' } }),
-        render: jest.fn().mockReturnValue('test render')
+        initialize: jest.fn().mockResolvedValue(undefined) as any,
+        process: jest.fn().mockResolvedValue({ test_output: { data: 'test' } }) as any,
+        render: jest.fn().mockReturnValue('test render') as any
       }
     };
   });
@@ -143,7 +143,7 @@ describe('WidgetEngine', () => {
 
     it('should handle processing errors gracefully', async () => {
       const mockError = new Error('Processing failed');
-      (mockWidgetDefinition.implementation.process as jest.Mock).mockRejectedValue(mockError);
+      (mockWidgetDefinition.implementation.process as any).mockRejectedValue(mockError);
       
       await engine.processWidget('test-instance', { test_input: 42 });
       
@@ -192,7 +192,7 @@ describe('WidgetEngine', () => {
     });
 
     it('should remove widget instance', async () => {
-      const mockCleanup = jest.fn().mockResolvedValue(undefined);
+      const mockCleanup = jest.fn().mockResolvedValue(undefined) as any;
       mockWidgetDefinition.implementation.cleanup = mockCleanup;
       
       await engine.removeWidget('test-instance');
