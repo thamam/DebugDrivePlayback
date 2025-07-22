@@ -116,7 +116,8 @@ export default function DataLoader({ onLoadComplete }: DataLoaderProps) {
       // Create data session in frontend database
       const sessionData = {
         name: loadingMode === "file" ? selectedFile?.name || "Unknown" : `Trip ${tripPath.split('/').pop()}`,
-        filename: loadingMode === "file" ? selectedFile?.name || "Unknown" : tripPath,
+        filePath: tripPath, // Required field
+        filename: loadingMode === "file" ? selectedFile?.name || "Unknown" : tripPath.split('/').pop(),
         fileSize: loadingMode === "file" ? selectedFile?.size || 0 : result.file_size || 0,
         duration: result.duration || 300,
         frequency: result.frequency || 10,

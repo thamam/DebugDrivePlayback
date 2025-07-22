@@ -301,9 +301,10 @@ describe('Widget Templates', () => {
     it('should have reasonable default values', () => {
       const trajectoryTemplate = widgetTemplates.find(t => t.id === 'trajectory_visualizer');
       
-      expect(trajectoryTemplate.configSchema.showPlannedPath.default).toBe(true);
-      expect(trajectoryTemplate.configSchema.pathColor.default).toBe('#8884d8');
-      expect(trajectoryTemplate.configSchema.chartSize.default).toBe('medium');
+      expect(trajectoryTemplate).toBeDefined();
+      expect(trajectoryTemplate?.configSchema.showPlannedPath.default).toBe(true);
+      expect(trajectoryTemplate?.configSchema.pathColor.default).toBe('#8884d8');
+      expect(trajectoryTemplate?.configSchema.chartSize.default).toBe('medium');
     });
   });
 });

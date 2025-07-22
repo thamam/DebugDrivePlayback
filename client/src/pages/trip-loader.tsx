@@ -24,8 +24,16 @@ export default function TripLoaderPage() {
 
   const handleStartAnalysis = () => {
     if (loadedSession) {
+      console.log('Starting analysis with session:', loadedSession.session);
       // Navigate to debug player with session data
       setLocation(`/?session=${loadedSession.session.id}`);
+    } else {
+      console.error('No loaded session available for analysis');
+      toast({
+        title: "No session available",
+        description: "Please load trip data first",
+        variant: "destructive"
+      });
     }
   };
 
