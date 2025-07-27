@@ -2,6 +2,9 @@ import React from 'react';
 import { render, screen } from '@testing-library/react';
 import '@testing-library/jest-dom';
 import { expect, test, describe } from '@jest/globals';
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import DebugPlayer from '../../client/src/pages/debug-player';
+import PluginManager from '../../client/src/pages/plugin-manager';
 
 // Simple unit test to validate disabled state logic
 describe('Disabled Features Logic', () => {

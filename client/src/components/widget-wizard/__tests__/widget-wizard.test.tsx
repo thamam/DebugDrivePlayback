@@ -3,6 +3,7 @@
  * Tests the complete widget creation workflow
  */
 
+import React from 'react';
 import { describe, it, expect, beforeEach, jest } from '@jest/globals';
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import WidgetWizard from '../widget-wizard';

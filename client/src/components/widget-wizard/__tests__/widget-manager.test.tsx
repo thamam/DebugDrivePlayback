@@ -3,6 +3,7 @@
  * Tests widget management functionality
  */
 
+import React from 'react';
 import { describe, it, expect, beforeEach, jest } from '@jest/globals';
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import WidgetManager from '../widget-manager';

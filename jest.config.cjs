@@ -61,4 +61,7 @@ module.exports = {
   testEnvironmentOptions: {
     url: 'http://localhost:5000'
   },
+  transformIgnorePatterns: [
+    "node_modules/(?!(.*\\.mjs$))"
+  ],
 };

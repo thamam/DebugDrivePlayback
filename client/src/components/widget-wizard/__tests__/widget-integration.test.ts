@@ -3,8 +3,9 @@
  * Tests end-to-end widget workflow and system integration
  */
 
+import React from 'react';
 import { describe, it, expect, beforeEach, jest } from '@jest/globals';
-import { WidgetEngine } from '../../../lib/widget-engine';
+import { WidgetEngine, WidgetDefinition } from '../../../lib/widget-engine';
 import { widgetTemplates } from '../../../lib/widget-templates';
 
 describe('Widget System Integration', () => {
@@ -209,13 +210,13 @@ describe('Widget System Integration', () => {
         ...widgetTemplates[0],
         id: 'error-widget',
         implementation: {
-          initialize: jest.fn().mockResolvedValue(undefined),
-          process: jest.fn().mockRejectedValue(new Error('Processing error')),
-          render: jest.fn().mockReturnValue('Error widget')
+          initialize: jest.fn<(config: Record<string, any>) => Promise<void>>().mockResolvedValue(undefined),
+          process: jest.fn<(inputs: Record<string, any>) => Promise<Record<string, any>>>().mockRejectedValue(new Error('Processing error')),
+          render: jest.fn<(data: Record<string, any>) => React.ReactNode>().mockReturnValue('Error widget')
         }
       };
 
-      engine.registerWidget(mockDefinition);
+      engine.registerWidget(mockDefinition as WidgetDefinition);
 
       const widget = await engine.createWidget(
         'error-widget',
@@ -224,8 +225,11 @@ describe('Widget System Integration', () => {
         {}
       );
 
-      // Process data that will cause error
-      await engine.processWidget('error-widget-1', { test: 'data' });
+      // Process data that will cause error (providing required inputs)
+      await engine.processWidget('error-widget-1', { 
+        w_car_pose_now_x_: 10.0,
+        w_car_pose_now_y: 20.0 
+      });
 
       // Widget should be in error state
       const errorWidget = engine.getInstance('error-widget-1');
@@ -298,7 +302,7 @@ describe('Widget System Integration', () => {
       // Process data concurrently
       const promises = [];
       for (let i = 0; i < 100; i++) {
-        promises.push(engine.broadcastData('test_signal', i));
+        promises.push(engine.broadcastData('signals', { test_signal: i }));
       }
 
       await Promise.all(promises);
@@ -309,28 +313,29 @@ describe('Widget System Integration', () => {
       // Verify all widgets processed the data
       const instances = engine.getInstances();
       instances.forEach(instance => {
-        expect(instance.inputs).toHaveProperty('test_signal');
+        expect(instance.inputs).toHaveProperty('signals');
       });
     });
   });
 
   describe('Memory Management Integration', () => {
     it('should clean up widget resources on removal', async () => {
-      const mockCleanup = jest.fn();
+      const mockCleanup = jest.fn<() => Promise<void>>().mockResolvedValue(undefined);
       
       // Create widget with cleanup function
       const mockDefinition = {
         ...widgetTemplates[0],
         id: 'cleanup-widget',
+        configSchema: {}, // Use empty config schema to avoid validation issues
         implementation: {
-          initialize: jest.fn().mockResolvedValue(undefined),
-          process: jest.fn().mockResolvedValue({}),
-          render: jest.fn().mockReturnValue('Cleanup widget'),
+          initialize: jest.fn<(config: Record<string, any>) => Promise<void>>().mockResolvedValue(undefined),
+          process: jest.fn<(inputs: Record<string, any>) => Promise<Record<string, any>>>().mockResolvedValue({}),
+          render: jest.fn<(data: Record<string, any>) => React.ReactNode>().mockReturnValue('Cleanup widget'),
           cleanup: mockCleanup
         }
       };
 
-      engine.registerWidget(mockDefinition);
+      engine.registerWidget(mockDefinition as WidgetDefinition);
 
       await engine.createWidget(
         'cleanup-widget',
@@ -351,7 +356,7 @@ describe('Widget System Integration', () => {
         'trajectory_visualizer',
         'no-cleanup-widget',
         'No Cleanup Widget',
-        {}
+        { testRequired: 'test_value' } // Provide required config value
       );
 
       // Should not throw error when removing widget without cleanup

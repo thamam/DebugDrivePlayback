@@ -302,9 +302,15 @@ export class WidgetEngine {
       return;
     }
 
-    const promises = Array.from(subscribers).map(instanceId => 
-      this.processWidget(instanceId, { [signal]: data })
-    );
+    const promises = Array.from(subscribers).map(async instanceId => {
+      const instance = this.instances.get(instanceId);
+      if (instance) {
+        // Update the instance inputs with the new signal data
+        instance.inputs = { ...instance.inputs, [signal]: data };
+        // Then process the widget with all its inputs
+        await this.processWidget(instanceId, instance.inputs);
+      }
+    });
 
     await Promise.all(promises);
   }
