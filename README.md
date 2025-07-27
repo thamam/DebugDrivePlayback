@@ -78,6 +78,7 @@ The application includes authentic vehicle data from a Kia Niro EV:
 
 ## 🧪 Testing
 
+### Quick Testing
 ```bash
 # Run all tests
 ./run-tests-simple.sh
@@ -87,6 +88,28 @@ npm run test:unit
 npm run test:e2e
 npm run test:coverage
 ```
+
+### Comprehensive Testing
+```bash
+# Run ALL possible tests (recommended)
+./run-all-tests-comprehensive.sh
+
+# Validate CI/CD setup
+.github/validate-workflows.sh
+```
+
+### 🤖 Automated CI/CD
+Every commit and pull request automatically runs **ALL** tests including:
+- ✅ Unit Tests (Jest)
+- ✅ E2E Tests (Playwright - 3 browsers)
+- ✅ Integration Tests (Frontend ↔ Backend)
+- ✅ Python Backend Tests
+- ✅ Performance Tests
+- ✅ Security Scans
+- ✅ Code Quality Checks
+- ✅ Build Validation
+
+**📊 [View CI/CD Setup Guide](docs/CICD_SETUP_GUIDE.md)**
 
 ## 🌐 Accessing the Application
 

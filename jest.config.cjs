@@ -1,6 +1,5 @@
 /** @type {import('jest').Config} */
 module.exports = {
-  preset: 'ts-jest',
   testEnvironment: 'jsdom',
   roots: ['<rootDir>/client/src', '<rootDir>/tests/unit'],
   testMatch: [
@@ -8,26 +7,8 @@ module.exports = {
     '**/*.(test|spec).(ts|tsx|js)'
   ],
   transform: {
-    '^.+\\.(ts|tsx)$': ['ts-jest', {
-      tsconfig: {
-        jsx: 'react-jsx',
-        esModuleInterop: true,
-        allowSyntheticDefaultImports: true,
-        strict: false,
-        skipLibCheck: true,
-        noImplicitAny: false,
-        moduleResolution: 'node',
-        allowJs: true,
-        isolatedModules: true,
-      },
-    }],
-    '^.+\\.(js|jsx)$': ['ts-jest', {
-      tsconfig: {
-        allowJs: true,
-        esModuleInterop: true,
-        allowSyntheticDefaultImports: true,
-      },
-    }],
+    '^.+\\.(ts|tsx)$': ['babel-jest'],
+    '^.+\\.(js|jsx)$': ['babel-jest'],
   },
   moduleFileExtensions: ['ts', 'tsx', 'js', 'jsx', 'json', 'node'],
   moduleNameMapper: {
@@ -62,6 +43,6 @@ module.exports = {
     url: 'http://localhost:5000'
   },
   transformIgnorePatterns: [
-    "node_modules/(?!(.*\\.mjs$))"
+    "node_modules/(?!(wouter|regexparam|.*\\.mjs$))"
   ],
 };

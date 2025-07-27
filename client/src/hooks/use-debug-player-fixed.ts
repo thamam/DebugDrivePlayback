@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback, useRef } from 'react';
+import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { useLocation } from 'wouter';
 import { generateMockVehicleData, mockBookmarks, mockPlugins, mockDataSession, mockActiveSignals, type MockVehicleData, type CollisionViolation } from '@/lib/mock-data';
 import { Bookmark, Plugin } from '@shared/schema';
@@ -7,6 +7,12 @@ import { Bookmark, Plugin } from '@shared/schema';
 const BASE_TIMESTAMP_OFFSET = 1752570362.062682; // Base timestamp from trajectory data
 
 export function useDebugPlayer() {
+  // Debug: Check if React is available
+  if (!React || typeof React.useRef !== 'function') {
+    console.error('React is not properly available:', React);
+    throw new Error('React hooks are not available. Please check React imports.');
+  }
+  
   const [location] = useLocation();
   const sessionId = new URLSearchParams(location.split('?')[1] || '').get('session');
   

@@ -180,7 +180,7 @@ test.describe('UI Functionality Validation', () => {
 test.describe('Backend Integration Tests', () => {
   test('should test Python backend health endpoint', async ({ page, request }) => {
     // Test the health endpoint
-    const response = await request.get('/api/python/health');
+    const response = await request.get('/api/python/health-status');
     expect(response.status()).toBeLessThan(600); // Should not crash
     
     const data = await response.json();
@@ -190,7 +190,7 @@ test.describe('Backend Integration Tests', () => {
 
   test('should handle plugin loading failures gracefully', async ({ page, request }) => {
     // Test plugin loading endpoint
-    const response = await request.get('/api/plugins');
+    const response = await request.get('/api/python/plugins');
     expect(response.status()).toBe(200);
     
     const plugins = await response.json();

@@ -12,6 +12,7 @@ class PerformanceTestSuite {
     this.testTripPath = '/home/thh3/data/trips/2025-07-15T12_06_02';
     this.browser = null;
     this.page = null;
+    this.requestStartTime = 0;
     this.metrics = {};
   }
 
@@ -63,9 +64,16 @@ class PerformanceTestSuite {
     // Monitor network requests
     this.page.on('response', async (response) => {
       if (response.url().includes('/api/python/data/timestamp')) {
-        const timing = response.timing();
-        this.metrics.apiResponseTime = timing.responseEnd - timing.requestStart;
+        // For performance monitoring, we'll use our own timing
+        this.metrics.apiResponseTime = Date.now() - this.requestStartTime;
         console.log(`📊 Signal API: ${this.metrics.apiResponseTime}ms`);
+      }
+    });
+
+    // Track request start times
+    this.page.on('request', (request) => {
+      if (request.url().includes('/api/python/data/timestamp')) {
+        this.requestStartTime = Date.now();
       }
     });
 
