@@ -7,8 +7,27 @@ module.exports = {
     '**/*.(test|spec).(ts|tsx|js)'
   ],
   transform: {
-    '^.+\\.(ts|tsx)$': ['babel-jest'],
-    '^.+\\.(js|jsx)$': ['babel-jest'],
+    '^.+\\.(ts|tsx)$': ['ts-jest', {
+      tsconfig: {
+        jsx: 'react-jsx',
+        esModuleInterop: true,
+        allowSyntheticDefaultImports: true,
+        strict: false,
+        skipLibCheck: true,
+        noImplicitAny: false,
+        moduleResolution: 'node',
+        allowJs: true,
+        isolatedModules: true,
+      },
+    }],
+    '^.+\\.(js|jsx)$': ['ts-jest', {
+      tsconfig: {
+        jsx: 'react-jsx',
+        allowJs: true,
+        esModuleInterop: true,
+        allowSyntheticDefaultImports: true,
+      },
+    }],
   },
   moduleFileExtensions: ['ts', 'tsx', 'js', 'jsx', 'json', 'node'],
   moduleNameMapper: {

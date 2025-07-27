@@ -1,0 +1,804 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Debug Player Framework - Codebase Structure</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/cytoscape/3.26.0/cytoscape.min.js"></script>
+    <style>
+        body { 
+            margin: 0; 
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; 
+            background: #1a1a1a;
+            color: #fff;
+        }
+        #cy { 
+            width: 100%; 
+            height: 100vh; 
+            background: linear-gradient(135deg, #1a1a1a 0%, #2d2d2d 100%);
+        }
+        #info-panel { 
+            position: absolute; 
+            top: 20px; 
+            right: 20px; 
+            width: 350px;
+            background: rgba(0, 0, 0, 0.9);
+            border: 1px solid #444;
+            border-radius: 10px;
+            padding: 20px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5);
+            backdrop-filter: blur(10px);
+            max-height: 70vh;
+            overflow-y: auto;
+        }
+        #info-panel h3 {
+            margin-top: 0;
+            color: #64b5f6;
+            border-bottom: 2px solid #64b5f6;
+            padding-bottom: 10px;
+        }
+        #info-panel .detail-row {
+            margin: 10px 0;
+            padding: 8px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 5px;
+            border-left: 3px solid #64b5f6;
+        }
+        #info-panel .detail-label {
+            font-weight: bold;
+            color: #81c784;
+            display: inline-block;
+            width: 80px;
+        }
+        #legend { 
+            position: absolute; 
+            bottom: 20px; 
+            left: 20px; 
+            background: rgba(0, 0, 0, 0.9);
+            border: 1px solid #444;
+            border-radius: 10px;
+            padding: 20px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5);
+            backdrop-filter: blur(10px);
+        }
+        #legend h4 {
+            margin-top: 0;
+            color: #64b5f6;
+            border-bottom: 2px solid #64b5f6;
+            padding-bottom: 8px;
+        }
+        .legend-item {
+            display: flex;
+            align-items: center;
+            margin: 8px 0;
+        }
+        .legend-color {
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            margin-right: 10px;
+            border: 2px solid #444;
+        }
+        .controls {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            background: rgba(0, 0, 0, 0.9);
+            border: 1px solid #444;
+            border-radius: 10px;
+            padding: 15px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5);
+        }
+        .controls h4 {
+            margin-top: 0;
+            color: #64b5f6;
+            margin-bottom: 10px;
+        }
+        .control-item {
+            color: #ccc;
+            margin: 5px 0;
+            font-size: 14px;
+        }
+        .search-box {
+            width: 100%;
+            padding: 8px;
+            margin: 10px 0;
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid #444;
+            border-radius: 5px;
+            color: #fff;
+        }
+        .search-box::placeholder {
+            color: #999;
+        }
+    </style>
+</head>
+<body>
+    <div id="cy"></div>
+    
+    <div class="controls">
+        <h4>Controls</h4>
+        <div class="control-item"><strong>Click:</strong> Select node</div>
+        <div class="control-item"><strong>+/-:</strong> Zoom in/out</div>
+        <div class="control-item"><strong>0:</strong> Fit to view</div>
+        <div class="control-item"><strong>R:</strong> Reset layout</div>
+        <input type="text" id="search" class="search-box" placeholder="Search nodes...">
+    </div>
+    
+    <div id="info-panel">
+        <h3>Component Details</h3>
+        <p>Click on any node to view detailed information about that component.</p>
+        <div id="node-details"></div>
+    </div>
+    
+    <div id="legend">
+        <h4>Node Types</h4>
+        <div class="legend-item">
+            <div class="legend-color" style="background: #ff6b6b;"></div>
+            <span>Root (Project)</span>
+        </div>
+        <div class="legend-item">
+            <div class="legend-color" style="background: #4ecdc4;"></div>
+            <span>Frontend Module</span>
+        </div>
+        <div class="legend-item">
+            <div class="legend-color" style="background: #45b7d1;"></div>
+            <span>Backend Module</span>
+        </div>
+        <div class="legend-item">
+            <div class="legend-color" style="background: #96ceb4;"></div>
+            <span>Python Backend</span>
+        </div>
+        <div class="legend-item">
+            <div class="legend-color" style="background: #ffeaa7;"></div>
+            <span>Component/Page</span>
+        </div>
+        <div class="legend-item">
+            <div class="legend-color" style="background: #dda0dd;"></div>
+            <span>Service/Plugin</span>
+        </div>
+        <div class="legend-item">
+            <div class="legend-color" style="background: #a8e6cf;"></div>
+            <span>Utility/Hook</span>
+        </div>
+    </div>
+
+    <script>
+        // Define the codebase structure with analyzed data
+        const elements = {
+            nodes: [
+                // Root
+                { data: { 
+                    id: 'root', 
+                    label: 'Debug Player Framework', 
+                    type: 'root', 
+                    description: 'Comprehensive debug tool for self-driving car data analysis',
+                    path: '/home/thh3/personal/DebugDrivePlayback',
+                    complexity: 'Very High',
+                    dependencies: 'React, FastAPI, Express, PostgreSQL'
+                }},
+                
+                // Main modules
+                { data: { 
+                    id: 'frontend', 
+                    label: 'Frontend (React)', 
+                    type: 'frontend',
+                    parent: 'root',
+                    description: 'React/TypeScript frontend with component-based architecture',
+                    path: 'client/',
+                    complexity: 'High',
+                    dependencies: 'React, Wouter, TanStack Query, Tailwind'
+                }},
+                { data: { 
+                    id: 'express-backend', 
+                    label: 'Express Backend', 
+                    type: 'backend',
+                    parent: 'root',
+                    description: 'Express.js server handling API routes and Python integration',
+                    path: 'server/',
+                    complexity: 'Medium',
+                    dependencies: 'Express, Drizzle ORM, PostgreSQL'
+                }},
+                { data: { 
+                    id: 'python-backend', 
+                    label: 'Python Backend', 
+                    type: 'python',
+                    parent: 'root',
+                    description: 'FastAPI backend for data analysis with plugin architecture',
+                    path: 'python_backend/',
+                    complexity: 'High',
+                    dependencies: 'FastAPI, Pandas, NumPy'
+                }},
+                
+                // Frontend sub-modules
+                { data: { 
+                    id: 'app-core', 
+                    label: 'App Core', 
+                    type: 'component',
+                    parent: 'frontend',
+                    description: 'Main application setup with routing and providers',
+                    path: 'client/src/App.tsx',
+                    complexity: 'Medium',
+                    loc: 71
+                }},
+                { data: { 
+                    id: 'pages', 
+                    label: 'Pages', 
+                    type: 'component',
+                    parent: 'frontend',
+                    description: 'Main application pages and views',
+                    path: 'client/src/pages/',
+                    complexity: 'High',
+                    dependencies: 'debug-player, widget-manager, plugin-manager'
+                }},
+                { data: { 
+                    id: 'components', 
+                    label: 'Components', 
+                    type: 'component',
+                    parent: 'frontend',
+                    description: 'Reusable UI components and specialized widgets',
+                    path: 'client/src/components/',
+                    complexity: 'High',
+                    dependencies: 'Radix UI, Lucide React'
+                }},
+                { data: { 
+                    id: 'services', 
+                    label: 'Services', 
+                    type: 'service',
+                    parent: 'frontend',
+                    description: 'API communication and data fetching services',
+                    path: 'client/src/services/',
+                    complexity: 'Medium',
+                    dependencies: 'TanStack Query'
+                }},
+                
+                // Key pages
+                { data: { 
+                    id: 'debug-player-page', 
+                    label: 'Debug Player', 
+                    type: 'component',
+                    parent: 'pages',
+                    description: 'Main debug interface with timeline and visualization',
+                    path: 'client/src/pages/debug-player.tsx',
+                    complexity: 'Very High',
+                    features: 'Timeline control, data visualization, real-time playback'
+                }},
+                { data: { 
+                    id: 'widget-manager-page', 
+                    label: 'Widget Manager', 
+                    type: 'component',
+                    parent: 'pages',
+                    description: 'Dynamic widget creation and management system',
+                    path: 'client/src/pages/widget-manager.tsx',
+                    complexity: 'High',
+                    features: 'Widget wizard, templates, drag-and-drop'
+                }},
+                { data: { 
+                    id: 'plugin-manager-page', 
+                    label: 'Plugin Manager', 
+                    type: 'component',
+                    parent: 'pages',
+                    description: 'Plugin management and configuration interface',
+                    path: 'client/src/pages/plugin-manager.tsx',
+                    complexity: 'Medium',
+                    features: 'Plugin loading, configuration, status monitoring'
+                }},
+                
+                // Key components
+                { data: { 
+                    id: 'debug-player-components', 
+                    label: 'Debug Player Components', 
+                    type: 'component',
+                    parent: 'components',
+                    description: 'Core debug player UI components',
+                    path: 'client/src/components/debug-player/',
+                    complexity: 'High',
+                    features: 'Sidebars, timeline, visualization area'
+                }},
+                { data: { 
+                    id: 'widget-wizard', 
+                    label: 'Widget Wizard', 
+                    type: 'component',
+                    parent: 'components',
+                    description: 'Dynamic widget creation system',
+                    path: 'client/src/components/widget-wizard/',
+                    complexity: 'Very High',
+                    features: 'Template engine, widget renderer, dashboard'
+                }},
+                { data: { 
+                    id: 'ui-components', 
+                    label: 'UI Components', 
+                    type: 'component',
+                    parent: 'components',
+                    description: 'Base UI components from shadcn/ui',
+                    path: 'client/src/components/ui/',
+                    complexity: 'Medium',
+                    dependencies: 'Radix UI primitives'
+                }},
+                
+                // Express backend components
+                { data: { 
+                    id: 'express-server', 
+                    label: 'Express Server', 
+                    type: 'service',
+                    parent: 'express-backend',
+                    description: 'Main Express server setup and middleware',
+                    path: 'server/index.ts',
+                    complexity: 'Medium',
+                    loc: 72,
+                    port: 5000
+                }},
+                { data: { 
+                    id: 'api-routes', 
+                    label: 'API Routes', 
+                    type: 'service',
+                    parent: 'express-backend',
+                    description: 'REST API endpoint definitions',
+                    path: 'server/routes.ts',
+                    complexity: 'Medium',
+                    endpoints: 'Multiple REST endpoints'
+                }},
+                { data: { 
+                    id: 'python-integration', 
+                    label: 'Python Integration', 
+                    type: 'service',
+                    parent: 'express-backend',
+                    description: 'Proxy service to Python backend',
+                    path: 'server/python-backend.ts',
+                    complexity: 'Medium',
+                    features: 'Request proxying, error handling'
+                }},
+                { data: { 
+                    id: 'database', 
+                    label: 'Database Layer', 
+                    type: 'service',
+                    parent: 'express-backend',
+                    description: 'PostgreSQL database with Drizzle ORM',
+                    path: 'server/db.ts',
+                    complexity: 'Medium',
+                    technology: 'PostgreSQL + Drizzle ORM'
+                }},
+                
+                // Python backend components
+                { data: { 
+                    id: 'fastapi-server', 
+                    label: 'FastAPI Server', 
+                    type: 'service',
+                    parent: 'python-backend',
+                    description: 'Main FastAPI application with REST endpoints',
+                    path: 'python_backend/main.py',
+                    complexity: 'Very High',
+                    loc: 446,
+                    port: 8000
+                }},
+                { data: { 
+                    id: 'plot-manager', 
+                    label: 'Plot Manager', 
+                    type: 'service',
+                    parent: 'python-backend',
+                    description: 'Central data management and plugin coordination',
+                    path: 'python_backend/core/plot_manager.py',
+                    complexity: 'High',
+                    features: 'Plugin registry, data caching, performance monitoring'
+                }},
+                { data: { 
+                    id: 'plugins', 
+                    label: 'Plugin System', 
+                    type: 'service',
+                    parent: 'python-backend',
+                    description: 'Extensible plugin architecture for data analysis',
+                    path: 'python_backend/plugins/',
+                    complexity: 'Very High',
+                    plugins: 'VehicleData, CollisionDetection, TripData'
+                }},
+                { data: { 
+                    id: 'core-interfaces', 
+                    label: 'Core Interfaces', 
+                    type: 'utility',
+                    parent: 'python-backend',
+                    description: 'Base interfaces and data structures',
+                    path: 'python_backend/core/interfaces.py',
+                    complexity: 'Medium',
+                    features: 'SignalInfo, BasePlugin, data validation'
+                }},
+                
+                // Plugin sub-components
+                { data: { 
+                    id: 'vehicle-plugin', 
+                    label: 'Vehicle Data Plugin', 
+                    type: 'service',
+                    parent: 'plugins',
+                    description: 'Vehicle telemetry data processing',
+                    path: 'python_backend/plugins/vehicle_data_plugin.py',
+                    complexity: 'High',
+                    dataTypes: 'GPS, IMU, Speed, Steering'
+                }},
+                { data: { 
+                    id: 'collision-plugin', 
+                    label: 'Collision Detection Plugin', 
+                    type: 'service',
+                    parent: 'plugins',
+                    description: 'Real-time collision detection and analysis',
+                    path: 'python_backend/plugins/collision_detection_plugin.py',
+                    complexity: 'Very High',
+                    features: 'TTC calculation, risk assessment'
+                }},
+                { data: { 
+                    id: 'trip-plugin', 
+                    label: 'Trip Data Plugin', 
+                    type: 'service',
+                    parent: 'plugins',
+                    description: 'Complete trip data management and loading',
+                    path: 'python_backend/plugins/trip_data_plugin.py',
+                    complexity: 'High',
+                    features: 'Multi-file loading, data aggregation'
+                }},
+                
+                // Utilities and hooks
+                { data: { 
+                    id: 'hooks', 
+                    label: 'React Hooks', 
+                    type: 'utility',
+                    parent: 'frontend',
+                    description: 'Custom React hooks for state management',
+                    path: 'client/src/hooks/',
+                    complexity: 'Medium',
+                    hooks: 'useDebugPlayer, useToast, useMobile'
+                }},
+                { data: { 
+                    id: 'lib-utils', 
+                    label: 'Utility Libraries', 
+                    type: 'utility',
+                    parent: 'frontend',
+                    description: 'Shared utilities and configurations',
+                    path: 'client/src/lib/',
+                    complexity: 'Medium',
+                    features: 'Widget templates, mock data, query client'
+                }},
+                
+                // Testing infrastructure
+                { data: { 
+                    id: 'testing', 
+                    label: 'Testing Suite', 
+                    type: 'utility',
+                    parent: 'root',
+                    description: 'Comprehensive testing infrastructure',
+                    path: 'tests/',
+                    complexity: 'High',
+                    frameworks: 'Jest, Playwright, Python unittest'
+                }}
+            ],
+            edges: [
+                // Root connections
+                { data: { source: 'root', target: 'frontend', type: 'contains' }},
+                { data: { source: 'root', target: 'express-backend', type: 'contains' }},
+                { data: { source: 'root', target: 'python-backend', type: 'contains' }},
+                { data: { source: 'root', target: 'testing', type: 'contains' }},
+                
+                // Frontend structure
+                { data: { source: 'frontend', target: 'app-core', type: 'contains' }},
+                { data: { source: 'frontend', target: 'pages', type: 'contains' }},
+                { data: { source: 'frontend', target: 'components', type: 'contains' }},
+                { data: { source: 'frontend', target: 'services', type: 'contains' }},
+                { data: { source: 'frontend', target: 'hooks', type: 'contains' }},
+                { data: { source: 'frontend', target: 'lib-utils', type: 'contains' }},
+                
+                // Page structure
+                { data: { source: 'pages', target: 'debug-player-page', type: 'contains' }},
+                { data: { source: 'pages', target: 'widget-manager-page', type: 'contains' }},
+                { data: { source: 'pages', target: 'plugin-manager-page', type: 'contains' }},
+                
+                // Component structure
+                { data: { source: 'components', target: 'debug-player-components', type: 'contains' }},
+                { data: { source: 'components', target: 'widget-wizard', type: 'contains' }},
+                { data: { source: 'components', target: 'ui-components', type: 'contains' }},
+                
+                // Express backend structure
+                { data: { source: 'express-backend', target: 'express-server', type: 'contains' }},
+                { data: { source: 'express-backend', target: 'api-routes', type: 'contains' }},
+                { data: { source: 'express-backend', target: 'python-integration', type: 'contains' }},
+                { data: { source: 'express-backend', target: 'database', type: 'contains' }},
+                
+                // Python backend structure
+                { data: { source: 'python-backend', target: 'fastapi-server', type: 'contains' }},
+                { data: { source: 'python-backend', target: 'plot-manager', type: 'contains' }},
+                { data: { source: 'python-backend', target: 'plugins', type: 'contains' }},
+                { data: { source: 'python-backend', target: 'core-interfaces', type: 'contains' }},
+                
+                // Plugin structure
+                { data: { source: 'plugins', target: 'vehicle-plugin', type: 'contains' }},
+                { data: { source: 'plugins', target: 'collision-plugin', type: 'contains' }},
+                { data: { source: 'plugins', target: 'trip-plugin', type: 'contains' }},
+                
+                // Dependencies
+                { data: { source: 'frontend', target: 'express-backend', type: 'depends', label: 'API calls' }},
+                { data: { source: 'express-backend', target: 'python-backend', type: 'depends', label: 'Proxy requests' }},
+                { data: { source: 'debug-player-page', target: 'debug-player-components', type: 'uses' }},
+                { data: { source: 'widget-manager-page', target: 'widget-wizard', type: 'uses' }},
+                { data: { source: 'pages', target: 'services', type: 'uses' }},
+                { data: { source: 'components', target: 'hooks', type: 'uses' }},
+                { data: { source: 'components', target: 'lib-utils', type: 'uses' }},
+                { data: { source: 'python-integration', target: 'fastapi-server', type: 'proxies' }},
+                { data: { source: 'fastapi-server', target: 'plot-manager', type: 'uses' }},
+                { data: { source: 'plot-manager', target: 'plugins', type: 'manages' }},
+                { data: { source: 'vehicle-plugin', target: 'core-interfaces', type: 'implements' }},
+                { data: { source: 'collision-plugin', target: 'core-interfaces', type: 'implements' }},
+                { data: { source: 'trip-plugin', target: 'core-interfaces', type: 'implements' }}
+            ]
+        };
+
+        // Initialize Cytoscape with hierarchical layout
+        const cy = cytoscape({
+            container: document.getElementById('cy'),
+            elements: elements,
+            style: [
+                // Node styles
+                {
+                    selector: 'node',
+                    style: {
+                        'content': 'data(label)',
+                        'text-valign': 'center',
+                        'text-halign': 'center',
+                        'background-color': function(ele) {
+                            const type = ele.data('type');
+                            switch(type) {
+                                case 'root': return '#ff6b6b';
+                                case 'frontend': return '#4ecdc4';
+                                case 'backend': return '#45b7d1';
+                                case 'python': return '#96ceb4';
+                                case 'component': return '#ffeaa7';
+                                case 'service': return '#dda0dd';
+                                case 'utility': return '#a8e6cf';
+                                default: return '#74b9ff';
+                            }
+                        },
+                        'width': function(ele) {
+                            const type = ele.data('type');
+                            switch(type) {
+                                case 'root': return 120;
+                                case 'frontend':
+                                case 'backend':
+                                case 'python': return 100;
+                                case 'component':
+                                case 'service': return 80;
+                                case 'utility': return 60;
+                                default: return 70;
+                            }
+                        },
+                        'height': function(ele) {
+                            const type = ele.data('type');
+                            switch(type) {
+                                case 'root': return 120;
+                                case 'frontend':
+                                case 'backend':
+                                case 'python': return 100;
+                                case 'component':
+                                case 'service': return 80;
+                                case 'utility': return 60;
+                                default: return 70;
+                            }
+                        },
+                        'border-width': 2,
+                        'border-color': '#333',
+                        'font-size': function(ele) {
+                            const type = ele.data('type');
+                            return type === 'root' ? '14px' : '12px';
+                        },
+                        'font-weight': function(ele) {
+                            const type = ele.data('type');
+                            return type === 'root' ? 'bold' : 'normal';
+                        },
+                        'color': '#fff',
+                        'text-outline-width': 1,
+                        'text-outline-color': '#000',
+                        'overlay-opacity': 0,
+                        'transition-property': 'background-color, border-color, width, height',
+                        'transition-duration': '0.3s'
+                    }
+                },
+                {
+                    selector: 'node:hover',
+                    style: {
+                        'border-color': '#fff',
+                        'border-width': 3,
+                        'font-size': '14px'
+                    }
+                },
+                {
+                    selector: 'node:selected',
+                    style: {
+                        'border-color': '#64b5f6',
+                        'border-width': 4,
+                        'background-color': function(ele) {
+                            return ele.style('background-color');
+                        }
+                    }
+                },
+                // Edge styles
+                {
+                    selector: 'edge',
+                    style: {
+                        'width': function(ele) {
+                            const type = ele.data('type');
+                            return type === 'depends' ? 3 : 2;
+                        },
+                        'line-color': function(ele) {
+                            const type = ele.data('type');
+                            switch(type) {
+                                case 'contains': return '#555';
+                                case 'depends': return '#e74c3c';
+                                case 'uses': return '#3498db';
+                                case 'implements': return '#2ecc71';
+                                case 'manages': return '#f39c12';
+                                case 'proxies': return '#9b59b6';
+                                default: return '#666';
+                            }
+                        },
+                        'target-arrow-color': function(ele) {
+                            return ele.style('line-color');
+                        },
+                        'target-arrow-shape': 'triangle',
+                        'arrow-scale': 1.5,
+                        'curve-style': 'bezier',
+                        'content': function(ele) {
+                            return ele.data('label') || '';
+                        },
+                        'font-size': '10px',
+                        'color': '#ccc',
+                        'text-rotation': 'autorotate',
+                        'source-endpoint': 'outside-to-node',
+                        'target-endpoint': 'outside-to-node',
+                        'line-style': function(ele) {
+                            const type = ele.data('type');
+                            return type === 'depends' ? 'dashed' : 'solid';
+                        }
+                    }
+                },
+                {
+                    selector: 'edge:hover',
+                    style: {
+                        'width': 4,
+                        'font-size': '12px'
+                    }
+                }
+            ],
+            layout: {
+                name: 'breadthfirst',
+                directed: true,
+                roots: '#root',
+                padding: 50,
+                spacingFactor: 2,
+                animate: true,
+                animationDuration: 1000,
+                avoidOverlap: true,
+                nodeDimensionsIncludeLabels: true
+            },
+            wheelSensitivity: 0.2,
+            minZoom: 0.1,
+            maxZoom: 3
+        });
+
+        // Add interactivity
+        let selectedNode = null;
+
+        cy.on('tap', 'node', function(evt) {
+            const node = evt.target;
+            selectedNode = node;
+            showNodeDetails(node);
+            
+            // Highlight connected edges
+            const edges = node.connectedEdges();
+            cy.elements().removeClass('highlighted');
+            node.addClass('highlighted');
+            edges.addClass('highlighted');
+        });
+
+        cy.on('tap', function(evt) {
+            if (evt.target === cy) {
+                cy.elements().removeClass('highlighted');
+                selectedNode = null;
+                clearNodeDetails();
+            }
+        });
+
+        function showNodeDetails(node) {
+            const data = node.data();
+            const detailsHtml = `
+                <div class="detail-row">
+                    <span class="detail-label">Name:</span> ${data.label}
+                </div>
+                <div class="detail-row">
+                    <span class="detail-label">Type:</span> ${data.type}
+                </div>
+                <div class="detail-row">
+                    <span class="detail-label">Path:</span> ${data.path || 'N/A'}
+                </div>
+                <div class="detail-row">
+                    <span class="detail-label">Complexity:</span> ${data.complexity || 'N/A'}
+                </div>
+                ${data.loc ? `<div class="detail-row"><span class="detail-label">Lines:</span> ${data.loc}</div>` : ''}
+                ${data.port ? `<div class="detail-row"><span class="detail-label">Port:</span> ${data.port}</div>` : ''}
+                ${data.dependencies ? `<div class="detail-row"><span class="detail-label">Dependencies:</span> ${data.dependencies}</div>` : ''}
+                ${data.features ? `<div class="detail-row"><span class="detail-label">Features:</span> ${data.features}</div>` : ''}
+                ${data.technology ? `<div class="detail-row"><span class="detail-label">Technology:</span> ${data.technology}</div>` : ''}
+                ${data.description ? `<div class="detail-row"><span class="detail-label">Description:</span> ${data.description}</div>` : ''}
+            `;
+            document.getElementById('node-details').innerHTML = detailsHtml;
+        }
+
+        function clearNodeDetails() {
+            document.getElementById('node-details').innerHTML = '<p>Click on any node to view detailed information about that component.</p>';
+        }
+
+        // Keyboard shortcuts
+        document.addEventListener('keydown', function(e) {
+            switch(e.key) {
+                case '+':
+                case '=':
+                    cy.zoom(cy.zoom() * 1.2);
+                    cy.center();
+                    break;
+                case '-':
+                    cy.zoom(cy.zoom() * 0.8);
+                    cy.center();
+                    break;
+                case '0':
+                    cy.fit();
+                    break;
+                case 'r':
+                case 'R':
+                    cy.layout({
+                        name: 'breadthfirst',
+                        directed: true,
+                        roots: '#root',
+                        padding: 50,
+                        spacingFactor: 2,
+                        animate: true,
+                        animationDuration: 1000
+                    }).run();
+                    break;
+            }
+        });
+
+        // Search functionality
+        const searchInput = document.getElementById('search');
+        searchInput.addEventListener('input', function(e) {
+            const searchTerm = e.target.value.toLowerCase();
+            
+            if (searchTerm === '') {
+                cy.elements().removeClass('dimmed highlighted');
+                return;
+            }
+            
+            const matchingNodes = cy.nodes().filter(function(node) {
+                const label = node.data('label').toLowerCase();
+                const description = (node.data('description') || '').toLowerCase();
+                return label.includes(searchTerm) || description.includes(searchTerm);
+            });
+            
+            if (matchingNodes.length > 0) {
+                cy.elements().addClass('dimmed');
+                matchingNodes.removeClass('dimmed').addClass('highlighted');
+                cy.fit(matchingNodes, 100);
+            } else {
+                cy.elements().removeClass('dimmed highlighted');
+            }
+        });
+
+        // Add dimmed style
+        cy.style().selector('.dimmed').style({
+            'opacity': 0.3
+        }).update();
+
+        cy.style().selector('.highlighted').style({
+            'opacity': 1,
+            'border-width': 3,
+            'border-color': '#64b5f6'
+        }).update();
+
+        // Initial fit
+        cy.ready(function() {
+            cy.fit();
+        });
+    </script>
+</body>
+</html>

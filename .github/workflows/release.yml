@@ -1,0 +1,53 @@
+name: Release
+
+on:
+  release:
+    types: [published]
+  workflow_dispatch:
+
+jobs:
+  deploy:
+    name: Deploy Application
+    runs-on: ubuntu-latest
+    environment: production
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '18'
+        cache: 'npm'
+
+    - name: Install dependencies
+      run: npm ci
+
+    - name: Run tests
+      run: |
+        npm run test:unit
+        npx playwright install chromium
+        npx playwright test --project=chromium
+
+    - name: Build for production
+      run: npm run build
+      env:
+        NODE_ENV: production
+
+    - name: Create deployment package
+      run: |
+        tar -czf debug-player-${{ github.sha }}.tar.gz \
+          dist/ \
+          server/ \
+          shared/ \
+          package.json \
+          package-lock.json \
+          README.md
+
+    - name: Upload release artifact
+      uses: actions/upload-artifact@v4
+      with:
+        name: debug-player-release
+        path: debug-player-${{ github.sha }}.tar.gz
+        retention-days: 90

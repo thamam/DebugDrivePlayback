@@ -37,7 +37,13 @@
       "Bash(npm run dev &)",
       "Bash(npm run build &)",
       "Bash(curl -X POST *)",
-      "Bash(TEST_TRIP_PATH=\"/home/thh3/data/trips/2025-07-15T12_06_02\" ./scripts/monitor-performance.sh)"
+      "Bash(TEST_TRIP_PATH=\"/home/thh3/data/trips/2025-07-15T12_06_02\" ./scripts/monitor-performance.sh)",
+      "Bash(./run-tests-simple.sh:*)",
+      "Bash(for file in *.spec.ts)",
+      "Bash(do if [ \"$file\" != \"basic-functionality.spec.ts\" ])",
+      "Bash(then mv \"$file\" \"$file.disabled\")",
+      "Bash(fi)",
+      "Bash(done)"
     ],
     "deny": [
       "Bash(sudo:*)",
