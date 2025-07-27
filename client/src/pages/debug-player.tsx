@@ -1,6 +1,6 @@
 import { Layers, Upload, Save, Download, Settings, RefreshCw, Filter } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { useDebugPlayer } from '@/hooks/use-debug-player-fixed';
+import { useDebugPlayerSimple } from '@/hooks/use-debug-player-simple';
 import { SidebarLeft } from '@/components/debug-player/sidebar-left';
 import { SidebarRight } from '@/components/debug-player/sidebar-right';
 import { VisualizationArea } from '@/components/debug-player/visualization-area';
@@ -33,7 +33,7 @@ export default function DebugPlayer() {
     togglePlayback,
     resetTime,
     skipToEnd
-  } = useDebugPlayer();
+  } = useDebugPlayerSimple();
 
   const currentData = getCurrentDataPoint();
   const activeViolations = collisionViolations.filter(v => Math.abs(v.time - currentTime) < 5);

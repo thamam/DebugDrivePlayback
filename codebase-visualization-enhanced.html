@@ -1,0 +1,1104 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Debug Player Framework - Enhanced Codebase Structure</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/cytoscape/3.26.0/cytoscape.min.js"></script>
+    <script src="https://unpkg.com/cytoscape-cose-bilkent/cytoscape-cose-bilkent.js"></script>
+    <style>
+        body { 
+            margin: 0; 
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; 
+            background: #0f0f0f;
+            color: #fff;
+            overflow: hidden;
+        }
+        #cy { 
+            width: 100%; 
+            height: 100vh; 
+            background: linear-gradient(135deg, #1a1a1a 0%, #2d2d2d 100%);
+        }
+        
+        #controls {
+            position: absolute; 
+            top: 15px; 
+            left: 15px;
+            background: rgba(0, 0, 0, 0.95);
+            padding: 20px;
+            border-radius: 12px;
+            box-shadow: 0 8px 32px rgba(0,0,0,0.3);
+            backdrop-filter: blur(10px);
+            border: 1px solid #333;
+            min-width: 220px;
+        }
+        
+        #info-panel {
+            position: absolute; 
+            top: 15px; 
+            right: 15px; 
+            width: 380px;
+            background: rgba(0, 0, 0, 0.95);
+            padding: 20px;
+            border-radius: 12px;
+            box-shadow: 0 8px 32px rgba(0,0,0,0.3);
+            backdrop-filter: blur(10px);
+            border: 1px solid #333;
+            max-height: 75vh; 
+            overflow-y: auto;
+        }
+        
+        #legend {
+            position: absolute; 
+            bottom: 15px; 
+            left: 15px;
+            background: rgba(0, 0, 0, 0.95);
+            padding: 20px;
+            border-radius: 12px;
+            box-shadow: 0 8px 32px rgba(0,0,0,0.3);
+            backdrop-filter: blur(10px);
+            border: 1px solid #333;
+            max-width: 300px;
+        }
+        
+        .control-group { 
+            margin-bottom: 15px; 
+        }
+        .control-group label { 
+            display: block; 
+            margin-bottom: 8px; 
+            font-size: 13px; 
+            font-weight: 600;
+            color: #64b5f6;
+        }
+        .control-group input[type="range"] { 
+            width: 100%; 
+            margin: 5px 0;
+        }
+        .control-group input[type="text"] {
+            width: 100%;
+            padding: 8px 12px;
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid #444;
+            border-radius: 6px;
+            color: #fff;
+            font-size: 13px;
+        }
+        .control-group input[type="text"]::placeholder {
+            color: #999;
+        }
+        
+        .control-buttons {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+        .control-buttons button {
+            flex: 1;
+            padding: 8px 12px;
+            background: linear-gradient(135deg, #4ecdc4, #44a08d);
+            border: none;
+            border-radius: 6px;
+            color: white;
+            font-size: 12px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        .control-buttons button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(78, 205, 196, 0.3);
+        }
+        
+        .filter-buttons {
+            display: flex;
+            gap: 6px;
+            flex-wrap: wrap;
+            margin-top: 10px;
+        }
+        .filter-buttons button {
+            padding: 6px 10px;
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid #444;
+            border-radius: 4px;
+            color: #ccc;
+            font-size: 11px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+        .filter-buttons button.active {
+            background: #64b5f6;
+            color: white;
+            border-color: #64b5f6;
+        }
+        
+        .hidden-badge {
+            background: linear-gradient(135deg, #ff6b6b, #ee5a24);
+            color: white; 
+            padding: 2px 8px;
+            border-radius: 12px; 
+            font-size: 10px; 
+            font-weight: bold;
+            margin-left: 8px;
+            box-shadow: 0 2px 4px rgba(255, 107, 107, 0.3);
+        }
+        
+        .complexity-indicator {
+            position: absolute;
+            top: -8px;
+            right: -8px;
+            width: 16px;
+            height: 16px;
+            border-radius: 50%;
+            font-size: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            color: white;
+            text-shadow: 0 1px 2px rgba(0,0,0,0.5);
+        }
+        
+        .detail-row {
+            margin: 12px 0;
+            padding: 10px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 6px;
+            border-left: 3px solid #64b5f6;
+        }
+        .detail-label {
+            font-weight: bold;
+            color: #81c784;
+            display: inline-block;
+            width: 90px;
+            font-size: 12px;
+        }
+        .detail-value {
+            color: #e1e1e1;
+            font-size: 12px;
+            word-break: break-word;
+        }
+        
+        h3, h4 {
+            color: #64b5f6;
+            margin-top: 0;
+            border-bottom: 2px solid #64b5f6;
+            padding-bottom: 8px;
+        }
+        
+        .legend-item {
+            display: flex;
+            align-items: center;
+            margin: 8px 0;
+            font-size: 13px;
+        }
+        .legend-color {
+            width: 18px;
+            height: 18px;
+            border-radius: 50%;
+            margin-right: 12px;
+            border: 2px solid rgba(255,255,255,0.2);
+        }
+        
+        .stats-display {
+            background: rgba(100, 181, 246, 0.1);
+            padding: 10px;
+            border-radius: 6px;
+            margin: 10px 0;
+            border: 1px solid rgba(100, 181, 246, 0.3);
+        }
+        
+        .progress-bar {
+            width: 100%;
+            height: 4px;
+            background: rgba(255,255,255,0.1);
+            border-radius: 2px;
+            margin: 5px 0;
+            overflow: hidden;
+        }
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #4ecdc4, #44a08d);
+            transition: width 0.3s ease;
+        }
+        
+        /* Custom scrollbar */
+        ::-webkit-scrollbar {
+            width: 6px;
+        }
+        ::-webkit-scrollbar-track {
+            background: rgba(255,255,255,0.1);
+            border-radius: 3px;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #64b5f6;
+            border-radius: 3px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #42a5f5;
+        }
+    </style>
+</head>
+<body>
+    <div id="cy"></div>
+    
+    <div id="controls">
+        <h3>Controls</h3>
+        <div class="control-group">
+            <div class="control-buttons">
+                <button onclick="expandAll()">Expand All</button>
+                <button onclick="collapseAll()">Collapse All</button>
+            </div>
+        </div>
+        
+        <div class="control-group">
+            <label>Complexity Filter (min LOC):</label>
+            <input type="range" id="complexity-slider" min="0" max="500" value="0" step="25">
+            <div style="display: flex; justify-content: space-between; font-size: 11px; color: #999;">
+                <span>0</span>
+                <span id="complexity-value">0</span>
+                <span>500+</span>
+            </div>
+            <div class="progress-bar">
+                <div class="progress-fill" id="complexity-progress"></div>
+            </div>
+        </div>
+        
+        <div class="control-group">
+            <label>Component Types:</label>
+            <div class="filter-buttons">
+                <button class="active" data-type="all">All</button>
+                <button data-type="module">Modules</button>
+                <button data-type="component">Components</button>
+                <button data-type="service">Services</button>
+                <button data-type="plugin">Plugins</button>
+            </div>
+        </div>
+        
+        <div class="control-group">
+            <label>Search Components:</label>
+            <input type="text" id="search" placeholder="Find component...">
+        </div>
+        
+        <div class="stats-display">
+            <div style="font-size: 12px; font-weight: bold; margin-bottom: 5px;">Visibility Stats</div>
+            <div style="font-size: 11px;">
+                Showing <span id="visible-count">0</span> of <span id="total-count">0</span> components
+            </div>
+            <div style="font-size: 11px; margin-top: 3px;">
+                Hidden: <span id="hidden-count">0</span> components
+            </div>
+        </div>
+    </div>
+    
+    <div id="info-panel">
+        <h3>Component Details</h3>
+        <div id="node-info">
+            <p style="color: #999; font-style: italic;">Click on any component for detailed information. Double-click modules to expand/collapse.</p>
+        </div>
+    </div>
+    
+    <div id="legend">
+        <h4>Legend</h4>
+        <div class="legend-item">
+            <div class="legend-color" style="background: linear-gradient(135deg, #ff6b6b, #ee5a24);"></div>
+            <span>Root Module</span>
+        </div>
+        <div class="legend-item">
+            <div class="legend-color" style="background: linear-gradient(135deg, #4ecdc4, #44a08d);"></div>
+            <span>Frontend Module</span>
+        </div>
+        <div class="legend-item">
+            <div class="legend-color" style="background: linear-gradient(135deg, #45b7d1, #3742fa);"></div>
+            <span>Backend Module</span>
+        </div>
+        <div class="legend-item">
+            <div class="legend-color" style="background: linear-gradient(135deg, #96ceb4, #2d3436);"></div>
+            <span>Python Backend</span>
+        </div>
+        <div class="legend-item">
+            <div class="legend-color" style="background: linear-gradient(135deg, #ffeaa7, #fdcb6e);"></div>
+            <span>Components/Pages</span>
+        </div>
+        <div class="legend-item">
+            <div class="legend-color" style="background: linear-gradient(135deg, #dda0dd, #a29bfe);"></div>
+            <span>Services/Plugins</span>
+        </div>
+        
+        <div style="margin-top: 15px; padding-top: 15px; border-top: 1px solid #333;">
+            <div style="font-size: 12px; font-weight: bold; margin-bottom: 8px;">Size Indicators:</div>
+            <div style="font-size: 11px; line-height: 1.4;">
+                <div>🔴 XL: 500+ LOC</div>
+                <div>🟡 L: 200-500 LOC</div>
+                <div>🟢 M: 50-200 LOC</div>
+                <div>⚪ S: &lt;50 LOC</div>
+            </div>
+        </div>
+        
+        <div style="margin-top: 10px; font-size: 11px; color: #999;">
+            <div>• Double-click modules to expand/collapse</div>
+            <div>• Red badges show hidden component count</div>
+            <div>• Border thickness = dependency count</div>
+        </div>
+    </div>
+    
+    <script>
+        // Store full graph data with importance scoring
+        let fullGraphData = {
+            nodes: [
+                // Root
+                { 
+                    data: { 
+                        id: 'root', 
+                        label: 'Debug Player Framework', 
+                        type: 'root',
+                        loc: 26210,
+                        dependencies: 15,
+                        importance: 100,
+                        description: 'Comprehensive debug tool for self-driving car data analysis',
+                        path: '/home/thh3/personal/DebugDrivePlayback',
+                        technology: 'React + FastAPI + Express + PostgreSQL',
+                        complexity: 'Critical',
+                        features: 'Real-time visualization, Plugin architecture, Widget system'
+                    }, 
+                    classes: 'root'
+                },
+                
+                // Main Modules (Compound nodes)
+                { 
+                    data: { 
+                        id: 'frontend-module', 
+                        label: 'Frontend Module (+18 components)', 
+                        type: 'module',
+                        loc: 8500,
+                        dependencies: 40,
+                        importance: 95,
+                        hiddenCount: 18,
+                        description: 'React/TypeScript frontend with component architecture',
+                        path: 'client/',
+                        technology: 'React + TypeScript + Tailwind',
+                        complexity: 'High'
+                    }, 
+                    classes: 'compound frontend'
+                },
+                { 
+                    data: { 
+                        id: 'express-module', 
+                        label: 'Express Backend (+8 services)', 
+                        type: 'module',
+                        loc: 1200,
+                        dependencies: 12,
+                        importance: 80,
+                        hiddenCount: 8,
+                        description: 'Express.js server with API routes and Python integration',
+                        path: 'server/',
+                        technology: 'Express.js + Drizzle ORM',
+                        complexity: 'Medium'
+                    }, 
+                    classes: 'compound backend'
+                },
+                { 
+                    data: { 
+                        id: 'python-module', 
+                        label: 'Python Backend (+12 plugins)', 
+                        type: 'module',
+                        loc: 3200,
+                        dependencies: 18,
+                        importance: 90,
+                        hiddenCount: 12,
+                        description: 'FastAPI backend with plugin architecture for data analysis',
+                        path: 'python_backend/',
+                        technology: 'FastAPI + Pandas + NumPy',
+                        complexity: 'High'
+                    }, 
+                    classes: 'compound python'
+                },
+                
+                // Top Frontend Components (shown by default)
+                { 
+                    data: { 
+                        id: 'app-core', 
+                        parent: 'frontend-module',
+                        label: 'App Core [M]', 
+                        type: 'component',
+                        loc: 70,
+                        dependencies: 13,
+                        importance: 85,
+                        description: 'Main application setup with routing and providers',
+                        path: 'client/src/App.tsx',
+                        features: 'Routing, Error boundaries, Query providers'
+                    }
+                },
+                { 
+                    data: { 
+                        id: 'plugin-templates', 
+                        parent: 'frontend-module',
+                        label: 'Plugin Templates [XL]', 
+                        type: 'service',
+                        loc: 1010,
+                        dependencies: 8,
+                        importance: 88,
+                        description: 'Template system for plugin creation and management',
+                        path: 'client/src/lib/plugin-templates.ts',
+                        features: 'Code generation, Plugin scaffolding'
+                    }
+                },
+                { 
+                    data: { 
+                        id: 'data-service', 
+                        parent: 'frontend-module',
+                        label: 'Data Service [L]', 
+                        type: 'service',
+                        loc: 460,
+                        dependencies: 15,
+                        importance: 92,
+                        description: 'Primary API communication and data fetching service',
+                        path: 'client/src/services/data-service.ts',
+                        features: 'API abstraction, Error handling, Caching'
+                    }
+                },
+                { 
+                    data: { 
+                        id: 'debug-player-page', 
+                        parent: 'frontend-module',
+                        label: 'Debug Player [L]', 
+                        type: 'component',
+                        loc: 273,
+                        dependencies: 7,
+                        importance: 95,
+                        description: 'Main debug interface with timeline and visualization',
+                        path: 'client/src/pages/debug-player.tsx',
+                        features: 'Timeline control, Real-time playback, Data visualization'
+                    }
+                },
+                { 
+                    data: { 
+                        id: 'widget-engine', 
+                        parent: 'frontend-module',
+                        label: 'Widget Engine [L]', 
+                        type: 'service',
+                        loc: 319,
+                        dependencies: 10,
+                        importance: 87,
+                        description: 'Dynamic widget creation and rendering engine',
+                        path: 'client/src/lib/widget-engine.ts',
+                        features: 'Widget lifecycle, Template rendering, State management'
+                    }
+                },
+                
+                // Top Express Components
+                { 
+                    data: { 
+                        id: 'express-server', 
+                        parent: 'express-module',
+                        label: 'Express Server [M]', 
+                        type: 'service',
+                        loc: 71,
+                        dependencies: 3,
+                        importance: 85,
+                        description: 'Main Express server setup and middleware',
+                        path: 'server/index.ts',
+                        port: 5000,
+                        features: 'Request logging, Error handling, Static serving'
+                    }
+                },
+                { 
+                    data: { 
+                        id: 'api-routes', 
+                        parent: 'express-module',
+                        label: 'API Routes [L]', 
+                        type: 'service',
+                        loc: 381,
+                        dependencies: 6,
+                        importance: 80,
+                        description: 'REST API endpoint definitions and handlers',
+                        path: 'server/routes.ts',
+                        features: 'CRUD operations, Authentication, Validation'
+                    }
+                },
+                { 
+                    data: { 
+                        id: 'python-integration', 
+                        parent: 'express-module',
+                        label: 'Python Proxy [L]', 
+                        type: 'service',
+                        loc: 228,
+                        dependencies: 3,
+                        importance: 75,
+                        description: 'Proxy service to Python backend with error handling',
+                        path: 'server/python-integration.ts',
+                        features: 'Request proxying, Error transformation, Timeout handling'
+                    }
+                },
+                
+                // Top Python Components
+                { 
+                    data: { 
+                        id: 'fastapi-main', 
+                        parent: 'python-module',
+                        label: 'FastAPI Server [L]', 
+                        type: 'service',
+                        loc: 445,
+                        dependencies: 3,
+                        importance: 90,
+                        description: 'Main FastAPI application with REST endpoints',
+                        path: 'python_backend/main.py',
+                        port: 8000,
+                        features: 'Data loading, Plugin management, Performance monitoring'
+                    }
+                },
+                { 
+                    data: { 
+                        id: 'plot-manager', 
+                        parent: 'python-module',
+                        label: 'Plot Manager [L]', 
+                        type: 'service',
+                        loc: 327,
+                        dependencies: 5,
+                        importance: 88,
+                        description: 'Central data management and plugin coordination',
+                        path: 'python_backend/core/plot_manager.py',
+                        features: 'Plugin registry, Data caching, Performance metrics'
+                    }
+                },
+                { 
+                    data: { 
+                        id: 'collision-plugin', 
+                        parent: 'python-module',
+                        label: 'Collision Detection [L]', 
+                        type: 'plugin',
+                        loc: 371,
+                        dependencies: 4,
+                        importance: 85,
+                        description: 'Real-time collision detection and analysis plugin',
+                        path: 'python_backend/plugins/collision_detection_plugin.py',
+                        features: 'TTC calculation, Risk assessment, Event detection'
+                    }
+                },
+                { 
+                    data: { 
+                        id: 'vehicle-plugin', 
+                        parent: 'python-module',
+                        label: 'Vehicle Data [L]', 
+                        type: 'plugin',
+                        loc: 301,
+                        dependencies: 3,
+                        importance: 82,
+                        description: 'Vehicle telemetry data processing and validation',
+                        path: 'python_backend/plugins/vehicle_data_plugin.py',
+                        features: 'GPS processing, IMU data, Speed/steering analysis'
+                    }
+                }
+            ],
+            edges: [
+                // Module connections
+                { data: { source: 'frontend-module', target: 'express-module', type: 'api_calls', weight: 8, label: 'API Calls' }},
+                { data: { source: 'express-module', target: 'python-module', type: 'proxy', weight: 6, label: 'Proxy Requests' }},
+                
+                // Internal dependencies
+                { data: { source: 'app-core', target: 'data-service', type: 'uses', weight: 5 }},
+                { data: { source: 'debug-player-page', target: 'widget-engine', type: 'uses', weight: 4 }},
+                { data: { source: 'widget-engine', target: 'data-service', type: 'uses', weight: 6 }},
+                { data: { source: 'python-integration', target: 'fastapi-main', type: 'proxies', weight: 7 }},
+                { data: { source: 'fastapi-main', target: 'plot-manager', type: 'uses', weight: 8 }},
+                { data: { source: 'plot-manager', target: 'collision-plugin', type: 'manages', weight: 3 }},
+                { data: { source: 'plot-manager', target: 'vehicle-plugin', type: 'manages', weight: 3 }},
+                { data: { source: 'api-routes', target: 'python-integration', type: 'delegates', weight: 4 }}
+            ]
+        };
+        
+        // State management
+        let expandedNodes = new Set();
+        let currentComplexityFilter = 0;
+        let currentTypeFilter = 'all';
+        let filteredBySearch = new Set();
+        
+        // Calculate size indicators
+        function getSizeIndicator(loc) {
+            if (loc >= 500) return '🔴';
+            if (loc >= 200) return '🟡';
+            if (loc >= 50) return '🟢';
+            return '⚪';
+        }
+        
+        function getComplexityClass(loc) {
+            if (loc >= 500) return 'xl';
+            if (loc >= 200) return 'l';
+            if (loc >= 50) return 'm';
+            return 's';
+        }
+        
+        // Create filtered elements based on current filters
+        function getFilteredElements() {
+            let visibleNodes = fullGraphData.nodes.filter(node => {
+                // Complexity filter
+                if (node.data.loc && node.data.loc < currentComplexityFilter) return false;
+                
+                // Type filter
+                if (currentTypeFilter !== 'all' && node.data.type !== currentTypeFilter) {
+                    // Always show compound nodes (modules)
+                    if (!node.classes || !node.classes.includes('compound')) return false;
+                }
+                
+                // Parent expansion check
+                if (node.data.parent && !expandedNodes.has(node.data.parent)) return false;
+                
+                // Search filter
+                if (filteredBySearch.size > 0 && !filteredBySearch.has(node.data.id)) return false;
+                
+                return true;
+            });
+            
+            let visibleNodeIds = new Set(visibleNodes.map(n => n.data.id));
+            let visibleEdges = fullGraphData.edges.filter(edge => 
+                visibleNodeIds.has(edge.data.source) && visibleNodeIds.has(edge.data.target)
+            );
+            
+            return { nodes: visibleNodes, edges: visibleEdges };
+        }
+        
+        // Initialize Cytoscape with enhanced styling
+        const cy = cytoscape({
+            container: document.getElementById('cy'),
+            elements: getFilteredElements(),
+            style: [
+                {
+                    selector: 'node',
+                    style: {
+                        'label': 'data(label)',
+                        'text-valign': 'center',
+                        'text-halign': 'center',
+                        'background-color': '#666',
+                        'color': '#fff',
+                        'text-outline-width': 2,
+                        'text-outline-color': '#000',
+                        'font-size': function(ele) {
+                            if (ele.hasClass('compound')) return '13px';
+                            return '11px';
+                        },
+                        'font-weight': function(ele) {
+                            return ele.hasClass('compound') ? 'bold' : 'normal';
+                        },
+                        'border-width': function(ele) {
+                            return Math.min((ele.data('dependencies') || 1) * 0.8, 6);
+                        },
+                        'border-color': '#444',
+                        'width': function(ele) {
+                            if (ele.hasClass('compound')) return 200;
+                            const loc = ele.data('loc') || 50;
+                            return Math.min(Math.max(60 + (loc / 20), 70), 120);
+                        },
+                        'height': function(ele) {
+                            if (ele.hasClass('compound')) return 150;
+                            const loc = ele.data('loc') || 50;
+                            return Math.min(Math.max(40 + (loc / 30), 50), 80);
+                        },
+                        'transition-property': 'background-color, border-color, width, height',
+                        'transition-duration': '0.3s'
+                    }
+                },
+                {
+                    selector: '.compound',
+                    style: {
+                        'background-color': 'rgba(78, 205, 196, 0.1)',
+                        'background-opacity': 0.2,
+                        'border-width': 3,
+                        'border-color': '#4ecdc4',
+                        'text-valign': 'top',
+                        'text-margin-y': 10,
+                        'padding': 20,
+                        'compound-sizing-wrt-labels': 'exclude'
+                    }
+                },
+                {
+                    selector: '.frontend',
+                    style: {
+                        'background-color': 'rgba(78, 205, 196, 0.15)',
+                        'border-color': '#4ecdc4'
+                    }
+                },
+                {
+                    selector: '.backend',
+                    style: {
+                        'background-color': 'rgba(69, 183, 209, 0.15)',
+                        'border-color': '#45b7d1'
+                    }
+                },
+                {
+                    selector: '.python',
+                    style: {
+                        'background-color': 'rgba(150, 206, 180, 0.15)',
+                        'border-color': '#96ceb4'
+                    }
+                },
+                {
+                    selector: '.root',
+                    style: {
+                        'background-color': '#ff6b6b',
+                        'border-color': '#ee5a24',
+                        'border-width': 4,
+                        'width': 180,
+                        'height': 120,
+                        'font-size': '16px',
+                        'font-weight': 'bold'
+                    }
+                },
+                {
+                    selector: 'node[type="component"]',
+                    style: {
+                        'background-color': function(ele) {
+                            const loc = ele.data('loc') || 50;
+                            if (loc >= 500) return '#e17055';
+                            if (loc >= 200) return '#fdcb6e';
+                            if (loc >= 50) return '#ffeaa7';
+                            return '#ddd';
+                        },
+                        'shape': 'roundrectangle'
+                    }
+                },
+                {
+                    selector: 'node[type="service"]',
+                    style: {
+                        'background-color': function(ele) {
+                            const loc = ele.data('loc') || 50;
+                            if (loc >= 500) return '#a29bfe';
+                            if (loc >= 200) return '#dda0dd';
+                            if (loc >= 50) return '#e17055';
+                            return '#fd79a8';
+                        },
+                        'shape': 'rectangle'
+                    }
+                },
+                {
+                    selector: 'node[type="plugin"]',
+                    style: {
+                        'background-color': '#00b894',
+                        'shape': 'diamond'
+                    }
+                },
+                {
+                    selector: 'edge',
+                    style: {
+                        'width': function(ele) {
+                            return Math.min((ele.data('weight') || 1) * 1.2, 6);
+                        },
+                        'line-color': function(ele) {
+                            const type = ele.data('type');
+                            switch(type) {
+                                case 'api_calls': return '#e74c3c';
+                                case 'proxy': return '#9b59b6';
+                                case 'uses': return '#3498db';
+                                case 'manages': return '#f39c12';
+                                case 'delegates': return '#2ecc71';
+                                default: return '#95a5a6';
+                            }
+                        },
+                        'target-arrow-color': function(ele) {
+                            return ele.style('line-color');
+                        },
+                        'target-arrow-shape': 'triangle',
+                        'arrow-scale': 1.5,
+                        'curve-style': 'bezier',
+                        'content': function(ele) {
+                            return ele.data('label') || '';
+                        },
+                        'font-size': '9px',
+                        'color': '#bbb',
+                        'text-rotation': 'autorotate',
+                        'text-background-color': 'rgba(0,0,0,0.7)',
+                        'text-background-padding': '2px',
+                        'source-endpoint': 'outside-to-node',
+                        'target-endpoint': 'outside-to-node',
+                        'opacity': 0.8
+                    }
+                },
+                {
+                    selector: 'edge[type="api_calls"]',
+                    style: {
+                        'line-style': 'dashed'
+                    }
+                },
+                {
+                    selector: ':selected',
+                    style: {
+                        'background-color': '#ffd93d',
+                        'border-color': '#f39c12',
+                        'border-width': 5,
+                        'line-color': '#ffd93d',
+                        'target-arrow-color': '#ffd93d'
+                    }
+                },
+                {
+                    selector: '.highlighted',
+                    style: {
+                        'border-color': '#64b5f6',
+                        'border-width': 4,
+                        'opacity': 1
+                    }
+                },
+                {
+                    selector: '.dimmed',
+                    style: {
+                        'opacity': 0.3
+                    }
+                }
+            ],
+            layout: {
+                name: 'cose-bilkent',
+                quality: 'proof',
+                nodeDimensionsIncludeLabels: true,
+                idealEdgeLength: 150,
+                edgeElasticity: 0.1,
+                nestingFactor: 0.2,
+                gravity: 0.25,
+                numIter: 2000,
+                tile: true,
+                animate: false,
+                randomize: false,
+                packComponents: true,
+                nodeRepulsion: 8000,
+                idealNodeSeparation: 80
+            },
+            wheelSensitivity: 0.3,
+            minZoom: 0.1,
+            maxZoom: 4
+        });
+        
+        // Event handlers
+        cy.on('dbltap', 'node', function(evt) {
+            const node = evt.target;
+            if (node.hasClass('compound')) {
+                const nodeId = node.id();
+                if (expandedNodes.has(nodeId)) {
+                    expandedNodes.delete(nodeId);
+                } else {
+                    expandedNodes.add(nodeId);
+                }
+                updateGraph();
+            }
+        });
+        
+        cy.on('tap', 'node', function(evt) {
+            const node = evt.target;
+            const data = node.data();
+            
+            let info = `<h4>${data.label}</h4>`;
+            info += `<div class="detail-row"><span class="detail-label">Type:</span><span class="detail-value">${data.type}</span></div>`;
+            info += `<div class="detail-row"><span class="detail-label">Size:</span><span class="detail-value">${getSizeIndicator(data.loc)} ${data.loc || 'N/A'} LOC</span></div>`;
+            info += `<div class="detail-row"><span class="detail-label">Importance:</span><span class="detail-value">${data.importance || 'N/A'}/100</span></div>`;
+            info += `<div class="detail-row"><span class="detail-label">Dependencies:</span><span class="detail-value">${data.dependencies || 0}</span></div>`;
+            
+            if (data.path) info += `<div class="detail-row"><span class="detail-label">Path:</span><span class="detail-value"><code>${data.path}</code></span></div>`;
+            if (data.port) info += `<div class="detail-row"><span class="detail-label">Port:</span><span class="detail-value">${data.port}</span></div>`;
+            if (data.technology) info += `<div class="detail-row"><span class="detail-label">Technology:</span><span class="detail-value">${data.technology}</span></div>`;
+            if (data.complexity) info += `<div class="detail-row"><span class="detail-label">Complexity:</span><span class="detail-value">${data.complexity}</span></div>`;
+            if (data.features) info += `<div class="detail-row"><span class="detail-label">Features:</span><span class="detail-value">${data.features}</span></div>`;
+            if (data.hiddenCount) info += `<div class="detail-row"><span class="detail-label">Hidden:</span><span class="detail-value">${data.hiddenCount} components</span></div>`;
+            if (data.description) info += `<div class="detail-row"><span class="detail-label">Description:</span><span class="detail-value">${data.description}</span></div>`;
+            
+            document.getElementById('node-info').innerHTML = info;
+            
+            // Highlight connected components
+            highlightConnections(node);
+        });
+        
+        cy.on('tap', function(evt) {
+            if (evt.target === cy) {
+                clearHighlights();
+                document.getElementById('node-info').innerHTML = '<p style="color: #999; font-style: italic;">Click on any component for detailed information. Double-click modules to expand/collapse.</p>';
+            }
+        });
+        
+        function highlightConnections(node) {
+            cy.elements().removeClass('highlighted dimmed');
+            
+            const connectedEdges = node.connectedEdges();
+            const connectedNodes = connectedEdges.connectedNodes();
+            
+            cy.elements().addClass('dimmed');
+            node.removeClass('dimmed').addClass('highlighted');
+            connectedNodes.removeClass('dimmed').addClass('highlighted');
+            connectedEdges.removeClass('dimmed').addClass('highlighted');
+        }
+        
+        function clearHighlights() {
+            cy.elements().removeClass('highlighted dimmed');
+        }
+        
+        // Update graph with new filtered elements
+        function updateGraph() {
+            const elements = getFilteredElements();
+            cy.elements().remove();
+            cy.add(elements);
+            
+            cy.layout({
+                name: 'cose-bilkent',
+                quality: 'proof',
+                nodeDimensionsIncludeLabels: true,
+                idealEdgeLength: 150,
+                edgeElasticity: 0.1,
+                nestingFactor: 0.2,
+                gravity: 0.25,
+                numIter: 1500,
+                animate: true,
+                animationDuration: 1000,
+                packComponents: true
+            }).run();
+            
+            updateStats();
+        }
+        
+        // Control functions
+        function expandAll() {
+            fullGraphData.nodes.forEach(node => {
+                if (node.classes && node.classes.includes('compound')) {
+                    expandedNodes.add(node.data.id);
+                }
+            });
+            updateGraph();
+        }
+        
+        function collapseAll() {
+            expandedNodes.clear();
+            updateGraph();
+        }
+        
+        // Update statistics display
+        function updateStats() {
+            const visibleCount = cy.nodes().length;
+            const totalCount = fullGraphData.nodes.length;
+            const hiddenCount = totalCount - visibleCount;
+            
+            document.getElementById('visible-count').textContent = visibleCount;
+            document.getElementById('total-count').textContent = totalCount;
+            document.getElementById('hidden-count').textContent = hiddenCount;
+        }
+        
+        // Complexity slider
+        const complexitySlider = document.getElementById('complexity-slider');
+        const complexityValue = document.getElementById('complexity-value');
+        const complexityProgress = document.getElementById('complexity-progress');
+        
+        complexitySlider.addEventListener('input', (e) => {
+            currentComplexityFilter = parseInt(e.target.value);
+            complexityValue.textContent = currentComplexityFilter;
+            complexityProgress.style.width = (currentComplexityFilter / 500 * 100) + '%';
+            updateGraph();
+        });
+        
+        // Type filter buttons
+        document.querySelectorAll('.filter-buttons button').forEach(button => {
+            button.addEventListener('click', (e) => {
+                document.querySelectorAll('.filter-buttons button').forEach(b => b.classList.remove('active'));
+                e.target.classList.add('active');
+                currentTypeFilter = e.target.dataset.type;
+                updateGraph();
+            });
+        });
+        
+        // Search functionality
+        const searchInput = document.getElementById('search');
+        searchInput.addEventListener('input', (e) => {
+            const query = e.target.value.toLowerCase().trim();
+            
+            if (query === '') {
+                filteredBySearch.clear();
+            } else {
+                filteredBySearch.clear();
+                fullGraphData.nodes.forEach(node => {
+                    const label = node.data.label.toLowerCase();
+                    const description = (node.data.description || '').toLowerCase();
+                    const path = (node.data.path || '').toLowerCase();
+                    
+                    if (label.includes(query) || description.includes(query) || path.includes(query)) {
+                        filteredBySearch.add(node.data.id);
+                        // Also include parent if this is a child node
+                        if (node.data.parent) {
+                            filteredBySearch.add(node.data.parent);
+                        }
+                    }
+                });
+            }
+            
+            updateGraph();
+            
+            if (query && filteredBySearch.size > 0) {
+                setTimeout(() => {
+                    const matchingNodes = cy.nodes().filter(node => filteredBySearch.has(node.id()));
+                    if (matchingNodes.length > 0) {
+                        cy.fit(matchingNodes, 100);
+                    }
+                }, 1200);
+            }
+        });
+        
+        // Keyboard shortcuts
+        document.addEventListener('keydown', function(e) {
+            switch(e.key) {
+                case '+':
+                case '=':
+                    cy.zoom(cy.zoom() * 1.2);
+                    cy.center();
+                    break;
+                case '-':
+                    cy.zoom(cy.zoom() * 0.8);
+                    cy.center();
+                    break;
+                case '0':
+                    cy.fit();
+                    break;
+                case 'r':
+                case 'R':
+                    if (!e.ctrlKey) {
+                        cy.layout({
+                            name: 'cose-bilkent',
+                            animate: true,
+                            animationDuration: 1500
+                        }).run();
+                    }
+                    break;
+                case 'Escape':
+                    clearHighlights();
+                    searchInput.value = '';
+                    filteredBySearch.clear();
+                    updateGraph();
+                    break;
+            }
+        });
+        
+        // Initialize with collapsed view
+        updateStats();
+        
+        // Auto-fit after initial layout
+        cy.ready(function() {
+            setTimeout(() => {
+                cy.fit();
+            }, 500);
+        });
+        
+        // Add tooltips for better UX
+        cy.on('mouseover', 'node', function(evt) {
+            const node = evt.target;
+            const data = node.data();
+            
+            if (!node.hasClass('compound')) {
+                node.style({
+                    'border-width': Math.min((data.dependencies || 1) * 1.2, 8),
+                    'border-color': '#64b5f6'
+                });
+            }
+        });
+        
+        cy.on('mouseout', 'node', function(evt) {
+            const node = evt.target;
+            const data = node.data();
+            
+            if (!node.selected() && !node.hasClass('highlighted')) {
+                node.style({
+                    'border-width': Math.min((data.dependencies || 1) * 0.8, 6),
+                    'border-color': '#444'
+                });
+            }
+        });
+    </script>
+</body>
+</html>

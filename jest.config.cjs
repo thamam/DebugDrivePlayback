@@ -23,6 +23,7 @@ module.exports = {
     }],
     '^.+\\.(js|jsx)$': ['ts-jest', {
       tsconfig: {
+        jsx: 'react-jsx',
         allowJs: true,
         esModuleInterop: true,
         allowSyntheticDefaultImports: true,

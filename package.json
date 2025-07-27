@@ -15,6 +15,7 @@
     "test:e2e": "playwright test",
     "test:coverage": "jest --coverage",
     "test": "npm run test:unit && npm run test:e2e",
+    "test:ci": "npm run test:unit && npx playwright test --project=chromium",
     "benchmark": "node scripts/benchmark-performance.js",
     "monitor": "./scripts/monitor-performance.sh"
   },

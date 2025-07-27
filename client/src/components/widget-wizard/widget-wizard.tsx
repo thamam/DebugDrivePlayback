@@ -30,7 +30,7 @@ const wizardTemplates: WidgetTemplate[] = widgetTemplates.map(template => ({
   name: template.name,
   description: template.inputs.map(i => i.description).join(', '),
   category: template.category,
-  icon: template.category === 'visualization' ? (template.type.includes('spatial') ? Map : Eye) : 
+  icon: template.category === 'visualization' ? (template.type?.includes('spatial') ? Map : Eye) : 
          template.category === 'analysis' ? BarChart3 : 
          template.category === 'export' ? Settings : Code,
   inputs: template.inputs.map(i => i.name),
