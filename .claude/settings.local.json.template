@@ -1,0 +1,21 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(chmod:*)",
+      "Bash(docker:*)",
+      "Bash(docker-compose:*)",
+      "Bash(python:*)",
+      "Bash(npm:*)",
+      "Bash(git:*)",
+      "Bash(./run.sh:*)",
+      "Bash(./run-tests-simple.sh:*)",
+      "Bash(./cleanup-test-artifacts.sh:*)",
+      "Bash(curl:*)"
+    ],
+    "deny": [
+      "Bash(sudo:*)",
+      "Bash(rm:/)",
+      "Bash(rm:/*)"
+    ]
+  }
+}

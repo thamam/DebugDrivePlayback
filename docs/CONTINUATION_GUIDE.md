@@ -40,8 +40,9 @@ All key files are committed and Claude will automatically find:
 ### Claude Code Setup
 1. Open Claude Code (claude.ai/code)
 2. Navigate to the repository directory
-3. Claude will automatically read `CLAUDE.md` and project context
-4. All project history and test improvements are documented
+3. (Optional) Copy `.claude/settings.local.json.template` to `.claude/settings.local.json` and customize permissions
+4. Claude will automatically read `CLAUDE.md` and project context
+5. All project history and test improvements are documented
 
 ## 📊 **Current Project Status (as of last session)**
 
@@ -150,7 +151,8 @@ npm run db:push
 - Claude settings are committed ✅
 
 ### Local Files (not committed)
-- `.claude/settings.local.json` - Your local Claude settings
+- `.claude/settings.local.json` - Your local Claude permissions (use template as starting point)
+- `.env` - Your local environment variables (copy from .env.example)
 - Test reports and coverage (regenerated on each test run)
 - Log files (cleaned up automatically)
 
