@@ -44,7 +44,7 @@ export const mockPlugins: Plugin[] = [
     description: 'Vehicle positioning data', 
     isActive: true, 
     version: '1.0.0',
-    pluginType: 'visualization',
+    type: 'visualization',
     configuration: '{}',
     createdAt: new Date()
   },
@@ -54,7 +54,7 @@ export const mockPlugins: Plugin[] = [
     description: 'Path visualization', 
     isActive: true, 
     version: '1.2.0',
-    pluginType: 'visualization',
+    type: 'visualization',
     configuration: '{}',
     createdAt: new Date()
   },
@@ -64,7 +64,7 @@ export const mockPlugins: Plugin[] = [
     description: 'Collision detection', 
     isActive: true, 
     version: '2.1.0',
-    pluginType: 'analysis',
+    type: 'analysis',
     configuration: '{}',
     createdAt: new Date()
   }
