@@ -220,7 +220,9 @@ class PlotManager:
                 self.performance_monitor.start_timing("data_update")
                 
                 # Check cache first
-                cache_key = f"data_{timestamp}_{hash(tuple(signals or []))}"
+                cache_key = self.cache.create_key(
+                    timestamp, signals=sorted(signals or [])
+                )
                 cached_data = self.cache.get(cache_key)
                 if cached_data:
                     duration = self.performance_monitor.end_timing("data_update")
