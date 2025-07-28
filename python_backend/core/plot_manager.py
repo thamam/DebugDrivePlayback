@@ -33,7 +33,7 @@ class PlotManager:
     Manages plugins, signals, and data flow orchestration.
     """
     
-    def __init__(self):
+    def __init__(self, cache_cleanup_interval: float = 60.0):
         self.logger = logging.getLogger(__name__)
         self.plugins: Dict[str, IPlugin] = {}
         self.signals: Dict[str, SignalInfo] = {}
@@ -46,6 +46,14 @@ class PlotManager:
         self.current_timestamp = 0.0
         self.config = PlotConfiguration()
         self._lock = threading.RLock()
+        self._stop_event = threading.Event()
+        self._cache_cleanup_interval = cache_cleanup_interval
+        # Start background thread to remove expired cache entries periodically
+        self._cache_cleaner_thread = threading.Thread(
+            target=self._cache_cleanup_loop,
+            daemon=True,
+        )
+        self._cache_cleaner_thread.start()
         
         # Event callbacks
         self.on_timestamp_change: Optional[Callable] = None
@@ -54,6 +62,17 @@ class PlotManager:
         self.on_signal_registered: Optional[Callable] = None
         
         self.logger.info("PlotManager initialized")
+
+    def _cache_cleanup_loop(self) -> None:
+        """Background loop cleaning expired cache entries."""
+        while not self._stop_event.is_set():
+            # Wait for the specified interval, exit early if shutting down
+            if self._stop_event.wait(timeout=self._cache_cleanup_interval):
+                break
+            try:
+                self.cache.cleanup_expired()
+            except Exception as e:
+                self.logger.error(f"Error cleaning cache: {e}")
     
     def register_plugin(self, plugin: IPlugin) -> bool:
         """
@@ -313,7 +332,12 @@ class PlotManager:
     def shutdown(self) -> None:
         """Shutdown the plot manager and clean up resources."""
         self.logger.info("Shutting down PlotManager")
-        
+
+        # Stop background cache cleanup thread
+        self._stop_event.set()
+        if self._cache_cleaner_thread.is_alive():
+            self._cache_cleaner_thread.join()
+
         # Unload all plugins
         plugin_names = list(self.plugins.keys())
         for plugin_name in plugin_names:
