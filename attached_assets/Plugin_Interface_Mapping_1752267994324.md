@@ -1,10 +1,10 @@
 # Plugin Interface Mapping Document
 ## Debug Player Framework - Implemented Plugins
 
-**Document Version:** 1.0  
-**Date:** December 2024  
-**Author:** System Analysis Team  
-**Status:** Final  
+**Document Version:** 1.0
+**Date:** December 2024
+**Author:** System Analysis Team
+**Status:** Final
 
 ---
 
@@ -85,11 +85,11 @@ class PluginBase(ABC):
     @abstractmethod
     def __init__(self, file_path: str) -> None:
         """Initialize plugin with file path"""
-        
+
     @abstractmethod
     def has_signal(self, signal: str) -> bool:
         """Check if plugin provides the signal"""
-        
+
     @abstractmethod
     def get_data_for_timestamp(self, signal: str, timestamp: float) -> Optional[Dict[str, Any]]:
         """Get data for specific signal and timestamp"""
@@ -150,7 +150,7 @@ class CarPosePlugin(PluginBase):
 # self.car_poses structure
 {
     "x": List[float],      # X coordinates from route['cp_x']
-    "y": List[float],      # Y coordinates from route['cp_y']  
+    "y": List[float],      # Y coordinates from route['cp_y']
     "theta": List[float]   # Heading angles from df_car_pose['cp_yaw_deg']
 }
 
@@ -203,8 +203,8 @@ List[float]  # All available timestamps in milliseconds
 #### 4.2.2 Interface Specification
 ```python
 class PathViewPlugin(PluginBase):
-    def __init__(self, file_path, path_type='path_trajectory.csv', 
-                 path_loader_type='polars', vehicle_config=None, 
+    def __init__(self, file_path, path_type='path_trajectory.csv',
+                 path_loader_type='polars', vehicle_config=None,
                  collision_margin_threshold=None):
         super().__init__(file_path)
         self.signals = {
@@ -793,7 +793,7 @@ timestamp,cp_x,cp_y,cp_yaw_deg
 # In PlotManager
 def register_plugin(self, plugin_name, plugin_instance):
     self.plugins[plugin_name] = plugin_instance
-    
+
     # Register each signal
     for signal, signal_info in plugin_instance.signals.items():
         self.signal_plugins[signal] = {
@@ -813,7 +813,7 @@ def validate_signal_definition(signal, signal_info, plugin_name):
     for field in required_fields:
         if field not in signal_info:
             raise SignalValidationError(f"Missing required field '{field}'")
-    
+
     valid_types = ["temporal", "spatial", "categorical", "boolean"]
     if signal_info["type"] not in valid_types:
         raise SignalValidationError(f"Invalid signal type: {signal_info['type']}")
@@ -828,7 +828,7 @@ def get_data_for_timestamp(self, signal, timestamp):
     if signal in self.signals:
         signal_info = self.signals[signal]
         func = signal_info["func"]
-        
+
         if signal_info.get("mode") == "dynamic":
             return func(timestamp)
         else:
@@ -844,11 +844,11 @@ def get_data_for_timestamp(self, signal, timestamp):
         if not self.has_signal(signal):
             print(f"Signal '{signal}' not found")
             return None
-            
+
         # Process data request
         result = self._process_signal_request(signal, timestamp)
         return result
-        
+
     except Exception as e:
         print(f"Error retrieving signal '{signal}': {e}")
         return None
@@ -864,19 +864,19 @@ class OptimizedPlugin(PluginBase):
         super().__init__(file_path)
         self._cache = {}
         self._cache_size_limit = 1000
-        
+
     def get_data_for_timestamp(self, signal, timestamp):
         cache_key = f"{signal}_{timestamp}"
-        
+
         if cache_key in self._cache:
             return self._cache[cache_key]
-            
+
         result = self._compute_data(signal, timestamp)
-        
+
         # Cache with size limit
         if len(self._cache) < self._cache_size_limit:
             self._cache[cache_key] = result
-            
+
         return result
 ```
 
@@ -887,11 +887,11 @@ class LazyPlugin(PluginBase):
     def __init__(self, file_path):
         super().__init__(file_path)
         self._data = None
-        
+
     def _ensure_data_loaded(self):
         if self._data is None:
             self._data = self._load_data()
-            
+
     def get_data_for_timestamp(self, signal, timestamp):
         self._ensure_data_loaded()
         return self._process_request(signal, timestamp)
@@ -1023,4 +1023,4 @@ print(f"Failed to load data from {file_path}: {error}")
 - **Approval**: Plugin Architecture Team and Development Lead
 - **Distribution**: All plugin developers and system integrators
 
-**Next Review Date:** January 2024 
+**Next Review Date:** January 2024
