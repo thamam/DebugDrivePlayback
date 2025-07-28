@@ -158,17 +158,28 @@ export class PythonBackendIntegration {
         };
       }
 
-      // Parse header to get column indices
-      const header = lines[0].split(',');
-      const timestampIdx = header.findIndex(h => h.includes('time'));
-      const xIdx = header.findIndex(h => h.includes('x') && h.includes('meter'));
-      const yIdx = header.findIndex(h => h.includes('y') && h.includes('meter'));
-      const yawIdx = header.findIndex(h => h.includes('yaw'));
+      // Parse header to get column indices - case insensitive
+      const header = lines[0].split(',').map(h => h.trim());
+      const normalized = header.map(h => h.toLowerCase());
+
+      const timestampIdx = normalized.findIndex(h => h.includes('time'));
+      const xIdx = normalized.findIndex(h =>
+        h.includes('x') && (h.includes('meter') || h.endsWith('_m'))
+      );
+      const yIdx = normalized.findIndex(h =>
+        h.includes('y') && (h.includes('meter') || h.endsWith('_m'))
+      );
+      const yawIdx = normalized.findIndex(h => h.includes('yaw'));
 
       if (timestampIdx === -1 || xIdx === -1 || yIdx === -1 || yawIdx === -1) {
+        const missing: string[] = [];
+        if (timestampIdx === -1) missing.push('time');
+        if (xIdx === -1) missing.push('x(_m)');
+        if (yIdx === -1) missing.push('y(_m)');
+        if (yawIdx === -1) missing.push('yaw');
         return {
           success: false,
-          error: `Required columns not found in car_pose.csv. Found columns: ${header.join(', ')}`
+          error: `Missing required columns: ${missing.join(', ')}. Found columns: ${header.join(', ')}`
         };
       }
 
