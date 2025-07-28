@@ -2,6 +2,9 @@ import { spawn } from "child_process";
 import { promises as fs } from "fs";
 import path from "path";
 
+/** Python backend base URL */
+export const PY_BACKEND = process.env.PYTHON_BACKEND_URL || "http://localhost:8000";
+
 /**
  * Python backend integration module
  * Handles communication with the Python backend for data processing
@@ -83,7 +86,7 @@ export class PythonBackendIntegration {
 
   async checkHealth(): Promise<boolean> {
     try {
-      const response = await fetch('http://localhost:8000/health');
+      const response = await fetch(`${PY_BACKEND}/health`);
       return response.ok;
     } catch (error) {
       return false;
@@ -102,7 +105,7 @@ export class PythonBackendIntegration {
     }
     
     try {
-      const response = await fetch('http://localhost:8000/load-data', {
+      const response = await fetch(`${PY_BACKEND}/load-data`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
