@@ -77,9 +77,11 @@ export default function DataLoader({ onLoadComplete }: DataLoaderProps) {
     setUploadProgress(0);
     setLoadingStatus("Loading trip data...");
 
+    let progressInterval: NodeJS.Timeout | null = null;
+
     try {
       // Simulate progress for better UX
-      const progressInterval = setInterval(() => {
+      progressInterval = setInterval(() => {
         setUploadProgress(prev => {
           if (prev >= 90) {
             clearInterval(progressInterval);
@@ -131,7 +133,6 @@ export default function DataLoader({ onLoadComplete }: DataLoaderProps) {
       });
       const session = await sessionResponse.json();
 
-      clearInterval(progressInterval);
       setLoadingStatus("Complete!");
 
       toast({
@@ -156,6 +157,9 @@ export default function DataLoader({ onLoadComplete }: DataLoaderProps) {
         variant: "destructive"
       });
     } finally {
+      if (progressInterval) {
+        clearInterval(progressInterval);
+      }
       setIsLoading(false);
       setUploadProgress(0);
       setLoadingStatus("");
@@ -176,13 +180,15 @@ export default function DataLoader({ onLoadComplete }: DataLoaderProps) {
     setUploadProgress(0);
     setLoadingStatus("Uploading file...");
 
+    let progressInterval: NodeJS.Timeout | null = null;
+
     try {
       const formData = new FormData();
       formData.append('file', selectedFile);
       formData.append('plugin_type', pluginType);
 
       // Simulate progress for better UX
-      const progressInterval = setInterval(() => {
+      progressInterval = setInterval(() => {
         setUploadProgress(prev => {
           if (prev >= 90) {
             clearInterval(progressInterval);
@@ -225,8 +231,6 @@ export default function DataLoader({ onLoadComplete }: DataLoaderProps) {
         body: JSON.stringify(sessionData),
       });
       const session = await sessionResponse.json();
-
-      clearInterval(progressInterval);
       setLoadingStatus("Complete!");
 
       toast({
@@ -249,6 +253,9 @@ export default function DataLoader({ onLoadComplete }: DataLoaderProps) {
         variant: "destructive"
       });
     } finally {
+      if (progressInterval) {
+        clearInterval(progressInterval);
+      }
       setIsLoading(false);
       setUploadProgress(0);
       setLoadingStatus("");
