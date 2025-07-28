@@ -223,6 +223,22 @@ export class PythonBackendIntegration {
     }
     this.isRunning = false;
   }
+
+  attach(server: import('http').Server): void {
+    const cleanup = async () => {
+      try {
+        await this.shutdown();
+      } catch (err) {
+        console.error('Error shutting down Python backend:', err);
+      }
+    };
+
+    server.on('close', cleanup);
+    process.on('SIGINT', async () => {
+      await cleanup();
+      process.exit();
+    });
+  }
 }
 
 // Export singleton instance
