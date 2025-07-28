@@ -52,6 +52,8 @@ The application includes authentic vehicle data from a Kia Niro EV:
 - Python 3.8+
 - PostgreSQL 13+
 
+The Node server uses the `PY_BACKEND_URL` environment variable to locate the Python backend. If not set, it defaults to `http://localhost:8000`.
+
 ### Local Development
 ```bash
 # Start Python backend

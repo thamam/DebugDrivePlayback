@@ -3,6 +3,7 @@ import { createServer, type Server } from "http";
 // import { storage } from "./storage"; // Temporarily disabled to avoid database connection
 // import { insertUserSchema, insertDataSessionSchema, insertVehicleDataSchema, insertBookmarkSchema, insertPluginSchema } from "@shared/schema";
 import { pythonBackend } from "./python-integration";
+import { PY_BACKEND_URL } from "./config";
 import path from "path";
 
 export async function registerRoutes(app: Express): Promise<Server> {
@@ -193,7 +194,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const sessionId = req.params.sessionId;
       
       // Get data from Python backend for all time points
-      const response = await fetch("http://localhost:8000/data-range", {
+      const response = await fetch(`${PY_BACKEND_URL}/data-range`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -226,7 +227,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         });
       }
       
-      const response = await fetch("http://localhost:8000/plugins");
+      const response = await fetch(`${PY_BACKEND_URL}/plugins`);
       if (!response.ok) {
         return res.status(response.status).json({ 
           message: `Python backend error: ${response.statusText}` 
@@ -250,7 +251,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         });
       }
       
-      const response = await fetch("http://localhost:8000/signals");
+      const response = await fetch(`${PY_BACKEND_URL}/signals`);
       if (!response.ok) {
         return res.status(response.status).json({ 
           message: `Python backend error: ${response.statusText}` 
@@ -274,7 +275,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         });
       }
       
-      const response = await fetch("http://localhost:8000/upload-data", {
+      const response = await fetch(`${PY_BACKEND_URL}/upload-data`, {
         method: "POST",
         body: req.body,
       });
@@ -295,7 +296,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     try {
       const { timestamp, signals } = req.body;
       
-      const response = await fetch("http://localhost:8000/data", {
+      const response = await fetch(`${PY_BACKEND_URL}/data`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -322,7 +323,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     try {
       const { start_time, end_time, signals } = req.body;
       
-      const response = await fetch("http://localhost:8000/data-range", {
+      const response = await fetch(`${PY_BACKEND_URL}/data-range`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -349,7 +350,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Add improved Python backend health endpoint with better error handling  
   app.get("/api/python/health-status", async (req, res) => {
     try {
-      const response = await fetch("http://127.0.0.1:8000/health", {
+      const response = await fetch(`${PY_BACKEND_URL}/health`, {
         method: 'GET',
         headers: { 'Content-Type': 'application/json' },
         signal: AbortSignal.timeout(5000),
