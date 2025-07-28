@@ -1,4 +1,4 @@
-import { spawn } from "child_process";
+import { spawn, ChildProcess } from "child_process";
 import { promises as fs } from "fs";
 import path from "path";
 
@@ -43,26 +43,28 @@ export interface SignalData {
 }
 
 export class PythonBackendIntegration {
-  private pythonProcess: any = null;
+  private pythonProcess: ChildProcess | null = null;
   private isRunning = false;
   
   async startPythonBackend(): Promise<boolean> {
     try {
       // Try to start the Python backend process
-      this.pythonProcess = spawn('python', [
+      const pythonProcess = spawn('python', [
         path.join(__dirname, '..', 'python_backend', 'run_server.py')
       ], {
         stdio: ['pipe', 'pipe', 'pipe'],
         cwd: path.join(__dirname, '..', 'python_backend')
       });
 
+      this.pythonProcess = pythonProcess;
+
       // Handle process events
-      this.pythonProcess.on('error', (error: Error) => {
+      pythonProcess.on('error', (error: Error) => {
         console.error('Python backend error:', error);
         this.isRunning = false;
       });
 
-      this.pythonProcess.on('exit', (code: number) => {
+      pythonProcess.on('exit', (code: number) => {
         console.log('Python backend exited with code:', code);
         this.isRunning = false;
       });
