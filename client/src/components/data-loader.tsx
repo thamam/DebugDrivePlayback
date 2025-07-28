@@ -150,9 +150,23 @@ export default function DataLoader({ onLoadComplete }: DataLoaderProps) {
 
     } catch (error: any) {
       console.error('Load error:', error);
+      
+      // Check if it's a network/backend connection error
+      let errorTitle = "Load failed";
+      let errorDescription = error.message || "An error occurred while loading the data";
+      
+      if (error.message?.includes('fetch') || error.message?.includes('network') || 
+          error.name === 'TypeError' || error.message?.includes('Failed to fetch')) {
+        errorTitle = "Backend server not reachable";
+        errorDescription = "Could not connect to the Python backend server. Please ensure the backend is running by starting it with './run.sh' or manually with 'cd python_backend && python main.py'";
+      } else if (error.message?.includes('Python backend')) {
+        errorTitle = "Python backend error";
+        errorDescription = `Backend server error: ${error.message}. The backend may not be running or may have encountered an issue.`;
+      }
+      
       toast({
-        title: "Load failed",
-        description: error.message || "An error occurred while loading the data",
+        title: errorTitle,
+        description: errorDescription,
         variant: "destructive"
       });
     } finally {
@@ -243,9 +257,23 @@ export default function DataLoader({ onLoadComplete }: DataLoaderProps) {
 
     } catch (error: any) {
       console.error('Upload error:', error);
+      
+      // Check if it's a network/backend connection error
+      let errorTitle = "Upload failed";
+      let errorDescription = error.message || "An error occurred while uploading the file";
+      
+      if (error.message?.includes('fetch') || error.message?.includes('network') || 
+          error.name === 'TypeError' || error.message?.includes('Failed to fetch')) {
+        errorTitle = "Backend server not reachable";
+        errorDescription = "Could not connect to the Python backend server. Please ensure the backend is running by starting it with './run.sh' or manually with 'cd python_backend && python main.py'";
+      } else if (error.message?.includes('Python backend')) {
+        errorTitle = "Python backend error";
+        errorDescription = `Backend server error: ${error.message}. The backend may not be running or may have encountered an issue.`;
+      }
+      
       toast({
-        title: "Upload failed",
-        description: error.message || "An error occurred while uploading the file",
+        title: errorTitle,
+        description: errorDescription,
         variant: "destructive"
       });
     } finally {
@@ -306,15 +334,62 @@ export default function DataLoader({ onLoadComplete }: DataLoaderProps) {
           {loadingMode === "path" && (
             <div className="space-y-2">
               <Label htmlFor="trip-path">Trip Data Path</Label>
-              <Input
-                id="trip-path"
-                value={tripPath}
-                onChange={(e) => setTripPath(e.target.value)}
-                placeholder="data/trips/2025-07-15T12_06_02"
-                disabled={isLoading}
-              />
+              <div className="flex space-x-2">
+                <Input
+                  id="trip-path"
+                  value={tripPath}
+                  onChange={(e) => setTripPath(e.target.value)}
+                  placeholder="data/trips/2025-07-15T12_06_02"
+                  disabled={isLoading}
+                  className="flex-1"
+                />
+                <Button
+                  type="button"
+                  variant="outline"
+                  onClick={() => {
+                    const input = document.createElement('input');
+                    input.type = 'file';
+                    input.webkitdirectory = true;
+                    input.addEventListener('change', (e) => {
+                      const files = (e.target as HTMLInputElement).files;
+                      if (files && files.length > 0) {
+                        // Get the directory path from the first file
+                        const fullPath = files[0].webkitRelativePath;
+                        const pathParts = fullPath.split('/');
+                        if (pathParts.length > 0) {
+                          // Remove the filename to get directory path
+                          pathParts.pop();
+                          const directoryPath = pathParts.join('/');
+                          
+                          // Show the selected directory and prompt for full path
+                          toast({
+                            title: "Directory selected",
+                            description: `Selected folder: "${directoryPath}". Please ensure the path field contains the full absolute path to this directory.`,
+                          });
+                          
+                          // If path doesn't start with /, suggest the likely full path
+                          if (!tripPath.startsWith('/')) {
+                            const suggestedPath = `/home/thh3/data/trips/${directoryPath}`;
+                            setTripPath(suggestedPath);
+                            toast({
+                              title: "Path updated",
+                              description: `Updated to suggested path: ${suggestedPath}. Verify this is correct before loading.`,
+                            });
+                          }
+                        }
+                      }
+                    });
+                    input.click();
+                  }}
+                  disabled={isLoading}
+                  className="flex items-center gap-2"
+                >
+                  <FolderOpen className="h-4 w-4" />
+                  Browse
+                </Button>
+              </div>
               <p className="text-xs text-muted-foreground">
-                Enter the full path to your local trip data directory (e.g., /home/thh3/data/trips/2025-07-15T12_06_02)
+                Enter the full path to your local trip data directory or click Browse to select a folder
               </p>
             </div>
           )}
