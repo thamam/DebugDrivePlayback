@@ -88,40 +88,40 @@ class TripDataPlugin(BasePlugin):
     
     def _combine_dataframes(self, dataframes: Dict[str, pd.DataFrame]) -> pd.DataFrame:
         """Combine multiple CSV files into a single DataFrame."""
-        combined_rows = []
-        
+        combined_frames = []
+
         for signal_name, df in dataframes.items():
             # Handle different CSV formats
-            if 'time_stamp' in df.columns and 'data_value' in df.columns:
-                # Standard format: time_stamp, data_value
-                for _, row in df.iterrows():
-                    if pd.notna(row['data_value']):
-                        combined_rows.append({
-                            'timestamp': row['time_stamp'],
-                            'signal': signal_name,
-                            'value': row['data_value']
-                        })
+            if {'time_stamp', 'data_value'}.issubset(df.columns):
+                # Standard format: vectorized filtering
+                df_clean = (
+                    df[['time_stamp', 'data_value']]
+                    .dropna(subset=['data_value'])
+                    .rename(columns={'time_stamp': 'timestamp', 'data_value': 'value'})
+                )
+                df_clean['signal'] = signal_name
+                combined_frames.append(df_clean)
             elif 'time_stamp' in df.columns and len(df.columns) > 2:
-                # Multi-column format (like GPS with lat, lon, etc.)
-                for _, row in df.iterrows():
-                    for col in df.columns:
-                        if col != 'time_stamp' and pd.notna(row[col]):
-                            signal_full_name = f"{signal_name}_{col}" if len(df.columns) > 2 else signal_name
-                            combined_rows.append({
-                                'timestamp': row['time_stamp'],
-                                'signal': signal_full_name,
-                                'value': row[col]
-                            })
+                # Multi-column format using melt
+                df_melt = (
+                    df.melt(id_vars='time_stamp', var_name='subsignal', value_name='value')
+                    .dropna(subset=['value'])
+                )
+                df_melt['signal'] = signal_name + '_' + df_melt['subsignal']
+                df_melt = df_melt[['time_stamp', 'signal', 'value']]
+                df_melt = df_melt.rename(columns={'time_stamp': 'timestamp'})
+                combined_frames.append(df_melt)
             else:
                 self.logger.warning(f"Unknown format for {signal_name}, skipping")
                 continue
-        
-        if not combined_rows:
-            return pd.DataFrame()
-        
-        combined_df = pd.DataFrame(combined_rows)
+
+        if not combined_frames:
+            return pd.DataFrame(columns=['timestamp', 'signal', 'value'])
+
+        combined_df = pd.concat(combined_frames, ignore_index=True)
         combined_df = combined_df.sort_values('timestamp')
-        
+        combined_df = combined_df[['timestamp', 'signal', 'value']]
+
         return combined_df
     
     def _initialize_signals(self) -> None:
