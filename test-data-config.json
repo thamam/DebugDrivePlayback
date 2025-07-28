@@ -1,0 +1,8 @@
+{
+  "testDataPaths": {
+    "primary": "/home/thh3/data/trips/2025-07-15T12_06_02",
+    "secondary": "/home/thh3/data/trips/2025-07-24T11_07_30",
+    "fallback": "./data/trips/2025-07-15T12_06_02"
+  },
+  "description": "Test data configuration for integration tests. Primary and secondary paths require local data, fallback uses repo data."
+}

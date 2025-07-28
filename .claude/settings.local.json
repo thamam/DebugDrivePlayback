@@ -43,7 +43,19 @@
       "Bash(do if [ \"$file\" != \"basic-functionality.spec.ts\" ])",
       "Bash(then mv \"$file\" \"$file.disabled\")",
       "Bash(fi)",
-      "Bash(done)"
+      "Bash(done)",
+      "Bash(gh pr list:*)",
+      "Bash(GH_HOST=github.com gh pr list --repo thamam/DebugDrivePlayback --state open)",
+      "Bash(GH_HOST=github.com gh pr view 20 --repo thamam/DebugDrivePlayback --comments)",
+      "Bash(GH_HOST=github.com gh pr diff 20 --repo thamam/DebugDrivePlayback)",
+      "Bash(GH_HOST=github.com gh pr reviews 20 --repo thamam/DebugDrivePlayback)",
+      "Bash(GH_HOST=github.com gh api repos/thamam/DebugDrivePlayback/pulls/20/reviews)",
+      "Bash(GH_HOST=github.com gh api repos/thamam/DebugDrivePlayback/pulls/20/comments)",
+      "Bash(GH_HOST=github.com gh *)",
+      "Bash(GH_HOST=github.com gh pr diff 19 --repo thamam/DebugDrivePlayback)",
+      "Bash(GH_HOST=github.com gh api repos/thamam/DebugDrivePlayback/pulls/19/comments)",
+      "Bash(GH_HOST=github.com gh pr view 18 --repo thamam/DebugDrivePlayback --comments)",
+      "Bash(GH_HOST=github.com gh pr diff 18 --repo thamam/DebugDrivePlayback)"
     ],
     "deny": [
       "Bash(sudo:*)",

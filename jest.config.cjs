@@ -1,6 +1,5 @@
 /** @type {import('jest').Config} */
 module.exports = {
-  preset: 'ts-jest',
   testEnvironment: 'jsdom',
   roots: ['<rootDir>/client/src', '<rootDir>/tests/unit'],
   testMatch: [
@@ -63,6 +62,6 @@ module.exports = {
     url: 'http://localhost:5000'
   },
   transformIgnorePatterns: [
-    "node_modules/(?!(.*\\.mjs$))"
+    "node_modules/(?!(wouter|regexparam|.*\\.mjs$))"
   ],
 };
