@@ -27,6 +27,17 @@ jobs:
     - name: Install Playwright browsers
       run: npx playwright install chromium
 
+    - name: Setup Python
+      uses: actions/setup-python@v5
+      with:
+        python-version: '3.11'
+
+    - name: Install Python dependencies
+      run: pip install -r python_backend/requirements.txt
+
+    - name: Run Python tests
+      run: pytest --junitxml=test-results/python-tests.xml
+
     - name: Run all tests
       run: npm run test:ci
 
