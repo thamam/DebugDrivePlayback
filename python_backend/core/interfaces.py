@@ -153,6 +153,12 @@ class IPlugin(ABC):
         """Check if plugin is loaded."""
         pass
 
+    @property
+    @abstractmethod
+    def data_points(self) -> int:
+        """Number of data rows loaded."""
+        pass
+
 
 class IDataProcessor(ABC):
     """Interface for data processing components."""

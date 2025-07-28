@@ -168,7 +168,7 @@ async def load_data(request: DataLoadRequest):
                 "units": info.units,
                 "description": info.description
             } for name, info in signals.items()},
-            "data_points": len(plugin._data) if hasattr(plugin, '_data') and plugin._data is not None else 0
+            "data_points": plugin.data_points
         }
         
     except Exception as e:

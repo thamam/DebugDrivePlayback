@@ -48,6 +48,11 @@ class BasePlugin(IPlugin):
     def is_loaded(self) -> bool:
         """Check if plugin is loaded."""
         return self._is_loaded
+
+    @property
+    def data_points(self) -> int:
+        """Number of data points loaded."""
+        return len(self._data) if self._data is not None else 0
     
     def load(self) -> bool:
         """Load and initialize the plugin."""
