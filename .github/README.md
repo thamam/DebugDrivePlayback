@@ -97,3 +97,4 @@ All workflows generate detailed reports and artifacts:
 - Security scan results
 
 Results are available in the Actions tab and as downloadable artifacts.
+

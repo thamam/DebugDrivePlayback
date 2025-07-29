@@ -1,10 +1,10 @@
 # Software Requirements Document (SRD)
 ## Debug Player Framework
 
-**Document Version:** 1.0  
-**Date:** December 2024  
-**Author:** System Analysis Team  
-**Status:** Final  
+**Document Version:** 1.0
+**Date:** December 2024
+**Author:** System Analysis Team
+**Status:** Final
 
 ---
 
@@ -74,15 +74,15 @@ graph TB
     B --> C[Plugin System]
     B --> D[GUI Framework]
     B --> E[Data Manager]
-    
+
     C --> F[CarPosePlugin]
     C --> G[PathViewPlugin]
     C --> H[Custom Plugins...]
-    
+
     D --> I[MainWindow]
     D --> J[Plot Widgets]
     D --> K[Control Widgets]
-    
+
     E --> L[Data Loader]
     E --> M[Signal Validator]
     E --> N[Cache Manager]
@@ -110,19 +110,19 @@ graph TB
 # Plugin Interface Specification
 class PluginBase(ABC):
     """Base class for all Debug Player plugins"""
-    
+
     @abstractmethod
     def __init__(self, file_path: str):
         """Initialize plugin with data source path"""
-        
+
     @abstractmethod
     def has_signal(self, signal: str) -> bool:
         """Check if plugin provides specified signal"""
-        
+
     @abstractmethod
     def get_data_for_timestamp(self, signal: str, timestamp: float) -> Dict:
         """Retrieve signal data for specific timestamp"""
-        
+
     @property
     @abstractmethod
     def signals(self) -> Dict[str, Dict]:
@@ -348,7 +348,7 @@ class PluginConfiguration:
     enabled_plugins: List[str]
     plugin_settings: Dict[str, Dict[str, Any]]
     loading_order: List[str]
-    
+
 @dataclass
 class SessionConfiguration:
     current_timestamp: float
@@ -372,57 +372,57 @@ from typing import Dict, Any, Optional, List
 
 class PluginBase(ABC):
     """Abstract base class for all Debug Player plugins"""
-    
+
     def __init__(self, file_path: str):
         """
         Initialize plugin with data source
-        
+
         Args:
             file_path: Path to data source file or directory
         """
         self.file_path = file_path
         self.signals: Dict[str, Dict[str, Any]] = {}
-        
+
     @abstractmethod
     def has_signal(self, signal: str) -> bool:
         """
         Check if plugin provides the specified signal
-        
+
         Args:
             signal: Signal name to check
-            
+
         Returns:
             True if signal is available, False otherwise
         """
         pass
-        
+
     @abstractmethod
     def get_data_for_timestamp(self, signal: str, timestamp: float) -> Optional[Dict[str, Any]]:
         """
         Retrieve signal data for specific timestamp
-        
+
         Args:
             signal: Signal name to retrieve
             timestamp: Timestamp in milliseconds since epoch
-            
+
         Returns:
             Signal data dictionary or None if unavailable
         """
         pass
-        
+
     def validate_signal_definition(self, signal: str) -> bool:
         """
         Validate signal definition against standards
-        
+
         Args:
             signal: Signal name to validate
-            
+
         Returns:
             True if valid, False otherwise
         """
         if signal not in self.signals:
             return False
-            
+
         signal_def = self.signals[signal]
         required_fields = ["func", "type"]
         return all(field in signal_def for field in required_fields)
@@ -453,23 +453,23 @@ signal_definition = {
 ```python
 class PlotWidgetInterface(ABC):
     """Interface for all plot visualization widgets"""
-    
+
     @abstractmethod
     def register_signal(self, signal: str, signal_info: Dict[str, Any]) -> bool:
         """Register a signal for visualization"""
-        
+
     @abstractmethod
     def update_data(self, signal: str, data: Dict[str, Any], timestamp: float) -> None:
         """Update visualization with new data"""
-        
+
     @abstractmethod
     def clear_data(self, signal: str) -> None:
         """Clear visualization data for signal"""
-        
+
     @abstractmethod
     def set_time_range(self, start: float, end: float) -> None:
         """Set visible time range for temporal plots"""
-        
+
     @abstractmethod
     def get_supported_signal_types(self) -> List[str]:
         """Return list of supported signal types"""
@@ -481,19 +481,19 @@ class PlotWidgetInterface(ABC):
 ```python
 class NavigationInterface(ABC):
     """Interface for timestamp navigation components"""
-    
+
     @abstractmethod
     def set_timestamp_range(self, start: float, end: float) -> None:
         """Set the available timestamp range"""
-        
+
     @abstractmethod
     def set_current_timestamp(self, timestamp: float) -> None:
         """Set current navigation position"""
-        
+
     @abstractmethod
     def get_current_timestamp(self) -> float:
         """Get current navigation position"""
-        
+
     # Signal emitted when timestamp changes
     timestamp_changed = Signal(float)
 ```
@@ -506,19 +506,19 @@ class NavigationInterface(ABC):
 ```python
 class DataLoaderInterface(ABC):
     """Interface for format-specific data loaders"""
-    
+
     @abstractmethod
     def can_load(self, file_path: str) -> bool:
         """Check if loader can handle the file format"""
-        
+
     @abstractmethod
     def load_data(self, file_path: str) -> Dict[str, Any]:
         """Load data from file and return structured format"""
-        
+
     @abstractmethod
     def get_metadata(self, file_path: str) -> Dict[str, Any]:
         """Extract metadata without loading full dataset"""
-        
+
     @abstractmethod
     def validate_format(self, file_path: str) -> Tuple[bool, List[str]]:
         """Validate file format and return errors if any"""
@@ -556,19 +556,19 @@ class DataLoaderInterface(ABC):
 ```python
 def data_validation_pipeline(raw_data: Any) -> ValidatedData:
     """Multi-stage data validation pipeline"""
-    
+
     # Stage 1: Format validation
     format_validated = validate_data_format(raw_data)
-    
-    # Stage 2: Type validation  
+
+    # Stage 2: Type validation
     type_validated = validate_data_types(format_validated)
-    
+
     # Stage 3: Range validation
     range_validated = validate_data_ranges(type_validated)
-    
+
     # Stage 4: Consistency validation
     consistency_validated = validate_data_consistency(range_validated)
-    
+
     return consistency_validated
 ```
 
@@ -578,15 +578,15 @@ def data_validation_pipeline(raw_data: Any) -> ValidatedData:
 ```python
 class DataTransform(ABC):
     """Base class for data transformations"""
-    
+
     @abstractmethod
     def transform(self, data: Any) -> Any:
         """Apply transformation to data"""
-        
+
     @abstractmethod
     def inverse_transform(self, data: Any) -> Any:
         """Reverse transformation if possible"""
-        
+
     @abstractmethod
     def can_inverse(self) -> bool:
         """Check if transformation is reversible"""
@@ -594,10 +594,10 @@ class DataTransform(ABC):
 # Example transformations
 class CoordinateTransform(DataTransform):
     """Transform between coordinate systems"""
-    
+
 class UnitConversion(DataTransform):
     """Convert between unit systems"""
-    
+
 class DataResampling(DataTransform):
     """Resample temporal data to different frequencies"""
 ```
@@ -610,30 +610,30 @@ class DataResampling(DataTransform):
 ```python
 class CacheManager:
     """Multi-level cache management system"""
-    
+
     def __init__(self):
         self.l1_cache = {}  # In-memory cache (fast, small)
         self.l2_cache = {}  # Compressed memory cache (medium, larger)
         self.l3_cache = {}  # Disk cache (slow, persistent)
-        
+
     def get_data(self, key: str) -> Optional[Any]:
         """Retrieve data from cache hierarchy"""
         # Check L1 (fastest)
         if key in self.l1_cache:
             return self.l1_cache[key]
-            
+
         # Check L2 (medium)
         if key in self.l2_cache:
             data = decompress(self.l2_cache[key])
             self.l1_cache[key] = data  # Promote to L1
             return data
-            
+
         # Check L3 (slowest)
         if key in self.l3_cache:
             data = load_from_disk(self.l3_cache[key])
             self.l1_cache[key] = data  # Promote to L1
             return data
-            
+
         return None
 ```
 
@@ -656,20 +656,20 @@ class CacheManager:
 ```python
 class PluginSecurityValidator:
     """Security validation for plugin code"""
-    
+
     FORBIDDEN_IMPORTS = [
         'os.system', 'subprocess', 'eval', 'exec',
         'socket', 'urllib', 'requests'
     ]
-    
+
     ALLOWED_FILE_EXTENSIONS = ['.csv', '.json', '.h5', '.parquet']
-    
+
     def validate_plugin_code(self, plugin_path: str) -> Tuple[bool, List[str]]:
         """Validate plugin code for security issues"""
-        
+
     def validate_file_access(self, file_path: str) -> bool:
         """Validate file access permissions"""
-        
+
     def create_sandbox_environment(self) -> Dict[str, Any]:
         """Create restricted execution environment"""
 ```
@@ -731,19 +731,19 @@ class PluginSecurityValidator:
 # Performance Benchmarks
 class PerformanceTargets:
     """Performance targets for data operations"""
-    
+
     DATA_LOADING_RATES = {
         "csv": 50_000_000,    # bytes/second
-        "hdf5": 100_000_000,  # bytes/second  
+        "hdf5": 100_000_000,  # bytes/second
         "parquet": 80_000_000 # bytes/second
     }
-    
+
     VISUALIZATION_RATES = {
         "temporal_points": 100_000,  # points/second
         "spatial_points": 50_000,    # points/second
         "real_time_updates": 60      # fps
     }
-    
+
     MEMORY_EFFICIENCY = {
         "data_overhead": 0.20,       # 20% overhead max
         "cache_hit_rate": 0.85,      # 85% cache hits
@@ -766,16 +766,16 @@ class PerformanceTargets:
 ```python
 class MemoryOptimizer:
     """Memory optimization strategies"""
-    
+
     def optimize_dataframe_dtypes(self, df: pd.DataFrame) -> pd.DataFrame:
         """Optimize pandas DataFrame memory usage"""
-        
+
     def implement_lazy_loading(self, data_source: str) -> LazyDataLoader:
         """Implement lazy loading for large datasets"""
-        
+
     def compress_cache_data(self, data: Any) -> CompressedData:
         """Compress cached data to reduce memory footprint"""
-        
+
     def monitor_memory_usage(self) -> MemoryStats:
         """Monitor and report memory usage statistics"""
 ```
@@ -811,16 +811,16 @@ class MemoryOptimizer:
 ```python
 class ErrorRecoveryManager:
     """Centralized error recovery and handling"""
-    
+
     def handle_plugin_failure(self, plugin_name: str, error: Exception) -> RecoveryAction:
         """Handle plugin loading or execution failures"""
-        
+
     def handle_data_corruption(self, data_source: str, error: Exception) -> RecoveryAction:
         """Handle data corruption or format errors"""
-        
+
     def handle_memory_exhaustion(self, operation: str) -> RecoveryAction:
         """Handle out-of-memory conditions"""
-        
+
     def handle_ui_freezing(self, component: str) -> RecoveryAction:
         """Handle UI responsiveness issues"""
 
@@ -893,16 +893,16 @@ class RecoveryAction(Enum):
 ```python
 class HardwareOptimizer:
     """Hardware-aware performance optimization"""
-    
+
     def detect_hardware_capabilities(self) -> HardwareProfile:
         """Detect and profile available hardware"""
-        
+
     def optimize_for_hardware(self, hardware: HardwareProfile) -> OptimizationSettings:
         """Configure system for optimal hardware utilization"""
-        
+
     def monitor_resource_usage(self) -> ResourceMetrics:
         """Monitor real-time resource utilization"""
-        
+
     def adjust_performance_settings(self, metrics: ResourceMetrics) -> None:
         """Dynamically adjust settings based on resource usage"""
 ```
@@ -966,19 +966,19 @@ export QT_QPA_PLATFORM=xcb
 ```python
 class ConfigurationManager:
     """Hierarchical configuration management"""
-    
+
     def __init__(self):
         self.system_config = {}    # System-wide defaults
         self.user_config = {}      # User-specific settings
         self.session_config = {}   # Session-specific settings
-        
+
     def get_setting(self, key: str, default: Any = None) -> Any:
         """Get setting with hierarchy precedence"""
         # Session > User > System > Default
-        
+
     def set_setting(self, key: str, value: Any, scope: str = "user") -> None:
         """Set setting at specified scope"""
-        
+
     def validate_configuration(self) -> List[ValidationError]:
         """Validate entire configuration for consistency"""
 ```
@@ -1004,7 +1004,7 @@ graph TB
         A --> C[Navigation Controls]
         A --> D[Menu System]
     end
-    
+
     subgraph "Core Services"
         B --> E[Plugin Registry]
         B --> F[Data Manager]
@@ -1012,20 +1012,20 @@ graph TB
         F --> H[Cache Manager]
         F --> I[Data Loader]
     end
-    
+
     subgraph "Plugin Layer"
         E --> J[CarPosePlugin]
         E --> K[PathViewPlugin]
         E --> L[CollisionPlugin]
         E --> M[Custom Plugins]
     end
-    
+
     subgraph "Visualization Layer"
         B --> N[Temporal Widgets]
         B --> O[Spatial Widgets]
         B --> P[Custom Widgets]
     end
-    
+
     subgraph "Data Layer"
         I --> Q[CSV Loader]
         I --> R[HDF5 Loader]
@@ -1042,7 +1042,7 @@ sequenceDiagram
     participant PM as PlotManager
     participant P as Plugin
     participant PW as PlotWidget
-    
+
     U->>MW: Change timestamp
     MW->>PM: request_data(timestamp)
     PM->>P: get_data_for_timestamp(signal, timestamp)
@@ -1093,7 +1093,7 @@ class PluginBase:
     def has_signal(self, signal: str) -> bool
     def get_data_for_timestamp(self, signal: str, timestamp: float) -> Optional[Dict]
     def validate_signal_definition(self, signal: str) -> bool
-    
+
     @property
     def signals(self) -> Dict[str, Dict[str, Any]]
 ```
@@ -1126,4 +1126,4 @@ class PluginBase:
 - **Approval**: Technical Architecture Board
 - **Distribution**: Development and QA teams
 
-**Next Review Date:** January 2024 
+**Next Review Date:** January 2024
