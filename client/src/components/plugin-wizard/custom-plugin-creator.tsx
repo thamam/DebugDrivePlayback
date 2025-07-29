@@ -272,55 +272,7 @@ export default function CustomPluginCreator({ onPluginCreate }: CustomPluginCrea
                   )}
                 />
 
-                <FormField
-                  control={form.control}
-                  name="processingMode"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Processing Mode</FormLabel>
-                      <Select onValueChange={field.onChange} defaultValue={field.value}>
-                        <FormControl>
-                          <SelectTrigger>
-                            <SelectValue placeholder="Select processing mode" />
-                          </SelectTrigger>
-                        </FormControl>
-                        <SelectContent>
-                          <SelectItem value="real_time">Real Time</SelectItem>
-                          <SelectItem value="batch">Batch Processing</SelectItem>
-                          <SelectItem value="streaming">Streaming</SelectItem>
-                        </SelectContent>
-                      </Select>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
               </div>
-
-              <FormField
-                control={form.control}
-                name="visualizationType"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Visualization Type (Optional)</FormLabel>
-                    <Select onValueChange={field.onChange} defaultValue={field.value}>
-                      <FormControl>
-                        <SelectTrigger>
-                          <SelectValue placeholder="Select visualization type" />
-                        </SelectTrigger>
-                      </FormControl>
-                      <SelectContent>
-                        <SelectItem value="line_chart">Line Chart</SelectItem>
-                        <SelectItem value="scatter_plot">Scatter Plot</SelectItem>
-                        <SelectItem value="spatial_2d">Spatial 2D</SelectItem>
-                        <SelectItem value="spatial_3d">Spatial 3D</SelectItem>
-                        <SelectItem value="gauge">Gauge</SelectItem>
-                        <SelectItem value="table">Table</SelectItem>
-                      </SelectContent>
-                    </Select>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
 
               <div className="flex justify-end gap-3 pt-4">
                 <Button

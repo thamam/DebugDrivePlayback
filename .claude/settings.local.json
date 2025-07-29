@@ -55,7 +55,13 @@
       "Bash(GH_HOST=github.com gh pr diff 19 --repo thamam/DebugDrivePlayback)",
       "Bash(GH_HOST=github.com gh api repos/thamam/DebugDrivePlayback/pulls/19/comments)",
       "Bash(GH_HOST=github.com gh pr view 18 --repo thamam/DebugDrivePlayback --comments)",
-      "Bash(GH_HOST=github.com gh pr diff 18 --repo thamam/DebugDrivePlayback)"
+      "Bash(GH_HOST=github.com gh pr diff 18 --repo thamam/DebugDrivePlayback)",
+      "Bash(./run-all-tests-comprehensive.sh)",
+      "Bash(rm:*)",
+      "Bash(npm run check:*)",
+      "Bash(npm run test:unit:*)",
+      "mcp__playwright__browser_navigate",
+      "Bash(npx playwright test:*)"
     ],
     "deny": [
       "Bash(sudo:*)",
