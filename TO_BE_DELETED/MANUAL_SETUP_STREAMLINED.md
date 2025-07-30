@@ -1,4 +1,7 @@
 # Streamlined Manual Setup - Debug Player Framework
+
+**Last Certified: 2025-07-30**
+
 ## Essential Dependencies Only
 
 ### Node.js Version Management (Required)

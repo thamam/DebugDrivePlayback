@@ -1,5 +1,7 @@
 # Debug Player Framework - Quick Start
 
+**Last Certified: 2025-07-30**
+
 ## Absolute Simplest (1 Command)
 
 ```bash

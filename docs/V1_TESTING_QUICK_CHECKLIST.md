@@ -1,4 +1,7 @@
 # v1.0 Quick Testing Checklist
+
+**Last Certified: 2025-07-30**
+
 ## Essential Tests for Release Readiness
 
 ### **Setup Verification** (2 minutes)

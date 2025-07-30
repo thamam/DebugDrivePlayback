@@ -1,5 +1,7 @@
 # Debug Player Framework - Architecture Overview
 
+**Last Certified: 2025-07-30**
+
 ## System Architecture
 
 The Debug Player Framework is a high-performance, real-time vehicle debugging tool designed for analyzing autonomous vehicle telemetry data. The system is built with zero-tolerance for delays and maximum responsiveness.

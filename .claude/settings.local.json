@@ -61,7 +61,15 @@
       "Bash(npm run check:*)",
       "Bash(npm run test:unit:*)",
       "mcp__playwright__browser_navigate",
-      "Bash(npx playwright test:*)"
+      "Bash(npx playwright test:*)",
+      "mcp__github-server__create_pull_request",
+      "Bash(ls:*)",
+      "Bash(mkdir:*)",
+      "Bash(find:*)",
+      "Bash(npx playwright:*)",
+      "Bash(npm run test:e2e:*)",
+      "Bash(node:*)",
+      "Bash(npm run build:*)"
     ],
     "deny": [
       "Bash(sudo:*)",

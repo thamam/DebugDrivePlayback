@@ -1,5 +1,7 @@
 # Debug Player Framework - Local Setup Guide
 
+**Last Certified: 2025-07-30**
+
 ## Overview
 
 This guide provides step-by-step instructions for setting up the Debug Player Framework locally on your machine. The application includes a React frontend, Express.js backend, Python FastAPI backend, and PostgreSQL database.

@@ -1,5 +1,7 @@
 # Data Integrity Summary
 
+**Last Certified: 2025-07-30**
+
 ## Real Trip Data Integration Complete
 
 ### What Was Implemented

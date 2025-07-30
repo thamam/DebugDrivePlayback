@@ -1,5 +1,7 @@
 # Trip Data Setup Guide
 
+**Last Certified: 2025-07-30**
+
 ## Working with Your Local Trip Data
 
 The system is designed to process your actual trip data from `/home/thh3/data/trips/2025-07-15T12_06_02/`. Here are the options to make your local data accessible:
