@@ -72,7 +72,7 @@ The codebase contains multiple test types that may not all be included in the ma
 
 6. **Performance Tests**
    - `test-performance.cjs` - Tests response times and load handling
-   - Run: `node --input-type=commonjs test-performance.cjs`
+   - Run: `node test-performance.cjs`
 
 7. **Basic Flow Tests**
    - `test_basic_flows.py` - Tests basic application workflows

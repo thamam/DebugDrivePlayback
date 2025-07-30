@@ -145,7 +145,7 @@ Every commit and pull request automatically runs **ALL** tests including:
 - ✅ Code Quality Checks
 - ✅ Build Validation
 
-**📊 [View CI/CD Setup Guide](docs/CICD_SETUP_GUIDE.md)**
+**📊 [View Testing Guide](docs/TEST_RUNNER_GUIDE.md)**
 
 ## 🌐 Accessing the Application
 
