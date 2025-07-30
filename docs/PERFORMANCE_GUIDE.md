@@ -1,5 +1,7 @@
 # Performance Guide
 
+**Last Certified: 2025-07-30**
+
 ## Zero-Delay Performance Requirements
 
 The Debug Player Framework has **zero-tolerance for delays**. Every interaction must feel instantaneous. This guide details the performance requirements, optimizations, and monitoring strategies.

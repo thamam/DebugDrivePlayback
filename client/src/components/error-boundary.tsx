@@ -2,7 +2,7 @@
  * Comprehensive Error Boundary Component
  */
 
-import React, { Component, ErrorInfo, ReactNode } from 'react';
+import React, { Component, ErrorInfo, ReactNode, useCallback } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Alert, AlertDescription } from '@/components/ui/alert';
@@ -69,7 +69,7 @@ export class ErrorBoundary extends Component<Props, State> {
     const { resetKeys, resetOnPropsChange } = this.props;
     const { hasError } = this.state;
 
-    if (hasError && !prevProps.hasError) {
+    if (hasError && prevProps.children === this.props.children) {
       return;
     }
 
@@ -248,7 +248,7 @@ export class ErrorBoundary extends Component<Props, State> {
 
 // Hook version for functional components
 export const useErrorHandler = () => {
-  const handleError = React.useCallback((error: Error, errorInfo?: ErrorInfo) => {
+  const handleError = useCallback((error: Error, errorInfo?: ErrorInfo) => {
     console.error('Error caught by error handler:', error, errorInfo);
     
     // Could integrate with error reporting service here

@@ -1,5 +1,7 @@
 # Testing Strategy for Debug Drive Playback
 
+**Last Certified: 2025-07-30**
+
 ## Overview
 
 This document outlines the comprehensive testing strategy for the Debug Drive Playback application, focusing on component isolation, integration testing, and user workflow validation.

@@ -1,4 +1,7 @@
 # v1.0 Release Testing Story
+
+**Last Certified: 2025-07-30**
+
 ## Debug Player Framework - Final Acceptance Criteria
 
 ### Testing Environment Setup

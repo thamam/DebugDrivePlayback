@@ -1,5 +1,7 @@
 # CLAUDE.md
 
+**Last Certified: 2025-07-30**
+
 This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
 
 ## Overview
@@ -37,19 +39,63 @@ npm run db:push
 ```
 
 ### Testing
+
+#### Comprehensive Test Runner (RECOMMENDED - Runs ALL Tests)
 ```bash
-# Run all tests (recommended)
-./run-tests-simple.sh
+# Run ALL tests in the codebase, including standalone test files
+./run-all-tests-comprehensive.sh
+```
 
-# Individual test types
-npm run test:unit
-npm run test:e2e
-npm run test:coverage
+#### Test Types and Locations
+The codebase contains multiple test types that may not all be included in the main test suite:
 
+1. **Unit Tests (Jest)** - `npm run test:unit`
+   - Widget tests: `client/src/components/widget-wizard/__tests__/*.test.{ts,tsx}`
+   - UI component tests: `tests/unit/*.test.tsx`
+   - Coverage: `npm run test:coverage`
+
+2. **E2E Tests (Playwright)** - `npm run test:e2e`
+   - UI functionality: `tests/e2e/*.spec.ts`
+   - Widget interactions: `tests/e2e/widget-*.spec.ts`
+
+3. **Python Backend Tests**
+   - `python_backend/test_backend.py` - Tests data loading from CSV files
+   - Run: `cd python_backend && python test_backend.py`
+
+4. **Frontend Integration Tests**
+   - `test-frontend-integration.js` - Tests complete UI flow including data loading
+   - Run: `node --input-type=commonjs test-frontend-integration.js`
+
+5. **Full Integration Tests**
+   - `test-integration-flow.py` - Tests API endpoints and data flow
+   - Run: `python test-integration-flow.py`
+
+6. **Performance Tests**
+   - `test-performance.cjs` - Tests response times and load handling
+   - Run: `node test-performance.cjs`
+
+7. **Basic Flow Tests**
+   - `test_basic_flows.py` - Tests basic application workflows
+   - Run: `python test_basic_flows.py`
+
+#### Individual Test Commands
+```bash
 # Run specific test file
 npx jest path/to/test.ts
 npx playwright test path/to/test.spec.ts
+
+# Run tests with specific reporter
+npm run test:unit -- --silent
+npm run test:e2e -- --reporter=dot
+
+# Debug failing tests
+npx jest --no-coverage --verbose path/to/test.ts
+npx playwright test --debug path/to/test.spec.ts
 ```
+
+#### Known Issues
+- Some Jest tests fail due to JSX configuration issues (widget-wizard.test.tsx, widget-manager.test.tsx)
+- Integration tests require both Express (port 5000) and Python backend (port 8000) to be running
 
 ### Python Backend
 ```bash

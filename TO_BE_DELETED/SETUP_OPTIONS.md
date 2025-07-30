@@ -1,5 +1,7 @@
 # Setup Options - Debug Player Framework
 
+**Last Certified: 2025-07-30**
+
 Choose the setup method that best fits your needs:
 
 ## Option 1: Docker Setup (Recommended for Clean Environment)

@@ -1,4 +1,7 @@
 # Simple Docker Setup - Debug Player Framework
+
+**Last Certified: 2025-07-30**
+
 ## Quick Start with Standard Python
 
 If the main Docker setup fails, use this simplified version:

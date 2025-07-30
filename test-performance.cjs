@@ -12,6 +12,7 @@ class PerformanceTestSuite {
     this.testTripPath = '/home/thh3/data/trips/2025-07-15T12_06_02';
     this.browser = null;
     this.page = null;
+    this.requestStartTimes = new Map();
     this.metrics = {};
   }
 
@@ -62,10 +63,21 @@ class PerformanceTestSuite {
 
     // Monitor network requests
     this.page.on('response', async (response) => {
-      if (response.url().includes('/api/python/data/timestamp')) {
-        const timing = response.timing();
-        this.metrics.apiResponseTime = timing.responseEnd - timing.requestStart;
-        console.log(`📊 Signal API: ${this.metrics.apiResponseTime}ms`);
+      const request = response.request();
+      if (request.url().includes('/api/python/data/timestamp')) {
+        const startTime = this.requestStartTimes.get(request);
+        if (startTime) {
+          this.metrics.apiResponseTime = Date.now() - startTime;
+          console.log(`📊 Signal API: ${this.metrics.apiResponseTime}ms`);
+          this.requestStartTimes.delete(request); // Clean up to prevent memory leaks
+        }
+      }
+    });
+
+    // Track request start times
+    this.page.on('request', (request) => {
+      if (request.url().includes('/api/python/data/timestamp')) {
+        this.requestStartTimes.set(request, Date.now());
       }
     });
 

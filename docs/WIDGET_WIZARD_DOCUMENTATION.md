@@ -1,5 +1,7 @@
 # Widget Wizard Infrastructure Documentation
 
+**Last Certified: 2025-07-30**
+
 ## Overview
 
 The Widget Wizard Infrastructure is the core extensibility mechanism for the Debug Player Framework. It provides a complete system for creating, managing, and deploying custom data visualization and analysis widgets without modifying the core system.

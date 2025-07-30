@@ -1,4 +1,6 @@
 # Continuation Guide for DebugDrivePlayback
+
+**Last Certified: 2025-07-30**
 *How to continue development from another computer*
 
 ## 📋 **Quick Setup Checklist**
