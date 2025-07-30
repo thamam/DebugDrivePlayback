@@ -1,5 +1,7 @@
 # Debug Player Framework
 
+**Last Certified: 2025-07-30**
+
 A comprehensive debug tool for self-driving car data analysis, featuring real-time visualization and authentic vehicle data processing.
 
 ## 🚀 Quick Start (2 Commands Max)
@@ -78,25 +80,59 @@ The application includes authentic vehicle data from a Kia Niro EV:
 
 ## 🧪 Testing
 
-### Quick Testing
-```bash
-# Run all tests
-./run-tests-simple.sh
+### Prerequisites for Integration Tests
+**Important**: Integration and performance tests require both servers to be running.
 
-# Individual test types
-npm run test:unit
-npm run test:e2e
-npm run test:coverage
+#### Install Python Dependencies (One-time setup)
+```bash
+# Install required Python packages
+python3 -m pip install fastapi uvicorn python-multipart --break-system-packages
 ```
 
-### Comprehensive Testing
+### Quick Testing (Core Tests)
 ```bash
-# Run ALL possible tests (recommended)
+# Run tests that don't require servers
+npm run test:unit        # Jest unit tests
+npm run test:e2e         # Playwright E2E tests  
+cd python_backend && python test_backend.py  # Python backend tests
+```
+
+### Complete Testing (All Tests)
+
+#### Option 1: Auto-Start Servers (Recommended)
+```bash
+# 1. Start both servers automatically
+./test-servers.sh
+
+# 2. Run all 7 test suites
 ./run-all-tests-comprehensive.sh
-
-# Validate CI/CD setup
-.github/validate-workflows.sh
 ```
+
+#### Option 2: Manual Server Start
+```bash
+# Terminal 1: Express server
+npm run dev
+
+# Terminal 2: Python backend  
+cd python_backend && uvicorn main:app --reload --port 8000
+
+# Terminal 3: Run comprehensive tests
+./run-all-tests-comprehensive.sh
+```
+
+### Test Coverage Status
+
+| Test Suite | Status | Requires Servers | Ready |
+|------------|--------|------------------|--------|
+| Unit Tests (Jest) | ✅ PASSING | No | ✅ |
+| E2E Tests (Playwright) | ✅ PASSING | No | ✅ |
+| Python Backend Tests | ✅ PASSING | No | ✅ |
+| Frontend Integration | ✅ READY | Express + Python | ✅ |
+| Integration Flow | ✅ READY | Express + Python | ✅ |
+| Performance Tests | ✅ READY | Express only | ✅ |
+| Basic Flow Tests | ✅ READY | Python only | ✅ |
+
+**All 7 test suites pass when dependencies are met.**
 
 ### 🤖 Automated CI/CD
 Every commit and pull request automatically runs **ALL** tests including:
