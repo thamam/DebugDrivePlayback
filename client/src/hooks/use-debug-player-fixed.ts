@@ -84,7 +84,7 @@ export function useDebugPlayer() {
               ...mockDataSession,
               name: 'Kia Niro EV - Real Trip Data',
               duration: duration,
-              signalCount: trajectoryData.total_points || realDataPoints.length
+              signalCount: trajectoryData.total_points || sampleDataPoints.length
             });
           } else {
             console.error('Failed to load trajectory data:', trajectoryData.error);
@@ -148,7 +148,9 @@ export function useDebugPlayer() {
           // Limit cache size to prevent memory issues (keep last 1000 entries)
           if (signalCacheRef.current.size > 1000) {
             const firstKey = signalCacheRef.current.keys().next().value;
-            signalCacheRef.current.delete(firstKey);
+            if (firstKey !== undefined) {
+              signalCacheRef.current.delete(firstKey);
+            }
           }
           
           console.log(`🔥 FETCHED: Signals at ${currentTime.toFixed(2)}s:`, signalData);

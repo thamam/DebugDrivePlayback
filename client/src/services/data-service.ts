@@ -4,6 +4,7 @@
  */
 
 import { queryClient } from '@/lib/queryClient';
+import { useQuery } from '@tanstack/react-query';
 
 export interface DataSource {
   type: 'real' | 'demo' | 'file';
@@ -135,7 +136,7 @@ class DataService {
     }
 
     // Fallback to demo data
-    return this.generateDemoSession(pathOrId);
+    return await this.generateDemoSession(pathOrId);
   }
 
   /**
@@ -375,14 +376,14 @@ class DataService {
   }
 
   // Demo data generators (simplified versions of mock data)
-  private generateDemoSession(pathOrId: string): SessionData {
+  private async generateDemoSession(pathOrId: string): Promise<SessionData> {
     return {
       id: `demo-session-${Date.now()}`,
       name: 'Demo Trip Data',
       duration: 179.2,
       startTime: Date.now() - 179200,
       endTime: Date.now(),
-      signals: this.getAvailableSignals('demo').slice(0, 10),
+      signals: (await this.getAvailableSignals('demo')).slice(0, 10),
       dataPoints: 1792,
       source: {
         type: 'demo',
@@ -453,7 +454,7 @@ export const dataService = new DataService();
 
 // Export for React Query hooks
 export const useDataSource = () => {
-  return queryClient.useQuery({
+  return useQuery({
     queryKey: ['dataSource'],
     queryFn: () => dataService.getDataSource(),
     refetchInterval: 5000 // Check connection status every 5 seconds
