@@ -15,7 +15,7 @@ try {
   }
 } catch (err) {
   // Fallback for environments where import.meta might not work properly
-  console.warn("Using process.cwd() fallback for __dirname:", err.message);
+  console.warn("Using process.cwd() fallback for __dirname:", err instanceof Error ? err.message : String(err));
   __dirname = process.cwd();
 }
 
