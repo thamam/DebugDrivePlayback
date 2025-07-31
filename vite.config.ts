@@ -1,36 +1,43 @@
 import { defineConfig } from "vite";
 import react from "@vitejs/plugin-react";
 import path from "path";
-import { fileURLToPath } from "url";
 import runtimeErrorOverlay from "@replit/vite-plugin-runtime-error-modal";
 
-const __dirname = path.dirname(fileURLToPath(import.meta.url));
+// Use process.cwd() as base directory - most reliable across all environments
+const rootDir = process.cwd();
 
-export default defineConfig({
-  plugins: [
+export default defineConfig(async () => {
+  // Load plugins conditionally
+  const plugins = [
     react(),
     runtimeErrorOverlay(),
-    ...(process.env.NODE_ENV !== "production" &&
-    process.env.REPL_ID !== undefined
-      ? [
-          await import("@replit/vite-plugin-cartographer").then((m) =>
-            m.cartographer(),
-          ),
-        ]
-      : []),
-  ],
+  ];
+
+  // Only add cartographer plugin in Replit environment
+  if (process.env.NODE_ENV !== "production" && process.env.REPL_ID !== undefined) {
+    try {
+      const cartographerModule = await import("@replit/vite-plugin-cartographer");
+      plugins.push(cartographerModule.cartographer());
+    } catch (err) {
+      // Ignore if cartographer is not available
+      console.warn("Replit cartographer plugin not available:", err);
+    }
+  }
+
+  return {
+    plugins,
   resolve: {
     alias: {
-      "@": path.resolve(__dirname, "client", "src"),
-      "@shared": path.resolve(__dirname, "shared"),
-      "@assets": path.resolve(__dirname, "attached_assets"),
-      "react": path.resolve(__dirname, "node_modules", "react"),
-      "react-dom": path.resolve(__dirname, "node_modules", "react-dom"),
+      "@": path.resolve(rootDir, "client", "src"),
+      "@shared": path.resolve(rootDir, "shared"),
+      "@assets": path.resolve(rootDir, "attached_assets"),
+      "react": path.resolve(rootDir, "node_modules", "react"),
+      "react-dom": path.resolve(rootDir, "node_modules", "react-dom"),
     },
   },
-  root: path.resolve(__dirname, "client"),
+  root: path.resolve(rootDir, "client"),
   build: {
-    outDir: path.resolve(__dirname, "dist/public"),
+    outDir: path.resolve(rootDir, "dist/public"),
     emptyOutDir: true,
   },
   server: {
@@ -39,4 +46,5 @@ export default defineConfig({
       deny: ["**/.*"],
     },
   },
+  };
 });
