@@ -13,6 +13,7 @@
     "build-storybook": "storybook build",
     "test:unit": "jest",
     "test:e2e": "playwright test",
+    "dev:ci": "NODE_ENV=development tsx server/index.ts",
     "test:coverage": "jest --coverage",
     "test": "npm run test:unit && npm run test:e2e",
     "test:ci": "npm run test:unit && npx playwright test --project=chromium",

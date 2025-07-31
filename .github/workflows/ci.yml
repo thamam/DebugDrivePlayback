@@ -51,8 +51,16 @@ jobs:
       - name: Install Playwright
         run: npx playwright install --with-deps chromium
       
+      - name: Start server
+        run: |
+          npm run dev &
+          sleep 10
+          curl -I http://localhost:5000 || echo "Server not responding"
+      
       - name: E2E tests
         run: npx playwright test --project=chromium
+        env:
+          CI: true
       
       - name: Upload test results
         if: failure()
