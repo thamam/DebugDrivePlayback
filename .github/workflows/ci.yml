@@ -53,9 +53,24 @@ jobs:
       
       - name: Start server
         run: |
-          npm run dev &
-          sleep 10
-          curl -I http://localhost:5000 || echo "Server not responding"
+          echo "Starting development server..."
+          npm run dev > server.log 2>&1 &
+          SERVER_PID=$!
+          echo "Server PID: $SERVER_PID"
+          
+          # Wait for server to be ready
+          for i in {1..30}; do
+            if curl -s http://localhost:5000 > /dev/null; then
+              echo "Server is ready!"
+              break
+            fi
+            echo "Waiting for server... ($i/30)"
+            sleep 2
+          done
+          
+          # Check if server is responding
+          echo "Testing server response:"
+          curl -I http://localhost:5000 || (echo "Server not responding!" && cat server.log && exit 1)
       
       - name: E2E tests
         run: npx playwright test --project=chromium
@@ -70,3 +85,4 @@ jobs:
           path: |
             test-results/
             playwright-report/
+            server.log
