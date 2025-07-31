@@ -71,9 +71,13 @@ jobs:
           # Check if server is responding
           echo "Testing server response:"
           curl -I http://localhost:5000 || (echo "Server not responding!" && cat server.log && exit 1)
+          
+          # Debug: Check what content is being served
+          echo "Checking served content:"
+          curl -s http://localhost:5000 | head -50
       
       - name: E2E tests
-        run: npx playwright test --project=chromium
+        run: npx playwright test --project=chromium --trace on
         env:
           CI: true
       
@@ -86,3 +90,4 @@ jobs:
             test-results/
             playwright-report/
             server.log
+            trace/
